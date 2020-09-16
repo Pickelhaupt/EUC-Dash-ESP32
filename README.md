@@ -4,7 +4,7 @@ Bluetooth Dashboard for electric unicycles (EUCs) for ESP32, Arduino sketch
 ## Introduction
 This is the first draft version of a dashboard for electric unicycles. It currently only supports KingSong 67V wheels and ttgo t-watch 2020. The interface is still very unpolished but usable.
 
-I got of help from reading the code from the cedbossneo/palachzzz /WheelLogAndroid project, it spared me from having to reverse engineer the protocol.
+I got a lot of help from reading the code from the cedbossneo/palachzzz /WheelLogAndroid project, it spared me from having to reverse engineer the protocol.
 
 
 ## Features
