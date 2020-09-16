@@ -33,6 +33,13 @@ Reads BLE notifications from the electric unicycle and display data on the ESP32
 - Odometer
 - 3:rd alarm speed setting
 - Tiltback speed setting
+### Supported Models
+Only supports Kingsong wheels at the moment. Might work with Gotway as well since the protocols are very similar.
+## Screenshot
+<div>
+  <img src="https://github.com/Pickelhaupt/EUC-Dash-ESP32/raw/master/20200916_0105.jpg" width="50%" align="center"/>
+</div>
+
 ## Dependencies
 ### Required libraries:
 - ESP32-BLE-Arduino
@@ -41,4 +48,4 @@ Reads BLE notifications from the electric unicycle and display data on the ESP32
 ## Building the project
 It is easiest to build it using the Arduino IDE. If you are building for the T-Watch, make both the ESP and t-watch libraries are added
 ## Connecting to the wheel
-It should connect automatically when it finds a compatible wheel. However there is currently no function implemented to make it possible to choose what wheel it will connect to of there are more than one compatible wheel in range, it will simply connect to the first one it finds. 
+It should connect automatically when it finds a compatible wheel. However there is currently no function implemented to make it possible to choose what wheel it will connect to of there are more than one compatible wheel in range, it will simply connect to the first one it finds. Make sure the wheel is on before switching on the ESP device.
