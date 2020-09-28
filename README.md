@@ -73,7 +73,7 @@ All dashboard functions explained:
 Set of screens in v1.0:
 
 <img src="https://github.com/Pickelhaupt/EUC-Dash-ESP32/raw/master/Images/Tileview-screens-small.png" width="70%" align="left"/>
-
+<br>
 ## Building the project
 It is easiest to build it using the Arduino IDE. If you are building for the T-Watch, make sure both the ESP and t-watch libraries are added. The lvgl condiguration file needs to be edited to enable some of the font sizes used in this version of the interface.
 ## Connecting to the wheel
