@@ -58,6 +58,8 @@ static lv_obj_t *timeLabel = nullptr;
 static lv_style_t time_style;
 static lv_style_t timeLabel_style;
 static lv_style_t timeLabel_bg_style;
+static lv_obj_t *dateLabel = nullptr;
+static lv_style_t dateLabel_style;
 
 // Text labels
 
@@ -342,6 +344,29 @@ void lv_temp_update(void) {
   lv_obj_align(temp_label, NULL, LV_ALIGN_CENTER, 64, 0);
 }
 
+void setbrightness() {
+  TTGOClass *ttgo = TTGOClass::getWatch();
+  time_t now;
+  struct tm  info;
+  char buf[64];
+  time(&now);
+  localtime_r(&now, &info);
+  strftime(buf, sizeof(buf), "%H", &info);
+  if (connected) {
+    if (info.tm_hour > 19 || info.tm_hour < 6) {
+      ttgo->setBrightness(64);
+    } else {
+      ttgo->setBrightness(240);
+    }
+  } else {
+    if (info.tm_hour > 19 || info.tm_hour < 6) {
+      ttgo->setBrightness(16);
+    } else {
+      ttgo->setBrightness(96);
+    }
+  }
+}
+
 void updateTime()
 {
   time_t now;
@@ -351,8 +376,10 @@ void updateTime()
   localtime_r(&now, &info);
   strftime(buf, sizeof(buf), "%H:%M", &info);
   lv_label_set_text(timeLabel, buf);
-  //lv_obj_align(timeLabel, NULL, LV_ALIGN_IN_TOP_MID, 0, 20);
-  lv_obj_align(timeLabel, NULL, LV_ALIGN_CENTER, 0, 0);
+  lv_obj_align(timeLabel, NULL, LV_ALIGN_CENTER, 0, -20);
+  strftime(buf, sizeof(buf), "%a %h %d %Y", &info);
+  lv_label_set_text (dateLabel, buf);
+  lv_obj_align(dateLabel, NULL, LV_ALIGN_CENTER, 0, 47);
   TTGOClass *ttgo = TTGOClass::getWatch();
   ttgo->rtc->syncToRtc();
 }
@@ -362,9 +389,11 @@ static void lv_dash_task(lv_task_t * dash_task) {
   lv_batt_update();
   lv_current_update();
   lv_temp_update();
+  setbrightness();
 }
 static void lv_time_task(lv_task_t * time_task) {
   updateTime();
+  setbrightness();
 }
 
 void setup_timeGui(void) {
@@ -383,7 +412,14 @@ void setup_timeGui(void) {
   timeLabel = lv_label_create(lv_scr_act(), NULL);
   lv_obj_add_style(timeLabel, LV_OBJ_PART_MAIN, &timeLabel_style);
   lv_label_set_align(timeLabel, LV_LABEL_ALIGN_CENTER);
-  lv_obj_align(timeLabel, temp_arc, LV_ALIGN_CENTER, 0, 0);
+  lv_obj_align(timeLabel, temp_arc, LV_ALIGN_CENTER, 0, -20);
+  lv_style_init(&dateLabel_style);
+  lv_style_set_text_font(&dateLabel_style, LV_STATE_DEFAULT, &DIN1451_m_cond_36);
+  lv_style_set_text_color(&dateLabel_style, LV_STATE_DEFAULT, watch_colour);
+  dateLabel = lv_label_create(lv_scr_act(), NULL);
+  lv_obj_add_style(dateLabel, LV_OBJ_PART_MAIN, &dateLabel_style);
+  lv_label_set_align(dateLabel, LV_LABEL_ALIGN_CENTER);
+  lv_obj_align(dateLabel, temp_arc, LV_ALIGN_CENTER, 0, 47);
   time_task = lv_task_create(lv_time_task, 1000, LV_TASK_PRIO_LOWEST, NULL);
 }
 
@@ -398,12 +434,12 @@ void setup_LVGui(void) {
   dash_task = lv_task_create(lv_dash_task, 250, LV_TASK_PRIO_MID, NULL);
 }
 
-void stop_time_task(){
+void stop_time_task() {
   if (time_task != nullptr) {
     lv_task_del(time_task);
   }
 }
-void stop_dash_task(){
+void stop_dash_task() {
   if (dash_task != nullptr) {
     lv_task_del(dash_task);
   }
