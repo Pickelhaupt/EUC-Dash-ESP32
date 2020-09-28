@@ -38,9 +38,10 @@ Reads BLE notifications from the electric unicycle and display data on the ESP32
 ### Supported Models
 Only supports Kingsong wheels at the moment. Might work with Gotway as well since the protocols are very similar.
 ## Screenshot
-Just a first test to make sure the data displays properly. The interface will change to something more readable.
+First version of the new design, colours are a bit off in the images and there are still some more things to add.
 <div>
-  <img src="https://github.com/Pickelhaupt/EUC-Dash-ESP32/raw/master/20200916_0105.jpg" width="50%" align="center"/>
+  <img src="https://github.com/Pickelhaupt/EUC-Dash-ESP32/raw/master/Images/ridemode-small2.jpg" width="30%" align="left"/>
+  <img src="https://github.com/Pickelhaupt/EUC-Dash-ESP32/raw/master/Images/watchmode-small.jpg" width="30%" align="center"/>
 </div>
 
 ## Dependencies
