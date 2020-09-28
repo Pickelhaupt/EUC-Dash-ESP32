@@ -64,10 +64,10 @@ boolean watch_running = false;
 static BLERemoteCharacteristic* pRemoteCharacteristic;
 static BLEAdvertisedDevice* myDevice;
 float wheeldata[16];
-String wheelmodel = "unknown";
 int ride_mode = 0;
 int scandelay = 0;
 boolean bleConn;
+byte KS_BLEreq[20];
 
 
 /************************************************
@@ -147,6 +147,9 @@ static void notifyCallback(
   if (length == 20) {
     if (pData[0] == 0xAA && pData[1] == 0x55) {
       decodeKS(pData); // For Kingsong only atm.
+      //Invoke the lvgl task handler from within the notifycallback handler
+      //(updates the text labels everytime there is a valid notification from the characteristic FFE1)
+      lv_task_handler(); //Since this function will loop, it's necessary to manage lv tasks
     }
   }
 }
@@ -239,9 +242,7 @@ static void decodeKS (byte KSdata[]) {
   Serial.print(wheeldata[14]); Serial.println(" alarm3");
   Serial.print(wheeldata[15]); Serial.println(" maxspeed");
 
-  //Invoke the lvgl task handler from within the notifycallback handler
-  //(updates the text labels everytime there is a valid notification from the characteristic FFE1)
-  lv_task_handler(); //Since this function will loop, it's necessary to manage lv tasks
+  
 } // End decodeKS
 
 static int decode2byte(byte byte1, byte byte2) { //converts big endian 2 byte value to int
@@ -330,13 +331,41 @@ class MyAdvertisedDeviceCallbacks: public BLEAdvertisedDeviceCallbacks {
     } // onResult
 }; // MyAdvertisedDeviceCallbacks
 
+void ks_ble_request(byte reqtype) {
+  /****************************************
+   * reqtype is the byte representing the request id
+   * 0x9B -- Serial Number
+   * 0x63 -- Manufacturer and model
+   * 0x98 -- speed alarm settings and tiltback (Max) speed
+   * Responses to the request is handled by the notification handler
+   * and will be added to the wheeldata[] array
+   */
+  byte KS_BLEreq[20] = {0x00}; //set array to zero
+  KS_BLEreq[0] = 0xAA;  //Header byte 1
+  KS_BLEreq[1] = 0x55;  //Header byte 2
+  KS_BLEreq[16] = reqtype;  // This is the byte that specifies what data is requested
+  KS_BLEreq[17] = 0x14; //Last 3 bytes also needed
+  KS_BLEreq[18] = 0x5A;
+  KS_BLEreq[19] = 0x5A;
+  pRemoteCharacteristic->writeValue(KS_BLEreq, 20);
+}
+
 void initks() {
-  /*
-      Request Kingsong Model Name, serial number and speed settings
-      Todo: put the write in a separate function and call it with the
-      specific byte(s) to be written.
+ /*
+  *   Request Kingsong Model Name, serial number and speed settings
+  *   This must be done before any BLE notifications will be pused by the KS wheel
   */
   Serial.println("requesting model..");
+  ks_ble_request(0x9B);
+  delay(200);
+  Serial.println("requesting serial..");
+  ks_ble_request(0x63);
+  delay(200);
+  Serial.println("requesting speed settings..");
+  ks_ble_request(0x98);
+  delay(200);
+  
+  /*
   byte BLEreq[20] = {0x00};
   BLEreq[0] = 0xAA;  //Header byte 1
   BLEreq[1] = 0x55;  //Header byte 2
@@ -358,6 +387,7 @@ void initks() {
   BLEreq[16] = 0x98;
   pRemoteCharacteristic->writeValue(BLEreq, 20);
   delay(200);
+  */
 } //End of initks
 
 void setup()

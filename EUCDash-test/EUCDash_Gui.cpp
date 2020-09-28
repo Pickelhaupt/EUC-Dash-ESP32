@@ -13,8 +13,8 @@ int warntemp = 50;
 extern float wheeldata[];
 SemaphoreHandle_t dash_xSemaphore = xSemaphoreCreateMutex();
 
-//lv_task_t *dash_task = nullptr;
-//lv_task_t *time_task = nullptr;
+lv_task_t *dash_task = nullptr;
+lv_task_t *time_task = nullptr;
 /*
    Declare LVGL Dashboard objects and styles
 */
@@ -355,7 +355,6 @@ void updateTime()
   lv_obj_align(timeLabel, NULL, LV_ALIGN_CENTER, 0, 0);
   TTGOClass *ttgo = TTGOClass::getWatch();
   ttgo->rtc->syncToRtc();
-  Serial.println(buf);
 }
 
 /*
@@ -397,7 +396,7 @@ void setup_timeGui(void) {
   lv_obj_add_style(timeLabel, LV_OBJ_PART_MAIN, &timeLabel_style);
   lv_label_set_align(timeLabel, LV_LABEL_ALIGN_CENTER);
   lv_obj_align(timeLabel, temp_arc, LV_ALIGN_CENTER, 0, 0);
-  lv_task_t * time_task = lv_task_create(lv_time_task, 1000, LV_TASK_PRIO_LOWEST, NULL);
+  time_task = lv_task_create(lv_time_task, 1000, LV_TASK_PRIO_LOWEST, NULL);
 }
 
 void setup_LVGui(void) {
@@ -408,15 +407,18 @@ void setup_LVGui(void) {
   lv_current_arc_1();
   lv_temp_arc_1();
   //Create task -- update freq 4/s
-  //lv_task_t * dtask = lv_task_create(dash_update, 250, LV_TASK_PRIO_MID, NULL);
-  lv_task_t * dash_task = lv_task_create(lv_dash_task, 250, LV_TASK_PRIO_LOWEST, NULL);
+  dash_task = lv_task_create(lv_dash_task, 250, LV_TASK_PRIO_MID, NULL);
 }
 
 void stop_time_task(){
-  //lv_task_del(time_task);
+  if (time_task != nullptr) {
+    lv_task_del(time_task);
+  }
 }
 void stop_dash_task(){
-  //lv_task_del(dash_task);
+  if (dash_task != nullptr) {
+    lv_task_del(dash_task);
+  }
 }
 
 
