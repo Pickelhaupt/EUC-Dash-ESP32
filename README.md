@@ -40,7 +40,8 @@ Only supports Kingsong wheels at the moment. Might work with Gotway as well sinc
 ## Screenshot
 Just a first test to make sure the data displays properly. The interface will change to something more readable.
 <div>
-  <img src="https://github.com/Pickelhaupt/EUC-Dash-ESP32/raw/master/20200916_0105.jpg" width="50%" align="center"/>
+  <img src="https://github.com/Pickelhaupt/EUC-Dash-ESP32/raw/master/ridemode-small2.jpg" width="50%" align="center"/>
+  <img src="https://github.com/Pickelhaupt/EUC-Dash-ESP32/raw/master/watchmode-small.jpg" width="50%" align="center"/>
 </div>
 
 ## Dependencies
