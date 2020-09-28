@@ -84,6 +84,6 @@ Set of screens in v1.0:
 <img src="https://github.com/Pickelhaupt/EUC-Dash-ESP32/raw/master/Images/Tileview-screens-small.png" width="70%" align="center"/>
 
 ## Building the project
-It is easiest to build it using the Arduino IDE. If you are building for the T-Watch, make sure both the ESP and t-watch libraries are added. The lvgl condiguration file needs to be edited to enable some of the font sizes used in this version of the interface.
+It is easiest to build it using the Arduino IDE. If you are building for the T-Watch, make sure both the ESP and t-watch libraries are added. The lvgl library included in the TTGO-Twatch-Library might need to be upgraded. If you don't gave Git, download the ZIP and extract the files. All source files are currently in the EUCDash-test directory. Open EUCDash-test.ino with the Arduino IDE and is should compile and upload if you have all the required libraries installed.
 ## Connecting to the wheel
-It should connect automatically when it finds a compatible wheel. However there is currently no function implemented to make it possible to choose what wheel it will connect to of there are more than one compatible wheel in range, it will simply connect to the first one it finds.
+It should connect automatically when it finds a compatible wheel when the screen is on, it will not connect when screen is off as the device is in sleep mode. However there is currently no function implemented to make it possible to choose what wheel it will connect to of there are more than one compatible wheel in range, it will simply connect to the first one it finds.
