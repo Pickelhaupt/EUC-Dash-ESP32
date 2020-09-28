@@ -114,6 +114,7 @@ static lv_color_t watch_colour = lv_color_make(0xFF, 0x00, 0x00); // (Red)
  ***********************************************************/
 
 LV_FONT_DECLARE(DIN1451_m_cond_24);
+LV_FONT_DECLARE(DIN1451_m_cond_28);
 LV_FONT_DECLARE(DIN1451_m_cond_36);
 LV_FONT_DECLARE(DIN1451_m_cond_44);
 LV_FONT_DECLARE(DIN1451_m_cond_66);

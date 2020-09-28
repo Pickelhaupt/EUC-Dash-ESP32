@@ -6,15 +6,17 @@
 #include <Ticker.h>
 #include "BLEDevice.h"
 
-int maxcurrent = 30;
-int crittemp = 65;
-int warntemp = 50;
+//int maxcurrent = 30;
+//int crittemp = 65;
+//int warntemp = 50;
+time_t now;
 
 extern float wheeldata[];
 SemaphoreHandle_t dash_xSemaphore = xSemaphoreCreateMutex();
 
 lv_task_t *dash_task = nullptr;
 lv_task_t *time_task = nullptr;
+
 /*
    Declare LVGL Dashboard objects and styles
 */
@@ -52,6 +54,10 @@ static lv_obj_t *temp_label = nullptr;
 static lv_style_t temp_indic_style;
 static lv_style_t temp_main_style;
 static lv_style_t temp_label_style;
+
+//Dashclock objects and styles
+static lv_obj_t *dashtime = nullptr;
+static lv_style_t dashtime_style;
 
 //Clock objects and styles
 static lv_obj_t *timeLabel = nullptr;
@@ -140,6 +146,11 @@ void lv_define_styles_1(void) {
 
   lv_style_init(&temp_label_style);
   lv_style_set_text_font(&temp_label_style, LV_STATE_DEFAULT, &DIN1451_m_cond_44);
+
+  // Clock
+  lv_style_init(&dashtime_style);
+  lv_style_set_text_color(&dashtime_style, LV_STATE_DEFAULT, LV_COLOR_GRAY);
+  lv_style_set_text_font(&dashtime_style, LV_STATE_DEFAULT, &DIN1451_m_cond_28);
 }
 
 /***************************
@@ -246,6 +257,12 @@ void lv_temp_arc_1(void)
   lv_obj_align(temp_label, temp_arc, LV_ALIGN_CENTER, 64, 0);
 }
 
+void lv_dashtime(void) {
+  dashtime = lv_label_create(lv_scr_act(), NULL);
+  lv_obj_add_style(dashtime, LV_OBJ_PART_MAIN, &dashtime_style);
+  lv_obj_align(dashtime, NULL, LV_ALIGN_IN_BOTTOM_RIGHT, 0, 0);
+}
+
 static void lv_speed_update(void) {
   if (wheeldata[1] >= wheeldata[15]) {
     lv_style_set_line_color(&speed_indic_style, LV_STATE_DEFAULT, LV_COLOR_RED);
@@ -344,6 +361,17 @@ void lv_temp_update(void) {
   lv_obj_align(temp_label, NULL, LV_ALIGN_CENTER, 64, 0);
 }
 
+void lv_dashtime_update(void) {
+  time_t now;
+  struct tm  info;
+  char buf[64];
+  time(&now);
+  localtime_r(&now, &info);
+  strftime(buf, sizeof(buf), "%H:%M", &info);
+  lv_label_set_text(dashtime, buf);
+  lv_obj_align(dashtime, NULL, LV_ALIGN_IN_BOTTOM_RIGHT, 0, 0);
+}
+
 void setbrightness() {
   TTGOClass *ttgo = TTGOClass::getWatch();
   time_t now;
@@ -384,11 +412,13 @@ void updateTime()
   ttgo->rtc->syncToRtc();
 }
 
+
 static void lv_dash_task(lv_task_t * dash_task) {
   lv_speed_update();
   lv_batt_update();
   lv_current_update();
   lv_temp_update();
+  lv_dashtime_update();
   setbrightness();
 }
 static void lv_time_task(lv_task_t * time_task) {
@@ -430,8 +460,9 @@ void setup_LVGui(void) {
   lv_batt_arc_1();
   lv_current_arc_1();
   lv_temp_arc_1();
+  lv_dashtime();
   //Create task -- update freq 4/s
-  dash_task = lv_task_create(lv_dash_task, 250, LV_TASK_PRIO_MID, NULL);
+  dash_task = lv_task_create(lv_dash_task, 250, LV_TASK_PRIO_LOWEST, NULL);
 }
 
 void stop_time_task() {

@@ -68,6 +68,9 @@ int ride_mode = 0;
 int scandelay = 0;
 boolean bleConn;
 byte KS_BLEreq[20];
+int maxcurrent;
+int crittemp;
+int warntemp;
 
 
 /************************************************
