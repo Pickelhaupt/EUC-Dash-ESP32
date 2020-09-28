@@ -9,7 +9,6 @@
 //int maxcurrent = 30;
 //int crittemp = 65;
 //int warntemp = 50;
-time_t now;
 
 extern float wheeldata[];
 SemaphoreHandle_t dash_xSemaphore = xSemaphoreCreateMutex();
@@ -17,15 +16,14 @@ SemaphoreHandle_t dash_xSemaphore = xSemaphoreCreateMutex();
 lv_task_t *dash_task = nullptr;
 lv_task_t *time_task = nullptr;
 
+// Function declarations
+static void lv_dash_task(lv_task_t *dash_task);
+static void lv_time_task(lv_task_t *time_task);
+
 /*
    Declare LVGL Dashboard objects and styles
 */
 
-// Function declarations
-//static void lv_dash_task(struct _lv_task_t *);
-//static void lv_time_task(struct _lv_task_t *);
-static void lv_dash_task(lv_task_t *dash_task);
-static void lv_time_task(lv_task_t *time_task);
 // static void updateTime();
 
 // Arc gauges and labels
@@ -151,10 +149,10 @@ void lv_define_styles_1(void) {
   lv_style_init(&dashtime_style);
   lv_style_set_text_color(&dashtime_style, LV_STATE_DEFAULT, LV_COLOR_GRAY);
   lv_style_set_text_font(&dashtime_style, LV_STATE_DEFAULT, &DIN1451_m_cond_28);
-}
+} //End Define LVGL default object styles
 
 /***************************
-   Create Dashboard objects
+ *  Create Dashboard objects
  ***************************/
 void lv_speed_arc_1(void)
 {
@@ -261,8 +259,12 @@ void lv_dashtime(void) {
   dashtime = lv_label_create(lv_scr_act(), NULL);
   lv_obj_add_style(dashtime, LV_OBJ_PART_MAIN, &dashtime_style);
   lv_obj_align(dashtime, NULL, LV_ALIGN_IN_BOTTOM_RIGHT, 0, 0);
-}
+} //End Create Dashboard objects
 
+/***************************************************************
+ * Dashboard GUI Update Functions, called via the task handler
+ * runs every 250ms
+ ***************************************************************/
 static void lv_speed_update(void) {
   if (wheeldata[1] >= wheeldata[15]) {
     lv_style_set_line_color(&speed_indic_style, LV_STATE_DEFAULT, LV_COLOR_RED);
@@ -370,7 +372,32 @@ void lv_dashtime_update(void) {
   strftime(buf, sizeof(buf), "%H:%M", &info);
   lv_label_set_text(dashtime, buf);
   lv_obj_align(dashtime, NULL, LV_ALIGN_IN_BOTTOM_RIGHT, 0, 0);
+} //End Dashboard GUI update functions
+
+//Update function for the clock display when wheel is disconnected
+void updateTime()
+{
+  time_t now;
+  struct tm  info;
+  char buf[64];
+  time(&now);
+  localtime_r(&now, &info);
+  strftime(buf, sizeof(buf), "%H:%M", &info);
+  lv_label_set_text(timeLabel, buf);
+  lv_obj_align(timeLabel, NULL, LV_ALIGN_CENTER, 0, -20);
+  strftime(buf, sizeof(buf), "%a %h %d %Y", &info);
+  lv_label_set_text (dateLabel, buf);
+  lv_obj_align(dateLabel, NULL, LV_ALIGN_CENTER, 0, 47);
+  TTGOClass *ttgo = TTGOClass::getWatch();
+  ttgo->rtc->syncToRtc();
 }
+/*
+ * sets the backlight level according to the time of day
+ * adjust this to your local conditions, 
+ * would be nice to have a functione to set this
+ * automatically according to latitude and day of year
+ * todo: add a separate task that runs less often for this
+ */
 
 void setbrightness() {
   TTGOClass *ttgo = TTGOClass::getWatch();
@@ -395,24 +422,10 @@ void setbrightness() {
   }
 }
 
-void updateTime()
-{
-  time_t now;
-  struct tm  info;
-  char buf[64];
-  time(&now);
-  localtime_r(&now, &info);
-  strftime(buf, sizeof(buf), "%H:%M", &info);
-  lv_label_set_text(timeLabel, buf);
-  lv_obj_align(timeLabel, NULL, LV_ALIGN_CENTER, 0, -20);
-  strftime(buf, sizeof(buf), "%a %h %d %Y", &info);
-  lv_label_set_text (dateLabel, buf);
-  lv_obj_align(dateLabel, NULL, LV_ALIGN_CENTER, 0, 47);
-  TTGOClass *ttgo = TTGOClass::getWatch();
-  ttgo->rtc->syncToRtc();
-}
 
-
+/************************
+ * Task update functions
+ ***********************/
 static void lv_dash_task(lv_task_t * dash_task) {
   lv_speed_update();
   lv_batt_update();
@@ -425,6 +438,11 @@ static void lv_time_task(lv_task_t * time_task) {
   updateTime();
   setbrightness();
 }
+
+/******************************************************
+ * Setup functions declared in the .h file and can be called 
+ * from the .ino file
+ ***************************************************/
 
 void setup_timeGui(void) {
   lv_style_init(&timeLabel_bg_style);
