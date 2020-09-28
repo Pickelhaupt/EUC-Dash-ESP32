@@ -2,9 +2,15 @@
 Bluetooth Dashboard for electric unicycles (EUCs) for ESP32, Arduino sketch
 
 ## Introduction
-This is the first draft version of a dashboard for electric unicycles. It currently only supports KingSong 67V wheels and ttgo t-watch 2020. The interface is still very unpolished but usable.
+Update - code rewritten and a number of features added:
+- New dashboard
+- Display clock when not connected to wheel
+- Power saving enabled
+- Accelerometer event wake up
 
-I got a lot of help from reading the code from the cedbossneo/palachzzz /WheelLogAndroid project, it spared me from having to reverse engineer the protocol.
+This is the first draft version of a dashboard for electric unicycles. It currently only supports KingSong 67V wheels and ttgo t-watch 2020. The code is still very unpolished and probably buggy.
+
+I got a lot of help from reading the code from the WheelLogAndroid project, it spared me from having to reverse engineer the protocol.
 
 
 ## Features
@@ -26,13 +32,9 @@ Reads BLE notifications from the electric unicycle and display data on the ESP32
 - EUC temperature
 ### Data displayed 
 - Current speed
-- Voltage
+- Battery level
 - Current
-- Max speed since power on
-- Trip counter
-- Odometer
-- 3:rd alarm speed setting
-- Tiltback speed setting
+- Temperature
 ### Supported Models
 Only supports Kingsong wheels at the moment. Might work with Gotway as well since the protocols are very similar.
 ## Screenshot
@@ -45,8 +47,8 @@ Just a first test to make sure the data displays properly. The interface will ch
 ### Required libraries:
 - ESP32-BLE-Arduino
 - TTGO T-Watch Library
-- LVGL
+- LVGL (The lvgl library that comes with the TTGO T-Watch Library needs to be updated to ver 7.5+)
 ## Building the project
-It is easiest to build it using the Arduino IDE. If you are building for the T-Watch, make both the ESP and t-watch libraries are added. The lvgl condiguration file needs to be edited to enable some of the font sizes used in this version of the interface.
+It is easiest to build it using the Arduino IDE. If you are building for the T-Watch, make sure both the ESP and t-watch libraries are added. The lvgl condiguration file needs to be edited to enable some of the font sizes used in this version of the interface.
 ## Connecting to the wheel
 It should connect automatically when it finds a compatible wheel. However there is currently no function implemented to make it possible to choose what wheel it will connect to of there are more than one compatible wheel in range, it will simply connect to the first one it finds. Make sure the wheel is on before switching on the ESP device.
