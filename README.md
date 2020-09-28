@@ -49,6 +49,20 @@ First version of the new design, there are still some more things to add.
 - ESP32-BLE-Arduino
 - TTGO T-Watch Library
 - LVGL (The lvgl library that comes with the TTGO T-Watch Library needs to be updated to ver 7.5+)
+## Bugs and issues
+- Sometimes hangs and require a restart
+- Does not properly remove tasks when switching modes
+- Backlight adjustment does not work at the moment
+## Todo
+- Add haptic feedback to alarms
+- Add missing dashboard objects
+- Add multiple screens (2 dashboard detail levels)
+- Add info screen
+- Add settings sreen and settings
+- Make alarms wake up screens
+- Make alarms more visible
+- Add persistent settings storage
+- Add gesture controls of light ans horn
 ## Building the project
 It is easiest to build it using the Arduino IDE. If you are building for the T-Watch, make sure both the ESP and t-watch libraries are added. The lvgl condiguration file needs to be edited to enable some of the font sizes used in this version of the interface.
 ## Connecting to the wheel
