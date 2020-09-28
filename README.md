@@ -62,7 +62,9 @@ First version of the new design, there are still some more things to add.
 - Make alarms wake up screens
 - Make alarms more visible
 - Add persistent settings storage
-- Add gesture controls of light ans horn
+- Add gesture controls of light and horn
+- Support for more wheel models
+- Autodetection of wheel make and model
 
 Below are mockups of the planned end state for version 1.0
 
