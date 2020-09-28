@@ -1,5 +1,5 @@
 # EUC-Dash-ESP32
-Bluetooth Dashboard for electric unicycles (EUCs) for ESP32, Arduino sketch
+Stand-alone Bluetooth dashboard for electric unicycles (EUCs) for ESP32, Arduino sketch
 
 ## Introduction
 Update - code rewritten and a number of features added:
