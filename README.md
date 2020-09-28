@@ -1,14 +1,13 @@
-This is the testing branch, new features will be added here
-
 # EUC-Dash-ESP32
 Stand-alone Bluetooth dashboard for electric unicycles (EUCs) for ESP32, Arduino sketch
 
 ## Introduction
-Update - code rewritten and a number of features added:
+Update new version in EUCDash-test, moved the old version to archive - code rewritten and a number of features added:
 - New dashboard
 - Display clock when not connected to wheel
 - Power saving enabled
 - Accelerometer event wake up
+- Time based backlight brightness config
 
 This is the first draft version of a dashboard for electric unicycles. It currently only supports KingSong 67V wheels and ttgo t-watch 2020. The code is still very unpolished and probably buggy.
 
@@ -37,6 +36,8 @@ Reads BLE notifications from the electric unicycle and display data on the ESP32
 - Battery level
 - Current
 - Temperature
+- Current time
+- Time and date when disconnected
 ### Supported Models
 Only supports Kingsong wheels at the moment. Might work with Gotway as well since the protocols are very similar.
 ## Screenshot
@@ -58,6 +59,10 @@ First version of the new design, there are still some more things to add.
 ## Todo
 - Add haptic feedback to alarms
 - Add missing dashboard objects
+  - Max/Avg/Min bars on arcs
+  - Trip distance
+  - Ride time
+  - Alert icons and red corners
 - Add multiple screens (2 dashboard detail levels)
 - Add info screen
 - Add settings sreen and settings
@@ -79,6 +84,6 @@ Set of screens in v1.0:
 <img src="https://github.com/Pickelhaupt/EUC-Dash-ESP32/raw/master/Images/Tileview-screens-small.png" width="70%" align="center"/>
 
 ## Building the project
-It is easiest to build it using the Arduino IDE. If you are building for the T-Watch, make sure both the ESP and t-watch libraries are added. The lvgl condiguration file needs to be edited to enable some of the font sizes used in this version of the interface.
+It is easiest to build it using the Arduino IDE. If you are building for the T-Watch, make sure both the ESP and t-watch libraries are added. The lvgl library included in the TTGO-Twatch-Library might need to be upgraded. If you don't gave Git, download the ZIP and extract the files. All source files are currently in the EUCDash-test directory. Open EUCDash-test.ino with the Arduino IDE and is should compile and upload if you have all the required libraries installed.
 ## Connecting to the wheel
-It should connect automatically when it finds a compatible wheel. However there is currently no function implemented to make it possible to choose what wheel it will connect to of there are more than one compatible wheel in range, it will simply connect to the first one it finds.
+It should connect automatically when it finds a compatible wheel when the screen is on, it will not connect when screen is off as the device is in sleep mode. However there is currently no function implemented to make it possible to choose what wheel it will connect to of there are more than one compatible wheel in range, it will simply connect to the first one it finds.
