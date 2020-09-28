@@ -2,11 +2,12 @@
 Stand-alone Bluetooth dashboard for electric unicycles (EUCs) for ESP32, Arduino sketch
 
 ## Introduction
-Update - code rewritten and a number of features added:
+Update new version in EUCDash-test, moved the old version to archive - code rewritten and a number of features added:
 - New dashboard
 - Display clock when not connected to wheel
 - Power saving enabled
 - Accelerometer event wake up
+- Time based backlight brightness config
 
 This is the first draft version of a dashboard for electric unicycles. It currently only supports KingSong 67V wheels and ttgo t-watch 2020. The code is still very unpolished and probably buggy.
 
@@ -35,6 +36,8 @@ Reads BLE notifications from the electric unicycle and display data on the ESP32
 - Battery level
 - Current
 - Temperature
+- Current time
+- Time and date when disconnected
 ### Supported Models
 Only supports Kingsong wheels at the moment. Might work with Gotway as well since the protocols are very similar.
 ## Screenshot
@@ -56,6 +59,10 @@ First version of the new design, there are still some more things to add.
 ## Todo
 - Add haptic feedback to alarms
 - Add missing dashboard objects
+  - Max/Avg/Min bars on arcs
+  - Trip distance
+  - Ride time
+  - Alert icons and red corners
 - Add multiple screens (2 dashboard detail levels)
 - Add info screen
 - Add settings sreen and settings
