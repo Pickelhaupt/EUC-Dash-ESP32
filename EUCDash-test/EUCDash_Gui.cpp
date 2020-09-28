@@ -357,18 +357,6 @@ void updateTime()
   ttgo->rtc->syncToRtc();
 }
 
-/*
-static void lv_dash_task(struct _lv_task_t *data) {
-  lv_speed_update();
-  lv_batt_update();
-  lv_current_update();
-  lv_temp_update();
-}
-static void lv_time_task(struct _lv_task_t *data) {
-  updateTime();
-}
-*/
-
 static void lv_dash_task(lv_task_t * dash_task) {
   lv_speed_update();
   lv_batt_update();

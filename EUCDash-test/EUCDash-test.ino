@@ -364,30 +364,6 @@ void initks() {
   Serial.println("requesting speed settings..");
   ks_ble_request(0x98);
   delay(200);
-  
-  /*
-  byte BLEreq[20] = {0x00};
-  BLEreq[0] = 0xAA;  //Header byte 1
-  BLEreq[1] = 0x55;  //Header byte 2
-  BLEreq[16] = 0x9B; //This is the byte that specifies what data is requested
-  BLEreq[17] = 0x14; //Last 3 bytes also needed
-  BLEreq[18] = 0x5A;
-  BLEreq[19] = 0x5A;
-  pRemoteCharacteristic->writeValue(BLEreq, 20);
-  delay(200);
-
-  // Request Kingsong Serial Number
-  Serial.println("requesting serial..");
-  BLEreq[16] = 0x63; //
-  pRemoteCharacteristic->writeValue(BLEreq, 20);
-  delay(200);
-
-  // Request Kingsong speed settings
-  Serial.println("requesting speed settings..");
-  BLEreq[16] = 0x98;
-  pRemoteCharacteristic->writeValue(BLEreq, 20);
-  delay(200);
-  */
 } //End of initks
 
 void setup()
