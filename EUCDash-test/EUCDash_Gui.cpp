@@ -408,7 +408,6 @@ void stop_dash_task(){
     lv_task_del(dash_task);
   }
 }
-
 /*******************
    End LVGL GUI Code
  *******************/
