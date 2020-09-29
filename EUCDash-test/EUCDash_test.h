@@ -11,8 +11,6 @@
 #define STR(_s) XSTR(_s)
 #define XSTR(_s) #_s
 
-#define THIS_VERSION_ID  0.1
-#define THIS_VERSION_STR "Ver " STR(THIS_VERSION_ID)
 
 /*
    Use a time-zone string from https://github.com/nayarsystems/posix_tz_db/blob/master/zones.csv
@@ -137,12 +135,12 @@ extern boolean connected;
 extern int maxcurrent;
 extern int crittemp;
 extern int warntemp;
-extern int max_speed;
-extern int avg_speed;
-extern int max_batt;
-extern int min_batt;
-extern int max_current;
-extern int max_temp;
+extern float max_speed;
+extern float avg_speed;
+extern float max_batt;
+extern float min_batt;
+extern float max_current;
+extern float max_temp;
 
 extern "C" {
   extern void lv_keyboard_def_event_cb(lv_obj_t * kb, lv_event_t event);

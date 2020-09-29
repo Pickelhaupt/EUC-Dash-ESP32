@@ -70,6 +70,7 @@ static lv_style_t min_bar_main_style;
 //Dashclock objects and styles
 static lv_obj_t *dashtime = nullptr;
 static lv_obj_t *wbatt = nullptr;
+static lv_obj_t *trip = nullptr;
 static lv_style_t dashtime_style;
 
 //Clock objects and styles
@@ -92,7 +93,7 @@ static lv_style_t dateLabel_style;
    Define LVGL default object styles
  ************************************/
 void lv_define_styles_1(void) {
-  int arclinew = 13; // line width of arc gauges
+  int arclinew = 15; // line width of arc gauges
   //Speed arc and label
   lv_style_init(&speed_indic_style);
   lv_style_set_line_rounded(&speed_indic_style, LV_STATE_DEFAULT, false);
@@ -295,7 +296,7 @@ void lv_current_arc_1(void)
   lv_arc_set_bg_angles(current_arc, 130, 230);
   lv_arc_set_range(current_arc, 0, maxcurrent);
   lv_arc_set_value(current_arc, wheeldata[3]);
-  lv_obj_set_size(current_arc, 227, 227);
+  lv_obj_set_size(current_arc, 225, 225);
   lv_obj_align(current_arc, NULL, LV_ALIGN_CENTER, 0, 0);
 
   //Max bar
@@ -304,7 +305,7 @@ void lv_current_arc_1(void)
   lv_obj_add_style(current_max_bar, LV_OBJ_PART_MAIN, &max_bar_main_style);
   lv_arc_set_bg_angles(current_max_bar, 130, 230);
   lv_arc_set_range(current_max_bar, 0, maxcurrent);
-  lv_obj_set_size(current_max_bar, 227, 227);
+  lv_obj_set_size(current_max_bar, 225, 225);
   lv_obj_align(current_max_bar, NULL, LV_ALIGN_CENTER, 0, 0);
 
   //Label
@@ -329,7 +330,7 @@ void lv_temp_arc_1(void)
   lv_arc_set_angles(temp_arc, 310, 50);
   lv_arc_set_range(temp_arc, 0, (crittemp + 10));
   lv_arc_set_value(temp_arc, ((crittemp + 10) - wheeldata[4]));
-  lv_obj_set_size(temp_arc, 227, 227);
+  lv_obj_set_size(temp_arc, 225, 225);
   lv_obj_align(temp_arc, NULL, LV_ALIGN_CENTER, 0, 0);
 
   //Max bar
@@ -338,7 +339,7 @@ void lv_temp_arc_1(void)
   lv_obj_add_style(temp_max_bar, LV_OBJ_PART_MAIN, &max_bar_main_style);
   lv_arc_set_bg_angles(temp_max_bar, 310, 50);
   lv_arc_set_range(temp_max_bar, 0, (crittemp + 10));
-  lv_obj_set_size(temp_max_bar, 227, 227);
+  lv_obj_set_size(temp_max_bar, 225, 225);
   lv_obj_align(temp_max_bar, NULL, LV_ALIGN_CENTER, 0, 0);
 
   //Label
@@ -358,6 +359,9 @@ void lv_dashtime(void) {
   wbatt = lv_label_create(lv_scr_act(), NULL);
   lv_obj_add_style(wbatt, LV_OBJ_PART_MAIN, &dashtime_style);
   lv_obj_align(wbatt, NULL, LV_ALIGN_IN_BOTTOM_RIGHT, 0, -25);
+  trip = lv_label_create(lv_scr_act(), NULL);
+  lv_obj_add_style(trip, LV_OBJ_PART_MAIN, &current_label_style);
+  lv_obj_align(trip, NULL, LV_ALIGN_IN_TOP_MID, 0, 25);
 } //End Create Dashboard objects
 
 /***************************************************************
@@ -409,7 +413,7 @@ void lv_batt_update(void) {
   }
   lv_obj_add_style(batt_arc, LV_ARC_PART_INDIC, &batt_indic_style);
   lv_arc_set_value(batt_arc, (100 - wheeldata[6]));
-  
+
   lv_arc_set_angles(batt_max_bar, (142 - (max_batt * 110 / 100)), (144 - (max_batt * 110 / 100)));
   lv_arc_set_angles(batt_min_bar, (142 - (min_batt * 110 / 100)), (144 - (min_batt * 110 / 100)));
 
@@ -471,9 +475,8 @@ void lv_temp_update(void) {
   lv_obj_add_style(temp_arc, LV_ARC_PART_INDIC, &temp_indic_style);
   lv_arc_set_value(temp_arc, ((crittemp + 10) - wheeldata[4]));
 
-  lv_arc_set_angles(temp_max_bar, (50 - (max_temp * 100 / (crittemp + 10))), (53 - (max_temp * 100 / (crittemp + 10)))),
-
-                    lv_obj_add_style(temp_label, LV_OBJ_PART_MAIN, &temp_label_style);
+  lv_arc_set_angles(temp_max_bar, (50 - (max_temp * 100 / (crittemp + 10))), (54 - (max_temp * 100 / (crittemp + 10))));
+  lv_obj_add_style(temp_label, LV_OBJ_PART_MAIN, &temp_label_style);
   char tempstring[4];
   dtostrf(wheeldata[4], 2, 0, tempstring);
   lv_label_set_text(temp_label, tempstring);
@@ -496,6 +499,10 @@ void lv_dashtime_update(void) {
   dtostrf(watchbatt, 2, 0, wbattstring);
   lv_label_set_text(wbatt, wbattstring);
   lv_obj_align(wbatt, NULL, LV_ALIGN_IN_BOTTOM_RIGHT, 0, -25);
+  char tripstring[4];
+  dtostrf(wheeldata[8], 2, 1, tripstring);
+  lv_label_set_text(trip, tripstring);
+  lv_obj_align(trip, NULL, LV_ALIGN_IN_TOP_MID, 0, 25);
 
 } //End Dashboard GUI update functions
 

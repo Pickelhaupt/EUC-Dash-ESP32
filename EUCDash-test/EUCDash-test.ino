@@ -72,12 +72,12 @@ int maxcurrent;
 int crittemp;
 int warntemp;
 
-int max_speed = 0;
-int avg_speed = 0;
-int max_batt = 0;
-int min_batt = 100;
-int max_current = 0;
-int max_temp = 0;
+float max_speed = 0;
+float avg_speed = 0;
+float max_batt = 0;
+float min_batt = 100;
+float max_current = 0;
+float max_temp = 0;
 
 
 /************************************************
@@ -242,7 +242,7 @@ static void decodeKS (byte KSdata[]) {
   if (wheeldata[6] < min_batt && wheeldata[6] != 0) {
     min_batt = wheeldata[6];
   }
-  if (wheeldata[3] > max_current && wheeldata[3] < (maxcurrent + 5)) {
+  if (wheeldata[3] > max_current && wheeldata[3] < (maxcurrent + 5) && wheeldata[3] >= 0) {
     max_current = wheeldata[3];
   }
   if (wheeldata[4] > max_temp) {
@@ -260,11 +260,11 @@ static void decodeKS (byte KSdata[]) {
   Serial.print(wheeldata[8]); Serial.println(" km");
   Serial.print(wheeldata[9]); Serial.println(" time");
   Serial.print(wheeldata[10]); Serial.println(" kmh");
- // Serial.print(wheeldata[11]); Serial.println(" fan");
+  Serial.print(wheeldata[11]); Serial.println(" fan");
   //Serial.print(wheeldata[12]); Serial.println(" alarm1");
   //Serial.print(wheeldata[13]); Serial.println(" alarm2");
   //Serial.print(wheeldata[14]); Serial.println(" alarm3");
-  //Serial.print(wheeldata[15]); Serial.println(" maxspeed");
+  Serial.print(wheeldata[15]); Serial.println(" maxspeed");
   Serial.print(max_speed); Serial.println(" max_speed");
   Serial.print(max_batt); Serial.println(" max_batt");
   Serial.print(min_batt); Serial.println(" min_batt");

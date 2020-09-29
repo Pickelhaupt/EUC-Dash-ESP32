@@ -1432,4 +1432,3 @@ lv_font_t DIN1451_m_cond_36 = {
 
 
 #endif /*#if DIN1451_M_COND_36*/
-
