@@ -63,7 +63,7 @@ boolean doScan = false;
 boolean watch_running = false;
 static BLERemoteCharacteristic* pRemoteCharacteristic;
 static BLEAdvertisedDevice* myDevice;
-float wheeldata[16];
+float wheeldata[16] = {0.0};
 int ride_mode = 0;
 int scandelay = 0;
 boolean bleConn;
@@ -71,6 +71,13 @@ byte KS_BLEreq[20];
 int maxcurrent;
 int crittemp;
 int warntemp;
+
+int max_speed = 0;
+int avg_speed = 0;
+int max_batt = 0;
+int min_batt = 100;
+int max_current = 0;
+int max_temp = 0;
 
 
 /************************************************
@@ -227,6 +234,20 @@ static void decodeKS (byte KSdata[]) {
     wheeldata[15] = KSdata[10]; //Max speed (tiltback)
   }
 
+  //set values for max/min arc bars
+  max_speed = wheeldata[10];
+  if (wheeldata[6] > max_batt) {
+    max_batt = wheeldata[6];
+  }
+  if (wheeldata[6] < min_batt && wheeldata[6] != 0) {
+    min_batt = wheeldata[6];
+  }
+  if (wheeldata[3] > max_current && wheeldata[3] < (maxcurrent + 5)) {
+    max_current = wheeldata[3];
+  }
+  if (wheeldata[4] > max_temp) {
+    max_temp = wheeldata[4];
+  }
   //Debug -- testing, print all data to serial
   Serial.print(wheeldata[0]); Serial.println(" V");
   Serial.print(wheeldata[1]); Serial.println(" kmh");
@@ -239,13 +260,16 @@ static void decodeKS (byte KSdata[]) {
   Serial.print(wheeldata[8]); Serial.println(" km");
   Serial.print(wheeldata[9]); Serial.println(" time");
   Serial.print(wheeldata[10]); Serial.println(" kmh");
-  Serial.print(wheeldata[11]); Serial.println(" fan");
-  Serial.print(wheeldata[12]); Serial.println(" alarm1");
-  Serial.print(wheeldata[13]); Serial.println(" alarm2");
-  Serial.print(wheeldata[14]); Serial.println(" alarm3");
-  Serial.print(wheeldata[15]); Serial.println(" maxspeed");
-
-
+ // Serial.print(wheeldata[11]); Serial.println(" fan");
+  //Serial.print(wheeldata[12]); Serial.println(" alarm1");
+  //Serial.print(wheeldata[13]); Serial.println(" alarm2");
+  //Serial.print(wheeldata[14]); Serial.println(" alarm3");
+  //Serial.print(wheeldata[15]); Serial.println(" maxspeed");
+  Serial.print(max_speed); Serial.println(" max_speed");
+  Serial.print(max_batt); Serial.println(" max_batt");
+  Serial.print(min_batt); Serial.println(" min_batt");
+  Serial.print(max_current); Serial.println(" max_current");
+  Serial.print(max_temp); Serial.println(" max_temp");
 } // End decodeKS
 
 static int decode2byte(byte byte1, byte byte2) { //converts big endian 2 byte value to int
@@ -354,40 +378,47 @@ void ks_ble_request(byte reqtype) {
 }
 
 void initks() {
-  /*
+
+  //Setting of some model specific parametes,
+  //Todo: automatic model identification
+  if (wheelmodel = "KS14SMD") {
+    maxcurrent = 30;
+    crittemp = 65;
+    warntemp = 50;
+  }
+  else if (wheelmodel = "KS16S") {
+    maxcurrent = 30;
+    crittemp = 65;
+    warntemp = 50;
+  }
+  else {
+    maxcurrent = 30;
+    crittemp = 65;
+    warntemp = 50;
+  }
+
+  /*****************************************
        Request Kingsong Model Name, serial number and speed settings
        This must be done before any BLE notifications will be pused by the KS wheel
-  */
+  ******************************************/
+  TTGOClass *ttgo = TTGOClass::getWatch();
   Serial.println("requesting model..");
   ks_ble_request(0x9B);
+  ttgo->shake ();
   delay(200);
   Serial.println("requesting serial..");
   ks_ble_request(0x63);
+  //ttgo->shake ();
   delay(200);
   Serial.println("requesting speed settings..");
   ks_ble_request(0x98);
+  //ttgo->shake ();
   delay(200);
 } //End of initks
 
 void setup()
 {
   Serial.begin (115200);
-
-  //Temporary setting of some model specific parametes,
-  //Todo: automatic model identification
-  if (wheelmodel = "KS14SMD") {
-    maxcurrent = 30;
-    crittemp = 65;
-    warntemp = 50;
-  } else if (wheelmodel = "KS16S") {
-    maxcurrent = 35;
-    crittemp = 65;
-    warntemp = 50;
-  } else {
-    maxcurrent = 30;
-    crittemp = 65;
-    warntemp = 50;
-  }
 
   //Create a program that allows the required message objects and group flags
   g_event_queue_handle = xQueueCreate(20, sizeof(uint8_t));
@@ -555,7 +586,7 @@ void loop()
     BLEDevice::getScan()->start(2);
     scandelay = 0;
     doScan = false;
-  } 
+  }
 
   // An XEvent signifies that there has been a wakeup interrupt, bring the CPU out of low energy mode
   EventBits_t  bits = xEventGroupGetBits(isr_group);

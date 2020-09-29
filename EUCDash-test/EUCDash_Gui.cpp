@@ -6,19 +6,23 @@
 #include <Ticker.h>
 #include "BLEDevice.h"
 
-//int maxcurrent = 30;
-//int crittemp = 65;
-//int warntemp = 50;
+//char watchbatt;
 
 extern float wheeldata[];
 SemaphoreHandle_t dash_xSemaphore = xSemaphoreCreateMutex();
 
 lv_task_t *dash_task = nullptr;
 lv_task_t *time_task = nullptr;
+lv_task_t *speed_shake = nullptr;
+//lv_task_t *current_shake = nullptr;
+//lv_task_t *temp_shake = nullptr;
 
 // Function declarations
 static void lv_dash_task(lv_task_t *dash_task);
 static void lv_time_task(lv_task_t *time_task);
+static void lv_speed_shake(lv_task_t *speed_shake);
+//static void lv_current_shake(lv_task_t *current_shake);
+//static void lv_temp_shake(lv_task_t *temp_shake);
 
 /*
    Declare LVGL Dashboard objects and styles
@@ -52,9 +56,20 @@ static lv_obj_t *temp_label = nullptr;
 static lv_style_t temp_indic_style;
 static lv_style_t temp_main_style;
 static lv_style_t temp_label_style;
+static lv_obj_t *speed_avg_bar = nullptr;
+static lv_obj_t *speed_max_bar = nullptr;
+static lv_obj_t *batt_max_bar = nullptr;
+static lv_obj_t *batt_min_bar = nullptr;
+static lv_obj_t *current_max_bar = nullptr;
+static lv_obj_t *temp_max_bar = nullptr;
+static lv_style_t max_bar_indic_style;
+static lv_style_t max_bar_main_style;
+static lv_style_t min_bar_indic_style;
+static lv_style_t min_bar_main_style;
 
 //Dashclock objects and styles
 static lv_obj_t *dashtime = nullptr;
+static lv_obj_t *wbatt = nullptr;
 static lv_style_t dashtime_style;
 
 //Clock objects and styles
@@ -145,6 +160,33 @@ void lv_define_styles_1(void) {
   lv_style_init(&temp_label_style);
   lv_style_set_text_font(&temp_label_style, LV_STATE_DEFAULT, &DIN1451_m_cond_44);
 
+  //Max bar
+  lv_style_init(&max_bar_indic_style);
+  lv_style_set_line_rounded(&max_bar_indic_style, LV_STATE_DEFAULT, false);
+  lv_style_set_line_width(&max_bar_indic_style, LV_STATE_DEFAULT, arclinew);
+  lv_style_set_line_color(&max_bar_indic_style, LV_STATE_DEFAULT, max_bar_clr);
+
+  lv_style_init(&max_bar_main_style);
+  lv_style_set_line_rounded(&max_bar_main_style, LV_STATE_DEFAULT, false);
+  lv_style_set_line_width(&max_bar_main_style, LV_STATE_DEFAULT, arclinew);
+  lv_style_set_bg_opa(&max_bar_main_style, LV_STATE_DEFAULT, LV_OPA_TRANSP);
+  lv_style_set_border_opa(&max_bar_main_style, LV_STATE_DEFAULT, LV_OPA_TRANSP);
+  lv_style_set_line_opa(&max_bar_main_style, LV_STATE_DEFAULT, LV_OPA_TRANSP);
+
+  //min bar
+  lv_style_init(&min_bar_indic_style);
+  lv_style_set_line_rounded(&min_bar_indic_style, LV_STATE_DEFAULT, false);
+  lv_style_set_line_width(&min_bar_indic_style, LV_STATE_DEFAULT, arclinew);
+  lv_style_set_line_color(&min_bar_indic_style, LV_STATE_DEFAULT, min_bar_clr);
+
+  lv_style_init(&min_bar_main_style);
+  lv_style_set_line_rounded(&min_bar_main_style, LV_STATE_DEFAULT, false);
+  lv_style_set_line_width(&min_bar_main_style, LV_STATE_DEFAULT, arclinew);
+  lv_style_set_bg_opa(&min_bar_main_style, LV_STATE_DEFAULT, LV_OPA_TRANSP);
+  lv_style_set_border_opa(&min_bar_main_style, LV_STATE_DEFAULT, LV_OPA_TRANSP);
+  lv_style_set_line_opa(&min_bar_main_style, LV_STATE_DEFAULT, LV_OPA_TRANSP);
+
+
   // Clock
   lv_style_init(&dashtime_style);
   lv_style_set_text_color(&dashtime_style, LV_STATE_DEFAULT, LV_COLOR_GRAY);
@@ -152,7 +194,7 @@ void lv_define_styles_1(void) {
 } //End Define LVGL default object styles
 
 /***************************
- *  Create Dashboard objects
+    Create Dashboard objects
  ***************************/
 void lv_speed_arc_1(void)
 {
@@ -167,6 +209,24 @@ void lv_speed_arc_1(void)
   lv_arc_set_value(speed_arc, wheeldata[1]);
   lv_obj_set_size(speed_arc, 268, 268);
   lv_obj_align(speed_arc, NULL, LV_ALIGN_CENTER, 0, 0);
+
+  //Max bar
+  speed_max_bar = lv_arc_create(lv_scr_act(), NULL);
+  lv_obj_add_style(speed_max_bar, LV_ARC_PART_INDIC, &max_bar_indic_style);
+  lv_obj_add_style(speed_max_bar, LV_OBJ_PART_MAIN, &max_bar_main_style);
+  lv_arc_set_bg_angles(speed_max_bar, 160, 20);
+  lv_arc_set_range(speed_max_bar, 0, (wheeldata[15] + 5));
+  lv_obj_set_size(speed_max_bar, 268, 268);
+  lv_obj_align(speed_max_bar, NULL, LV_ALIGN_CENTER, 0, 0);
+
+  //avg bar
+  speed_avg_bar = lv_arc_create(lv_scr_act(), NULL);
+  lv_obj_add_style(speed_avg_bar, LV_ARC_PART_INDIC, &min_bar_indic_style);
+  lv_obj_add_style(speed_avg_bar, LV_OBJ_PART_MAIN, &min_bar_main_style);
+  lv_arc_set_bg_angles(speed_avg_bar, 160, 20);
+  lv_arc_set_range(speed_avg_bar, 0, (wheeldata[15] + 5));
+  lv_obj_set_size(speed_avg_bar, 268, 268);
+  lv_obj_align(speed_avg_bar, NULL, LV_ALIGN_CENTER, 0, 0);
 
   //Label
   speed_label = lv_label_create(lv_scr_act(), NULL);
@@ -197,6 +257,24 @@ void lv_batt_arc_1(void)
   lv_obj_set_size(batt_arc, 268, 268);
   lv_obj_align(batt_arc, NULL, LV_ALIGN_CENTER, 0, 0);
 
+  //max bar
+  batt_max_bar = lv_arc_create(lv_scr_act(), NULL);
+  lv_obj_add_style(batt_max_bar, LV_ARC_PART_INDIC, &max_bar_indic_style);
+  lv_obj_add_style(batt_max_bar, LV_OBJ_PART_MAIN, &max_bar_main_style);
+  lv_arc_set_bg_angles(batt_max_bar, 35, 145);
+  lv_arc_set_range(batt_max_bar, 0, 100);
+  lv_obj_set_size(batt_max_bar, 268, 268);
+  lv_obj_align(batt_max_bar, NULL, LV_ALIGN_CENTER, 0, 0);
+
+  //min bar
+  batt_min_bar = lv_arc_create(lv_scr_act(), NULL);
+  lv_obj_add_style(batt_min_bar, LV_ARC_PART_INDIC, &min_bar_indic_style);
+  lv_obj_add_style(batt_min_bar, LV_OBJ_PART_MAIN, &min_bar_main_style);
+  lv_arc_set_bg_angles(batt_min_bar, 35, 145);
+  lv_arc_set_range(batt_min_bar, 0, 100);
+  lv_obj_set_size(batt_min_bar, 268, 268);
+  lv_obj_align(batt_min_bar, NULL, LV_ALIGN_CENTER, 0, 0);
+
   //Label
   batt_label = lv_label_create(lv_scr_act(), NULL);
   lv_obj_add_style(batt_label, LV_OBJ_PART_MAIN, &batt_label_style);
@@ -219,6 +297,15 @@ void lv_current_arc_1(void)
   lv_arc_set_value(current_arc, wheeldata[3]);
   lv_obj_set_size(current_arc, 227, 227);
   lv_obj_align(current_arc, NULL, LV_ALIGN_CENTER, 0, 0);
+
+  //Max bar
+  current_max_bar = lv_arc_create(lv_scr_act(), NULL);
+  lv_obj_add_style(current_max_bar, LV_ARC_PART_INDIC, &max_bar_indic_style);
+  lv_obj_add_style(current_max_bar, LV_OBJ_PART_MAIN, &max_bar_main_style);
+  lv_arc_set_bg_angles(current_max_bar, 130, 230);
+  lv_arc_set_range(current_max_bar, 0, maxcurrent);
+  lv_obj_set_size(current_max_bar, 227, 227);
+  lv_obj_align(current_max_bar, NULL, LV_ALIGN_CENTER, 0, 0);
 
   //Label
   current_label = lv_label_create(lv_scr_act(), NULL);
@@ -245,6 +332,15 @@ void lv_temp_arc_1(void)
   lv_obj_set_size(temp_arc, 227, 227);
   lv_obj_align(temp_arc, NULL, LV_ALIGN_CENTER, 0, 0);
 
+  //Max bar
+  temp_max_bar = lv_arc_create(lv_scr_act(), NULL);
+  lv_obj_add_style(temp_max_bar, LV_ARC_PART_INDIC, &max_bar_indic_style);
+  lv_obj_add_style(temp_max_bar, LV_OBJ_PART_MAIN, &max_bar_main_style);
+  lv_arc_set_bg_angles(temp_max_bar, 310, 50);
+  lv_arc_set_range(temp_max_bar, 0, (crittemp + 10));
+  lv_obj_set_size(temp_max_bar, 227, 227);
+  lv_obj_align(temp_max_bar, NULL, LV_ALIGN_CENTER, 0, 0);
+
   //Label
   temp_label = lv_label_create(lv_scr_act(), NULL);
   lv_obj_add_style(temp_label, LV_OBJ_PART_MAIN, &temp_label_style);
@@ -259,11 +355,14 @@ void lv_dashtime(void) {
   dashtime = lv_label_create(lv_scr_act(), NULL);
   lv_obj_add_style(dashtime, LV_OBJ_PART_MAIN, &dashtime_style);
   lv_obj_align(dashtime, NULL, LV_ALIGN_IN_BOTTOM_RIGHT, 0, 0);
+  wbatt = lv_label_create(lv_scr_act(), NULL);
+  lv_obj_add_style(wbatt, LV_OBJ_PART_MAIN, &dashtime_style);
+  lv_obj_align(wbatt, NULL, LV_ALIGN_IN_BOTTOM_RIGHT, 0, -25);
 } //End Create Dashboard objects
 
 /***************************************************************
- * Dashboard GUI Update Functions, called via the task handler
- * runs every 250ms
+   Dashboard GUI Update Functions, called via the task handler
+   runs every 250ms
  ***************************************************************/
 static void lv_speed_update(void) {
   if (wheeldata[1] >= wheeldata[15]) {
@@ -272,12 +371,18 @@ static void lv_speed_update(void) {
   } else if (wheeldata[1] >= wheeldata[14]) {
     lv_style_set_line_color(&speed_indic_style, LV_STATE_DEFAULT, LV_COLOR_YELLOW);
     lv_style_set_text_color(&speed_label_style, LV_STATE_DEFAULT, LV_COLOR_YELLOW);
+    //speed_shake = lv_task_create(lv_speed_shake, 750, LV_TASK_PRIO_LOWEST, NULL);
+    //lv_task_ready(speed_shake);
   } else {
     lv_style_set_line_color(&speed_indic_style, LV_STATE_DEFAULT, speed_fg_clr);
     lv_style_set_text_color(&speed_label_style, LV_STATE_DEFAULT, speed_fg_clr);
+    //stop_speed_shake();
   }
   lv_obj_add_style(speed_arc, LV_ARC_PART_INDIC, &speed_indic_style);
   lv_arc_set_value(speed_arc, wheeldata[1]);
+
+  lv_arc_set_angles(speed_max_bar, (160 + (max_speed * (200 / (wheeldata[15] + 5)))), (163 + (max_speed * (200 / (wheeldata[15] + 5)))));
+  lv_arc_set_angles(speed_avg_bar, (160 + (avg_speed * (200 / (wheeldata[15] + 5)))), (163 + (avg_speed * (200 / (wheeldata[15] + 5)))));
 
   lv_obj_add_style(speed_label, LV_LABEL_PART_MAIN, &speed_label_style);
   char speedstring[4];
@@ -304,6 +409,9 @@ void lv_batt_update(void) {
   }
   lv_obj_add_style(batt_arc, LV_ARC_PART_INDIC, &batt_indic_style);
   lv_arc_set_value(batt_arc, (100 - wheeldata[6]));
+  
+  lv_arc_set_angles(batt_max_bar, (142 - (max_batt * 110 / 100)), (144 - (max_batt * 110 / 100)));
+  lv_arc_set_angles(batt_min_bar, (142 - (min_batt * 110 / 100)), (144 - (min_batt * 110 / 100)));
 
   lv_obj_add_style(batt_label, LV_OBJ_PART_MAIN, &batt_label_style);
   char battstring[4];
@@ -322,15 +430,20 @@ void lv_current_update(void) {
   if (wheeldata[3] > (maxcurrent * 0.75)) {
     lv_style_set_line_color(&current_indic_style, LV_STATE_DEFAULT, LV_COLOR_RED);
     lv_style_set_text_color(&current_label_style, LV_STATE_DEFAULT, LV_COLOR_RED);
+    //current_shake = lv_task_create(lv_current_shake, 200, LV_TASK_PRIO_LOWEST, NULL);
   } else if (wheeldata[3] > (maxcurrent * 0.5)) {
     lv_style_set_line_color(&current_indic_style, LV_STATE_DEFAULT, LV_COLOR_YELLOW);
     lv_style_set_text_color(&current_label_style, LV_STATE_DEFAULT, LV_COLOR_YELLOW);
+    //stop_current_shake();
   } else {
     lv_style_set_line_color(&current_indic_style, LV_STATE_DEFAULT, current_fg_clr);
     lv_style_set_text_color(&current_label_style, LV_STATE_DEFAULT, current_fg_clr);
+    //stop_current_shake();
   }
   lv_obj_add_style(current_arc, LV_ARC_PART_INDIC, &current_indic_style);
   lv_arc_set_value(current_arc, wheeldata[3]);
+
+  lv_arc_set_angles(current_max_bar, (130 + (max_current * 100 / maxcurrent)), (133 + (max_current * 100 / maxcurrent)));
 
   lv_obj_add_style(current_label, LV_OBJ_PART_MAIN, &current_label_style);
   char currentstring[4];
@@ -345,17 +458,22 @@ void lv_temp_update(void) {
   if (wheeldata[4] > crittemp) {
     lv_style_set_line_color(&temp_indic_style, LV_STATE_DEFAULT, LV_COLOR_RED);
     lv_style_set_text_color(&temp_label_style, LV_STATE_DEFAULT, LV_COLOR_RED);
+    //temp_shake = lv_task_create(lv_temp_shake, 500, LV_TASK_PRIO_LOWEST, NULL);
   } else if (wheeldata[4] > warntemp) {
     lv_style_set_line_color(&temp_indic_style, LV_STATE_DEFAULT, LV_COLOR_YELLOW);
     lv_style_set_text_color(&temp_label_style, LV_STATE_DEFAULT, LV_COLOR_YELLOW);
+    //stop_temp_shake();
   } else {
     lv_style_set_line_color(&temp_indic_style, LV_STATE_DEFAULT, temp_fg_clr);
     lv_style_set_text_color(&temp_label_style, LV_STATE_DEFAULT, temp_fg_clr);
+    //stop_temp_shake();
   }
   lv_obj_add_style(temp_arc, LV_ARC_PART_INDIC, &temp_indic_style);
   lv_arc_set_value(temp_arc, ((crittemp + 10) - wheeldata[4]));
 
-  lv_obj_add_style(temp_label, LV_OBJ_PART_MAIN, &temp_label_style);
+  lv_arc_set_angles(temp_max_bar, (50 - (max_temp * 100 / (crittemp + 10))), (53 - (max_temp * 100 / (crittemp + 10)))),
+
+                    lv_obj_add_style(temp_label, LV_OBJ_PART_MAIN, &temp_label_style);
   char tempstring[4];
   dtostrf(wheeldata[4], 2, 0, tempstring);
   lv_label_set_text(temp_label, tempstring);
@@ -372,6 +490,13 @@ void lv_dashtime_update(void) {
   strftime(buf, sizeof(buf), "%H:%M", &info);
   lv_label_set_text(dashtime, buf);
   lv_obj_align(dashtime, NULL, LV_ALIGN_IN_BOTTOM_RIGHT, 0, 0);
+  TTGOClass *ttgo = TTGOClass::getWatch();
+  int watchbatt = ttgo->power->getBattPercentage();
+  char wbattstring[2];
+  dtostrf(watchbatt, 2, 0, wbattstring);
+  lv_label_set_text(wbatt, wbattstring);
+  lv_obj_align(wbatt, NULL, LV_ALIGN_IN_BOTTOM_RIGHT, 0, -25);
+
 } //End Dashboard GUI update functions
 
 //Update function for the clock display when wheel is disconnected
@@ -393,12 +518,12 @@ void updateTime()
 }
 
 /*
- * sets the backlight level according to the time of day
- * adjust this to your local conditions, 
- * would be nice to have a functione to set this
- * automatically according to latitude and day of year
- * todo: add a separate task that runs less often for this
- */
+   sets the backlight level according to the time of day
+   adjust this to your local conditions,
+   would be nice to have a functione to set this
+   automatically according to latitude and day of year
+   todo: add a separate task that runs less often for this
+*/
 void setbrightness() {
   TTGOClass *ttgo = TTGOClass::getWatch();
   time_t now;
@@ -422,9 +547,8 @@ void setbrightness() {
   }
 }
 
-
 /************************
- * Task update functions
+   Task update functions
  ***********************/
 static void lv_dash_task(lv_task_t * dash_task) {
   lv_speed_update();
@@ -438,10 +562,28 @@ static void lv_time_task(lv_task_t * time_task) {
   updateTime();
   setbrightness();
 }
+/*
+  static void lv_current_shake(lv_task_t * current_shake) {
+  TTGOClass *ttgo = TTGOClass::getWatch();
+  ttgo->shake ();
+  }
+  static void lv_temp_shake(lv_task_t * temp_shake) {
+  TTGOClass *ttgo = TTGOClass::getWatch();
+  ttgo->shake ();
+  }
+*/
+
+static void lv_speed_shake(lv_task_t * speed_shake) {
+  TTGOClass *ttgo = TTGOClass::getWatch();
+  ttgo->shake ();
+  //delay(250);
+  //ttgo->shake ();
+}
+
 
 /******************************************************
- * Setup functions declared in the .h file and can be called 
- * from the .ino file
+   Setup functions declared in the .h file and can be called
+   from the .ino file
  ***************************************************/
 
 void setup_timeGui(void) {
@@ -493,6 +635,26 @@ void stop_dash_task() {
     lv_task_del(dash_task);
   }
 }
+
+
+void stop_speed_shake() {
+  if (speed_shake != nullptr) {
+    lv_task_del(speed_shake);
+  }
+}
+/*
+  void stop_current_shake() {
+  if (current_shake != nullptr) {
+    lv_task_del(current_shake);
+  }
+  }
+
+  void stop_temp_shake() {
+  if (temp_shake != nullptr) {
+    lv_task_del(temp_shake);
+  }
+  }
+*/
 /*******************
    End LVGL GUI Code
  *******************/

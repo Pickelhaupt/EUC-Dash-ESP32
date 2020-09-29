@@ -85,6 +85,9 @@ void updateBatteryLevel();
 void updateTime();
 void stop_time_task();
 void stop_dash_task();
+void stop_speed_shake();
+void stop_current_shake();
+void stop_temp_shake();
 
 /**********************************************
    Define custom colours for the EUC gauges
@@ -99,10 +102,12 @@ static lv_color_t speed_bg_clr = lv_color_make(0x00, 0x0a, 0x00); //Speed gauge 
 static lv_color_t speed_fg_clr = lv_color_make(0x00, 0xfa, 0x0f); //Speed gauge indicator color (default = green)
 static lv_color_t batt_bg_clr = lv_color_make(0x00, 0x0a, 0x00); //Speed gauge arc background (default = dark green)
 static lv_color_t batt_fg_clr = lv_color_make(0x00, 0xfa, 0x0f); //Speed gauge indicator color (default = green)
-static lv_color_t temp_bg_clr = lv_color_make(0x05, 0x05, 0x0a); //Temperature gauge arc background
-static lv_color_t temp_fg_clr = lv_color_make(0x2a, 0x1f, 0xff); //Temperature gauge indicator color
+static lv_color_t temp_bg_clr = lv_color_make(0x05, 0x05, 0x0a); //Temperature gauge arc background (dark blue)
+static lv_color_t temp_fg_clr = lv_color_make(0x2a, 0x1f, 0xff); //Temperature gauge indicator color (light blue)
 //Misc colours
-static lv_color_t ride_mode_colour = lv_color_make(0xFF, 0xFF, 0x00); //The H M S ride mode indicator (Magenta)
+static lv_color_t ride_mode_clr = lv_color_make(0xFF, 0x00, 0xFF); //The H M S ride mode indicator (Magenta)
+static lv_color_t max_bar_clr = lv_color_make(0xFF, 0x00, 0xFF); //The H M S ride mode indicator (Magenta)
+static lv_color_t min_bar_clr = lv_color_make(0x2a, 0x1f, 0xff); //The H M S ride mode indicator (light blue)
 static lv_color_t watch_info_colour = lv_color_make(0xB0, 0xB0, 0xB0); //Watch battery level and time (Gray)
 //Disconnected time display colour
 static lv_color_t watch_colour = lv_color_make(0xFF, 0x00, 0x00); // (Red)
@@ -132,6 +137,12 @@ extern boolean connected;
 extern int maxcurrent;
 extern int crittemp;
 extern int warntemp;
+extern int max_speed;
+extern int avg_speed;
+extern int max_batt;
+extern int min_batt;
+extern int max_current;
+extern int max_temp;
 
 extern "C" {
   extern void lv_keyboard_def_event_cb(lv_obj_t * kb, lv_event_t event);
