@@ -4,7 +4,7 @@
    Borrowed some snippets from Alex Goodyear's agoodWatch and a fair bit from
    SimpleWatch example in https://github.com/Xinyuan-LilyGO/TTGO_TWatch_Library
    By Lewis He
-   
+
    BLE code is based on the BLE client example ftom the ESP library
 
    Wheel data decoding is based on Wheellog by Kevin Cooper, Cedric Hauber and Palachzzz,
@@ -245,7 +245,7 @@ static void decodeKS (byte KSdata[]) {
   Serial.print(wheeldata[14]); Serial.println(" alarm3");
   Serial.print(wheeldata[15]); Serial.println(" maxspeed");
 
-  
+
 } // End decodeKS
 
 static int decode2byte(byte byte1, byte byte2) { //converts big endian 2 byte value to int
@@ -336,13 +336,13 @@ class MyAdvertisedDeviceCallbacks: public BLEAdvertisedDeviceCallbacks {
 
 void ks_ble_request(byte reqtype) {
   /****************************************
-   * reqtype is the byte representing the request id
-   * 0x9B -- Serial Number
-   * 0x63 -- Manufacturer and model
-   * 0x98 -- speed alarm settings and tiltback (Max) speed
-   * Responses to the request is handled by the notification handler
-   * and will be added to the wheeldata[] array
-   */
+     reqtype is the byte representing the request id
+     0x9B -- Serial Number
+     0x63 -- Manufacturer and model
+     0x98 -- speed alarm settings and tiltback (Max) speed
+     Responses to the request is handled by the notification handler
+     and will be added to the wheeldata[] array
+  */
   byte KS_BLEreq[20] = {0x00}; //set array to zero
   KS_BLEreq[0] = 0xAA;  //Header byte 1
   KS_BLEreq[1] = 0x55;  //Header byte 2
@@ -354,9 +354,9 @@ void ks_ble_request(byte reqtype) {
 }
 
 void initks() {
- /*
-  *   Request Kingsong Model Name, serial number and speed settings
-  *   This must be done before any BLE notifications will be pused by the KS wheel
+  /*
+       Request Kingsong Model Name, serial number and speed settings
+       This must be done before any BLE notifications will be pused by the KS wheel
   */
   Serial.println("requesting model..");
   ks_ble_request(0x9B);
@@ -373,7 +373,7 @@ void setup()
 {
   Serial.begin (115200);
 
-  //Temporary setting of some model specific parametes, 
+  //Temporary setting of some model specific parametes,
   //Todo: automatic model identification
   if (wheelmodel = "KS14SMD") {
     maxcurrent = 30;
@@ -524,13 +524,13 @@ void loop()
       doScan = true;
     }
     scandelay++;
-    Serial.print("scandelay: "); Serial.println(scandelay);
-    if (!watch_running){
-        stop_dash_task();
-        setup_timeGui();
-        watch_running = true;
-        Serial.println(watch_running);
-      }
+    //Serial.print("scandelay: "); Serial.println(scandelay);
+    if (!watch_running) {
+      stop_dash_task();
+      setup_timeGui();
+      watch_running = true;
+      //Serial.println(watch_running);
+    }
   }
 
 
@@ -539,7 +539,7 @@ void loop()
       Serial.println("We are now connected to the BLE Server.");
     } else {
       Serial.println("We have failed to connect to the server;");
-      
+
     }
     doConnect = false;
 
@@ -550,20 +550,12 @@ void loop()
     watch_running = false;
     setup_LVGui();
   }
-  if (connected) {
-    ride_mode = 1;
-  }
-  else if (doScan && (ttgo->bl->isOn())) {
-    ride_mode = 0;
+  if (!connected && doScan && (ttgo->bl->isOn())) {
     Serial.println("Disconnected... starting scan");
-    ride_mode = 0;
     BLEDevice::getScan()->start(2);
     scandelay = 0;
     doScan = false;
-  } else {
-    ride_mode = 0;
-    Serial.println("Disconnected... scanning is off");
-  }
+  } 
 
   // An XEvent signifies that there has been a wakeup interrupt, bring the CPU out of low energy mode
   EventBits_t  bits = xEventGroupGetBits(isr_group);

@@ -391,6 +391,7 @@ void updateTime()
   TTGOClass *ttgo = TTGOClass::getWatch();
   ttgo->rtc->syncToRtc();
 }
+
 /*
  * sets the backlight level according to the time of day
  * adjust this to your local conditions, 
@@ -398,7 +399,6 @@ void updateTime()
  * automatically according to latitude and day of year
  * todo: add a separate task that runs less often for this
  */
-
 void setbrightness() {
   TTGOClass *ttgo = TTGOClass::getWatch();
   time_t now;
