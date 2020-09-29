@@ -59,10 +59,9 @@ First version of the new design, there are still some more things to add.
 ## Todo
 - Add haptic feedback to alarms
 - Add missing dashboard objects
-  - <strikethrough> Max/Avg/Min bars on arcs </strikethrough>
-  - Trip distance
   - Ride time
   - Alert icons and red corners
+- Add simple dashboard
 - Add multiple screens (2 dashboard detail levels)
 - Add info screen
 - Add settings sreen and settings
