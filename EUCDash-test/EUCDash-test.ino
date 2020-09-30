@@ -500,15 +500,16 @@ void setup()
   //Synchronize time to system time
   ttgo->rtc->syncToSystem();
 
-  //Execute your own GUI interface
-  if (!connected) {
-    setup_timeGui();
-  }
   //Clear lvgl counter
   lv_disp_trig_activity(NULL);
 
   //When the initialization is complete, turn on the backlight
   ttgo->openBL();
+  
+  //Execute watch only GUI interface
+  if (!connected) {
+    setup_timeGui();
+  }
 
   /*
      Setup the axes for the TWatch-2020-V1 for the tilt detection.

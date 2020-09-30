@@ -493,8 +493,9 @@ void lv_dashtime_update(void) {
   strftime(buf, sizeof(buf), "%H:%M", &info);
   lv_label_set_text(dashtime, buf);
   lv_obj_align(dashtime, NULL, LV_ALIGN_IN_BOTTOM_RIGHT, 0, 0);
-  TTGOClass *ttgo = TTGOClass::getWatch();
-  int watchbatt = ttgo->power->getBattPercentage();
+  //TTGOClass *ttgo = TTGOClass::getWatch();
+  //int watchbatt = ttgo->power->getBattPercentage();
+  int watchbatt = 0;
   char wbattstring[2];
   dtostrf(watchbatt, 2, 0, wbattstring);
   lv_label_set_text(wbatt, wbattstring);
