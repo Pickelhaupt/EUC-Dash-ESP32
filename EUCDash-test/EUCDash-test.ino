@@ -57,6 +57,7 @@ unsigned int screenTimeout = DEFAULT_SCREEN_TIMEOUT;
 String wheelmodel = "KS14SMD";
 //String wheelmodel = "KS16S";
 
+SemaphoreHandle_t dash_xSemaphore = xSemaphoreCreateMutex();
 boolean doConnect = false;
 boolean connected = false;
 boolean doScan = false;
@@ -131,14 +132,37 @@ void low_energy()
     ttgo->rtc->syncToSystem();
     // updateBatteryLevel();
     // updateBatteryIcon(batState);
-    //updateTime();
     lv_disp_trig_activity(NULL);
     ttgo->openBL();
+    setbrightness();
     displayOff = true;
     if (connected) {
       screenTimeout = ridingScreenTimeout;
     } else {
       screenTimeout = defaultScreenTimeout;
+    }
+  }
+}
+
+void setbrightness() {
+  TTGOClass *ttgo = TTGOClass::getWatch();
+  time_t now;
+  struct tm  info;
+  char buf[64];
+  time(&now);
+  localtime_r(&now, &info);
+  strftime(buf, sizeof(buf), "%H", &info);
+  if (connected) {
+    if (info.tm_hour > 19 || info.tm_hour < 6) {
+      ttgo->setBrightness(64);
+    } else {
+      ttgo->setBrightness(240);
+    }
+  } else {
+    if (info.tm_hour > 19 || info.tm_hour < 6) {
+      ttgo->setBrightness(16);
+    } else {
+      ttgo->setBrightness(96);
     }
   }
 }
@@ -157,9 +181,6 @@ static void notifyCallback(
   if (length == 20) {
     if (pData[0] == 0xAA && pData[1] == 0x55) {
       decodeKS(pData); // For Kingsong only atm.
-      //Invoke the lvgl task handler from within the notifycallback handler
-      //(updates the text labels everytime there is a valid notification from the characteristic FFE1)
-      lv_task_handler(); //Since this function will loop, it's necessary to manage lv tasks
     }
   }
 }
@@ -235,14 +256,16 @@ static void decodeKS (byte KSdata[]) {
   }
 
   //set values for max/min arc bars
-  max_speed = wheeldata[10];
+  if (wheeldata[10] < (wheeldata[15] + 6)) {
+    max_speed = wheeldata[10];
+  }
   if (wheeldata[6] > max_batt) {
     max_batt = wheeldata[6];
   }
   if (wheeldata[6] < min_batt && wheeldata[6] != 0) {
     min_batt = wheeldata[6];
   }
-  if (wheeldata[3] > max_current && wheeldata[3] < (maxcurrent + 5) && wheeldata[3] >= 0) {
+  if (wheeldata[3] > max_current && wheeldata[3] <= maxcurrent) {
     max_current = wheeldata[3];
   }
   if (wheeldata[4] > max_temp) {
@@ -251,25 +274,25 @@ static void decodeKS (byte KSdata[]) {
   //Debug -- testing, print all data to serial
   Serial.print(wheeldata[0]); Serial.println(" V");
   Serial.print(wheeldata[1]); Serial.println(" kmh");
-  Serial.print(wheeldata[2]); Serial.println(" km");
+ // Serial.print(wheeldata[2]); Serial.println(" km");
   Serial.print(wheeldata[3]); Serial.println(" A");
-  Serial.print(wheeldata[4]); Serial.println(" C");
-  Serial.print(wheeldata[5]); Serial.println(" rmode");
-  Serial.print(wheeldata[6]); Serial.println(" %");
-  Serial.print(wheeldata[7]); Serial.println(" W");
-  Serial.print(wheeldata[8]); Serial.println(" km");
-  Serial.print(wheeldata[9]); Serial.println(" time");
-  Serial.print(wheeldata[10]); Serial.println(" kmh");
-  Serial.print(wheeldata[11]); Serial.println(" fan");
+ // Serial.print(wheeldata[4]); Serial.println(" C");
+ // Serial.print(wheeldata[5]); Serial.println(" rmode");
+ // Serial.print(wheeldata[6]); Serial.println(" %");
+ // Serial.print(wheeldata[7]); Serial.println(" W");
+ // Serial.print(wheeldata[8]); Serial.println(" km");
+ // Serial.print(wheeldata[9]); Serial.println(" time");
+ // Serial.print(wheeldata[10]); Serial.println(" kmh");
+ // Serial.print(wheeldata[11]); Serial.println(" fan");
   //Serial.print(wheeldata[12]); Serial.println(" alarm1");
   //Serial.print(wheeldata[13]); Serial.println(" alarm2");
   //Serial.print(wheeldata[14]); Serial.println(" alarm3");
-  Serial.print(wheeldata[15]); Serial.println(" maxspeed");
-  Serial.print(max_speed); Serial.println(" max_speed");
-  Serial.print(max_batt); Serial.println(" max_batt");
-  Serial.print(min_batt); Serial.println(" min_batt");
-  Serial.print(max_current); Serial.println(" max_current");
-  Serial.print(max_temp); Serial.println(" max_temp");
+ // Serial.print(wheeldata[15]); Serial.println(" maxspeed");
+  //Serial.print(max_speed); Serial.println(" max_speed");
+  //Serial.print(max_batt); Serial.println(" max_batt");
+  //Serial.print(min_batt); Serial.println(" min_batt");
+  //Serial.print(max_current); Serial.println(" max_current");
+  //Serial.print(max_temp); Serial.println(" max_temp");
 } // End decodeKS
 
 static int decode2byte(byte byte1, byte byte2) { //converts big endian 2 byte value to int
@@ -505,11 +528,12 @@ void setup()
 
   //When the initialization is complete, turn on the backlight
   ttgo->openBL();
-  
+  setbrightness();
+
   //Execute watch only GUI interface
-  if (!connected) {
-    setup_timeGui();
-  }
+  //if (!connected) {
+  //  setup_timeGui();
+  //}
 
   /*
      Setup the axes for the TWatch-2020-V1 for the tilt detection.
@@ -543,7 +567,7 @@ void setup()
   pBLEScan->setInterval(1349);
   pBLEScan->setWindow(449);
   pBLEScan->setActiveScan(true);
-  pBLEScan->start(5, false);
+  pBLEScan->start(2, false);
 }
 
 void loop()
@@ -564,8 +588,6 @@ void loop()
       //Serial.println(watch_running);
     }
   }
-
-
   if (doConnect == true) {
     if (connectToServer()) {
       Serial.println("We are now connected to the BLE Server.");
@@ -577,6 +599,7 @@ void loop()
 
     //    Send necessary initialisation packages to start BLE notifications, do not know why this is needed though
     Serial.println("initialising KingSong");
+    //setCpuFrequencyMhz (CPU_FREQ_MEDIUM);
     initks();
     stop_time_task();
     watch_running = false;
@@ -648,18 +671,18 @@ void loop()
         log_i("Q_EVENT_AXP_INT");
 
         ttgo->power->readIRQ();
-        if (ttgo->power->isVbusPlugInIRQ()) {
+        /*if (ttgo->power->isVbusPlugInIRQ()) {
           batState = LV_ICON_CHARGE;
           // updateBatteryIcon(LV_ICON_CHARGE);
-        }
-        if (ttgo->power->isVbusRemoveIRQ()) {
+          }
+          if (ttgo->power->isVbusRemoveIRQ()) {
           batState = LV_ICON_CALCULATION;
           // updateBatteryIcon(LV_ICON_CALCULATION);
-        }
-        if (ttgo->power->isChargingDoneIRQ()) {
+          }
+          if (ttgo->power->isChargingDoneIRQ()) {
           batState = LV_ICON_CALCULATION;
           // updateBatteryIcon(LV_ICON_CALCULATION);
-        }
+          }*/
         if (ttgo->power->isPEKShortPressIRQ()) {
           ttgo->power->clearIRQ();
           low_energy();
@@ -670,7 +693,11 @@ void loop()
     }
   }
   if (lv_disp_get_inactive_time(NULL) < screenTimeout) {
-    lv_task_handler();
+    //if (pdTRUE == xSemaphoreTake(dash_xSemaphore, portMAX_DELAY)) {
+      lv_task_handler(); //Since this function will loop, it's necessary to manage lv tasks
+    //  xSemaphoreGive(dash_xSemaphore);
+      //delay(5);
+   // }
   } else {
     low_energy();
   }

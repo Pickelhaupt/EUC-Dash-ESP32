@@ -36,6 +36,7 @@
 #define RIDING_SCREEN_TIMEOUT  60*1000    // Long timeout when connected to the wheel
 
 #define CPU_FREQ_MIN     10
+#define CPU_FREQ_LOW     40
 #define CPU_FREQ_NORM    80
 #define CPU_FREQ_WIFI    80
 #define CPU_FREQ_BLE     80  //to avoid BLE notification issues
@@ -86,6 +87,7 @@ void stop_dash_task();
 void stop_speed_shake();
 void stop_current_shake();
 void stop_temp_shake();
+void setbrightness();
 
 /**********************************************
    Define custom colours for the EUC gauges
@@ -94,19 +96,19 @@ void stop_temp_shake();
    is a warning or critical state
  **********************************************/
 // Gauge colours
-static lv_color_t current_bg_clr = lv_color_make(0x05, 0x05, 0x05); //Current gauge arc background (default = dark gray)
+static lv_color_t current_bg_clr = lv_color_make(0x25, 0x25, 0x25); //Current gauge arc background (default = dark gray)
 static lv_color_t current_fg_clr = lv_color_make(0xff, 0xff, 0xff); //Current gauge arc background (default = white)
-static lv_color_t speed_bg_clr = lv_color_make(0x00, 0x0a, 0x00); //Speed gauge arc background (default = dark green)
+static lv_color_t speed_bg_clr = lv_color_make(0x05, 0x2a, 0x05); //Speed gauge arc background (default = dark green)
 static lv_color_t speed_fg_clr = lv_color_make(0x00, 0xfa, 0x0f); //Speed gauge indicator color (default = green)
-static lv_color_t batt_bg_clr = lv_color_make(0x00, 0x0a, 0x00); //Speed gauge arc background (default = dark green)
-static lv_color_t batt_fg_clr = lv_color_make(0x00, 0xfa, 0x0f); //Speed gauge indicator color (default = green)
-static lv_color_t temp_bg_clr = lv_color_make(0x05, 0x05, 0x0a); //Temperature gauge arc background (dark blue)
+static lv_color_t batt_bg_clr = lv_color_make(0x05, 0x2a, 0x05); //Battery gauge arc background (default = dark green)
+static lv_color_t batt_fg_clr = lv_color_make(0x00, 0xfa, 0x0f); //Battery gauge indicator color (default = green)
+static lv_color_t temp_bg_clr = lv_color_make(0x05, 0x05, 0x3a); //Temperature gauge arc background (dark blue)
 static lv_color_t temp_fg_clr = lv_color_make(0x2a, 0x1f, 0xff); //Temperature gauge indicator color (light blue)
 //Misc colours
 static lv_color_t ride_mode_clr = lv_color_make(0xFF, 0x00, 0xFF); //The H M S ride mode indicator (Magenta)
 static lv_color_t max_bar_clr = lv_color_make(0xFF, 0x00, 0xFF); //The H M S ride mode indicator (Magenta)
 static lv_color_t min_bar_clr = lv_color_make(0x2a, 0x1f, 0xff); //The H M S ride mode indicator (light blue)
-static lv_color_t watch_info_colour = lv_color_make(0xB0, 0xB0, 0xB0); //Watch battery level and time (Gray)
+static lv_color_t watch_info_colour = lv_color_make(0xD0, 0xD0, 0xD0); //Watch battery level and time (Gray)
 //Disconnected time display colour
 static lv_color_t watch_colour = lv_color_make(0xFF, 0x00, 0x00); // (Red)
 
@@ -125,6 +127,7 @@ LV_FONT_DECLARE(DIN1451_m_cond_72);
 LV_FONT_DECLARE(DIN1451_m_cond_80);
 LV_FONT_DECLARE(DIN1451_m_cond_120);
 LV_FONT_DECLARE(DIN1451_m_cond_150);
+LV_FONT_DECLARE(DIN1451_m_cond_180);
 
 extern unsigned int screenTimeout;
 extern unsigned int defaultScreenTimeout;
