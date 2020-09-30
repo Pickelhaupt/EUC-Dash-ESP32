@@ -113,7 +113,6 @@ void lv_define_styles_1(void) {
   lv_style_set_line_rounded(&speed_main_style, LV_STATE_DEFAULT, false);
   lv_style_set_line_width(&speed_main_style, LV_STATE_DEFAULT, arclinew);
   lv_style_set_bg_color(&speed_main_style, LV_STATE_DEFAULT, LV_COLOR_BLACK);
-
   lv_style_set_line_color(&speed_main_style, LV_STATE_DEFAULT, speed_bg_clr);
   if (display_speedarc = false) {
     lv_style_set_line_opa(&speed_main_style, LV_STATE_DEFAULT, LV_OPA_TRANSP);
@@ -210,8 +209,6 @@ void lv_define_styles_1(void) {
 void lv_speed_arc_1(void)
 {
   /*Create speed gauge arc*/
-
-
   //Arc
   speed_arc = lv_arc_create(lv_scr_act(), NULL);
   lv_obj_add_style(speed_arc, LV_ARC_PART_INDIC, &speed_indic_style);
@@ -222,7 +219,7 @@ void lv_speed_arc_1(void)
   lv_obj_set_size(speed_arc, 268, 268);
   lv_obj_align(speed_arc, NULL, LV_ALIGN_CENTER, 0, 0);
 
-  if (display_speedarc) {
+  if (display_speedarc = true) {
     //Max bar
     speed_max_bar = lv_arc_create(lv_scr_act(), NULL);
     lv_obj_add_style(speed_max_bar, LV_ARC_PART_INDIC, &max_bar_indic_style);
@@ -397,7 +394,7 @@ static void lv_speed_update(void) {
     lv_style_set_text_color(&speed_label_style, LV_STATE_DEFAULT, speed_fg_clr);
     //stop_speed_shake();
   }
-  if (display_speedarc) {
+  if (display_speedarc = true) {
     lv_obj_add_style(speed_arc, LV_ARC_PART_INDIC, &speed_indic_style);
     lv_arc_set_value(speed_arc, wheeldata[1]);
 
