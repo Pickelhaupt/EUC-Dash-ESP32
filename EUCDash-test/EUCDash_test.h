@@ -11,7 +11,6 @@
 #define STR(_s) XSTR(_s)
 #define XSTR(_s) #_s
 
-
 /*
    Use a time-zone string from https://github.com/nayarsystems/posix_tz_db/blob/master/zones.csv
    Courtesy of Andreas Spiess NTP example https://github.com/SensorsIot and his YouTube channel
@@ -111,6 +110,7 @@ static lv_color_t min_bar_clr = lv_color_make(0x2a, 0x1f, 0xff); //The H M S rid
 static lv_color_t watch_info_colour = lv_color_make(0xD0, 0xD0, 0xD0); //Watch battery level and time (Gray)
 //Disconnected time display colour
 static lv_color_t watch_colour = lv_color_make(0xFF, 0x00, 0x00); // (Red)
+static lv_color_t watch_bg_colour = lv_color_make(0x3F, 0x00, 0x00); // (Dark Red)
 
 /***********************************************************
    Declare custom fonts, TTF fonts can be converted to C at:

@@ -80,7 +80,6 @@ float min_batt = 100;
 float max_current = 0;
 float max_temp = 0;
 
-
 /************************************************
    For Kingsong and Gotway EUCs
    Inmotion/Solowheel and Ninebot/Segway use
@@ -99,8 +98,6 @@ static BLEUUID serviceUUID("0000fff0-0000-1000-8000-00805f9b34fb");
 static BLEUUID serviceUUID2("0000ffe0-0000-1000-8000-00805f9b34fb");
 // The characteristic UUID of all wheel notifications
 static BLEUUID charUUID("0000ffe1-0000-1000-8000-00805f9b34fb");
-
-
 
 /******************************************************************
    Function managing the entry and exit from sleep/power save mode
@@ -133,8 +130,8 @@ void low_energy()
     // updateBatteryLevel();
     // updateBatteryIcon(batState);
     lv_disp_trig_activity(NULL);
-    ttgo->openBL();
     setbrightness();
+    ttgo->openBL();
     displayOff = true;
     if (connected) {
       screenTimeout = ridingScreenTimeout;
@@ -145,7 +142,7 @@ void low_energy()
 }
 
 void setbrightness() {
-  TTGOClass *ttgo = TTGOClass::getWatch();
+  // TTGOClass *ttgo = TTGOClass::getWatch();
   time_t now;
   struct tm  info;
   char buf[64];
@@ -154,15 +151,15 @@ void setbrightness() {
   strftime(buf, sizeof(buf), "%H", &info);
   if (connected) {
     if (info.tm_hour > 19 || info.tm_hour < 6) {
-      ttgo->setBrightness(64);
+      ttgo->setBrightness(96);
     } else {
-      ttgo->setBrightness(240);
+      ttgo->setBrightness(255);
     }
   } else {
     if (info.tm_hour > 19 || info.tm_hour < 6) {
-      ttgo->setBrightness(16);
+      ttgo->setBrightness(32);
     } else {
-      ttgo->setBrightness(96);
+      ttgo->setBrightness(128);
     }
   }
 }
@@ -274,20 +271,20 @@ static void decodeKS (byte KSdata[]) {
   //Debug -- testing, print all data to serial
   Serial.print(wheeldata[0]); Serial.println(" V");
   Serial.print(wheeldata[1]); Serial.println(" kmh");
- // Serial.print(wheeldata[2]); Serial.println(" km");
+  // Serial.print(wheeldata[2]); Serial.println(" km");
   Serial.print(wheeldata[3]); Serial.println(" A");
- // Serial.print(wheeldata[4]); Serial.println(" C");
- // Serial.print(wheeldata[5]); Serial.println(" rmode");
- // Serial.print(wheeldata[6]); Serial.println(" %");
- // Serial.print(wheeldata[7]); Serial.println(" W");
- // Serial.print(wheeldata[8]); Serial.println(" km");
- // Serial.print(wheeldata[9]); Serial.println(" time");
- // Serial.print(wheeldata[10]); Serial.println(" kmh");
- // Serial.print(wheeldata[11]); Serial.println(" fan");
+  // Serial.print(wheeldata[4]); Serial.println(" C");
+  Serial.print(wheeldata[5]); Serial.println(" rmode");
+  // Serial.print(wheeldata[6]); Serial.println(" %");
+  // Serial.print(wheeldata[7]); Serial.println(" W");
+  // Serial.print(wheeldata[8]); Serial.println(" km");
+  // Serial.print(wheeldata[9]); Serial.println(" time");
+  // Serial.print(wheeldata[10]); Serial.println(" kmh");
+  // Serial.print(wheeldata[11]); Serial.println(" fan");
   //Serial.print(wheeldata[12]); Serial.println(" alarm1");
   //Serial.print(wheeldata[13]); Serial.println(" alarm2");
   //Serial.print(wheeldata[14]); Serial.println(" alarm3");
- // Serial.print(wheeldata[15]); Serial.println(" maxspeed");
+  // Serial.print(wheeldata[15]); Serial.println(" maxspeed");
   //Serial.print(max_speed); Serial.println(" max_speed");
   //Serial.print(max_batt); Serial.println(" max_batt");
   //Serial.print(min_batt); Serial.println(" min_batt");
@@ -382,14 +379,15 @@ class MyAdvertisedDeviceCallbacks: public BLEAdvertisedDeviceCallbacks {
 }; // MyAdvertisedDeviceCallbacks
 
 void ks_ble_request(byte reqtype) {
-  /****************************************
-     reqtype is the byte representing the request id
-     0x9B -- Serial Number
-     0x63 -- Manufacturer and model
-     0x98 -- speed alarm settings and tiltback (Max) speed
-     Responses to the request is handled by the notification handler
-     and will be added to the wheeldata[] array
-  */
+  /****************************************************************
+      reqtype is the byte representing the request id
+      0x9B -- Serial Number
+      0x63 -- Manufacturer and model
+      0x98 -- speed alarm settings and tiltback (Max) speed
+      0x88 -- horn
+      Responses to the request is handled by the notification handler
+      and will be added to the wheeldata[] array
+   *****************************************************************/
   byte KS_BLEreq[20] = {0x00}; //set array to zero
   KS_BLEreq[0] = 0xAA;  //Header byte 1
   KS_BLEreq[1] = 0x55;  //Header byte 2
@@ -405,12 +403,12 @@ void initks() {
   //Setting of some model specific parametes,
   //Todo: automatic model identification
   if (wheelmodel = "KS14SMD") {
-    maxcurrent = 30;
+    maxcurrent = 35;
     crittemp = 65;
     warntemp = 50;
   }
   else if (wheelmodel = "KS16S") {
-    maxcurrent = 30;
+    maxcurrent = 35;
     crittemp = 65;
     warntemp = 50;
   }
@@ -424,18 +422,16 @@ void initks() {
        Request Kingsong Model Name, serial number and speed settings
        This must be done before any BLE notifications will be pused by the KS wheel
   ******************************************/
-  TTGOClass *ttgo = TTGOClass::getWatch();
+  //TTGOClass *ttgo = TTGOClass::getWatch();
   Serial.println("requesting model..");
   ks_ble_request(0x9B);
   ttgo->shake ();
   delay(200);
   Serial.println("requesting serial..");
   ks_ble_request(0x63);
-  //ttgo->shake ();
   delay(200);
   Serial.println("requesting speed settings..");
   ks_ble_request(0x98);
-  //ttgo->shake ();
   delay(200);
 } //End of initks
 
@@ -461,7 +457,7 @@ void setup()
   //Turn off unused power
   ttgo->power->setPowerOutPut(AXP202_EXTEN, AXP202_OFF);
   ttgo->power->setPowerOutPut(AXP202_DCDC2, AXP202_OFF);
-  ttgo->power->setPowerOutPut(AXP202_LDO3, AXP202_OFF);
+  //ttgo->power->setPowerOutPut(AXP202_LDO3, AXP202_OFF);
   ttgo->power->setPowerOutPut(AXP202_LDO4, AXP202_OFF);
 
   //Initialize lvgl
@@ -527,8 +523,8 @@ void setup()
   lv_disp_trig_activity(NULL);
 
   //When the initialization is complete, turn on the backlight
-  ttgo->openBL();
   setbrightness();
+  ttgo->openBL();
 
   //Execute watch only GUI interface
   //if (!connected) {
@@ -576,7 +572,7 @@ void loop()
   uint8_t data;
   static uint32_t start = 0;
   if (!connected) {
-    if (scandelay > 1000) { //Scan for BLE devices around every 5 seconds when nor connected
+    if (scandelay > 1000) { //Scan for BLE devices around every 5 seconds when not connected
       doScan = true;
     }
     scandelay++;
@@ -593,7 +589,6 @@ void loop()
       Serial.println("We are now connected to the BLE Server.");
     } else {
       Serial.println("We have failed to connect to the server;");
-
     }
     doConnect = false;
 
@@ -657,6 +652,13 @@ void loop()
           {
             screenTimeout--;
             ttgo->setBrightness(255);
+          } else if (screenTimeout == ridingScreenTimeout) {
+            if (wheeldata[1] > 2) {
+              ks_ble_request(0x9B);
+              //  } else {
+              //    add lights off here
+              //  }
+            }
           }
           else
           {
@@ -693,11 +695,7 @@ void loop()
     }
   }
   if (lv_disp_get_inactive_time(NULL) < screenTimeout) {
-    //if (pdTRUE == xSemaphoreTake(dash_xSemaphore, portMAX_DELAY)) {
-      lv_task_handler(); //Since this function will loop, it's necessary to manage lv tasks
-    //  xSemaphoreGive(dash_xSemaphore);
-      //delay(5);
-   // }
+    lv_task_handler(); //Since this function will loop, it's necessary to manage lv tasks
   } else {
     low_energy();
   }
