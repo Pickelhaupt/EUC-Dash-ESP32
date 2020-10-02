@@ -253,10 +253,12 @@ static void decodeKS (byte KSdata[]) {
   }
 
   //set values for max/min arc bars
-  if (wheeldata[10] < (wheeldata[15] + 6)) {
+  if (wheeldata[10] < (wheeldata[15] + 5)) {
     max_speed = wheeldata[10];
+  } else {
+    max_speed = (wheeldata[15] + 5);
   }
-  if (wheeldata[6] > max_batt) {
+  if (wheeldata[6] > max_batt && wheeldata[3] >= 0) {
     max_batt = wheeldata[6];
   }
   if (wheeldata[6] < min_batt && wheeldata[6] != 0) {
@@ -269,17 +271,17 @@ static void decodeKS (byte KSdata[]) {
     max_temp = wheeldata[4];
   }
   //Debug -- testing, print all data to serial
-  Serial.print(wheeldata[0]); Serial.println(" V");
-  Serial.print(wheeldata[1]); Serial.println(" kmh");
+  //Serial.print(wheeldata[0]); Serial.println(" V");
+  //Serial.print(wheeldata[1]); Serial.println(" kmh");
   // Serial.print(wheeldata[2]); Serial.println(" km");
-  Serial.print(wheeldata[3]); Serial.println(" A");
+  //Serial.print(wheeldata[3]); Serial.println(" A");
   // Serial.print(wheeldata[4]); Serial.println(" C");
-  Serial.print(wheeldata[5]); Serial.println(" rmode");
+  //Serial.print(wheeldata[5]); Serial.println(" rmode");
   // Serial.print(wheeldata[6]); Serial.println(" %");
   // Serial.print(wheeldata[7]); Serial.println(" W");
   // Serial.print(wheeldata[8]); Serial.println(" km");
   // Serial.print(wheeldata[9]); Serial.println(" time");
-  // Serial.print(wheeldata[10]); Serial.println(" kmh");
+  //Serial.print(wheeldata[10]); Serial.println(" kmh");
   // Serial.print(wheeldata[11]); Serial.println(" fan");
   //Serial.print(wheeldata[12]); Serial.println(" alarm1");
   //Serial.print(wheeldata[13]); Serial.println(" alarm2");

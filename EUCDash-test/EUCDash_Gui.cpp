@@ -10,7 +10,10 @@
    Mike, Change these to false if you want the simple dash
  ***********************************************/
 bool fulldash = true;
-bool display_speedarc = true;
+bool dspeedarc = true;
+
+//bool fulldash = false;
+//bool dspeedarc = false;
 
 extern float wheeldata[];
 
@@ -102,11 +105,11 @@ static lv_style_t batt_bg_style;
  ************************************/
 void lv_define_styles_1(void) {
   int arclinew = 25;
+  if (!dspeedarc) {
+    arclinew = 30;
+  }
   if (fulldash) {
     arclinew = 15; // line width of arc gauges
-  }
-  if (display_speedarc = false) {
-    arclinew = 30;
   }
   //Speed arc and label
 
@@ -119,7 +122,7 @@ void lv_define_styles_1(void) {
   lv_style_set_line_width(&speed_main_style, LV_STATE_DEFAULT, arclinew);
   lv_style_set_bg_color(&speed_main_style, LV_STATE_DEFAULT, LV_COLOR_BLACK);
   lv_style_set_line_color(&speed_main_style, LV_STATE_DEFAULT, speed_bg_clr);
-  if (display_speedarc = false) {
+  if (!dspeedarc) {
     lv_style_set_line_opa(&speed_main_style, LV_STATE_DEFAULT, LV_OPA_TRANSP);
   }
   lv_style_init(&speed_label_style);
@@ -204,7 +207,7 @@ void lv_define_styles_1(void) {
 
   // Clock
   lv_style_init(&dashtime_style);
-  lv_style_set_text_color(&dashtime_style, LV_STATE_DEFAULT, LV_COLOR_GRAY);
+  lv_style_set_text_color(&dashtime_style, LV_STATE_DEFAULT, watch_info_colour);
   lv_style_set_text_font(&dashtime_style, LV_STATE_DEFAULT, &DIN1451_m_cond_28);
 } //End Define LVGL default object styles
 
@@ -224,7 +227,7 @@ void lv_speed_arc_1(void)
   lv_obj_set_size(speed_arc, 268, 268);
   lv_obj_align(speed_arc, NULL, LV_ALIGN_CENTER, 0, 0);
 
-  if (display_speedarc = true) {
+  if (dspeedarc) {
     //Max bar
     speed_max_bar = lv_arc_create(lv_scr_act(), NULL);
     lv_obj_add_style(speed_max_bar, LV_ARC_PART_INDIC, &max_bar_indic_style);
@@ -399,12 +402,27 @@ static void lv_speed_update(void) {
     lv_style_set_text_color(&speed_label_style, LV_STATE_DEFAULT, speed_fg_clr);
     //stop_speed_shake();
   }
-  if (display_speedarc = true) {
+  if (dspeedarc) {
     lv_obj_add_style(speed_arc, LV_ARC_PART_INDIC, &speed_indic_style);
     lv_arc_set_value(speed_arc, wheeldata[1]);
-
-    lv_arc_set_angles(speed_max_bar, (160 + (max_speed * 200 / (wheeldata[15] + 5))), (163 + (max_speed * 200 / (wheeldata[15] + 5))));
-    lv_arc_set_angles(speed_avg_bar, (160 + (avg_speed * 200 / (wheeldata[15] + 5))), (163 + (avg_speed * 200 / (wheeldata[15] + 5))));
+    int ang_max_1 = (160 + (max_speed * 220 / (wheeldata[15] + 5)));
+    if (ang_max_1 >= 360) {
+      ang_max_1 = (ang_max_1 - 360);
+    }
+    int ang_max_2 = (163 + (max_speed * 220 / (wheeldata[15] + 5)));
+    if (ang_max_2 >= 360) {
+      ang_max_2 = (ang_max_2 - 360);
+    }
+    int ang_avg_1 = (160 + (avg_speed * 220 / (wheeldata[15] + 5)));
+    if (ang_avg_1 >= 360) {
+      ang_avg_1 = (ang_avg_1 - 360);
+    }
+    int ang_avg_2 = (163 + (avg_speed * 220 / (wheeldata[15] + 5)));
+    if (ang_avg_2 >= 360) {
+      ang_avg_2 = (ang_avg_2 - 360);
+    }
+    lv_arc_set_angles(speed_max_bar, ang_max_1, ang_max_2);
+    lv_arc_set_angles(speed_avg_bar, ang_avg_1, ang_avg_2);
   }
   lv_obj_add_style(speed_label, LV_LABEL_PART_MAIN, &speed_label_style);
   char speedstring[4];
