@@ -53,9 +53,7 @@ Version 0.4, getting close, there are still some more things to add.
 - TTGO T-Watch Library
 - LVGL (The lvgl library that comes with the TTGO T-Watch Library needs to be updated to ver 7.5+)
 ## Bugs and issues
-- Sometimes hangs and require a restart
-- Does not properly remove tasks when switching modes
-- Backlight adjustment does not work at the moment
+
 ## Todo
 - Add haptic feedback to alarms
 - Add missing dashboard objects
