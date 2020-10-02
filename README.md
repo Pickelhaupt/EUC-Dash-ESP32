@@ -41,10 +41,10 @@ Reads BLE notifications from the electric unicycle and display data on the ESP32
 ### Supported Models
 Only supports Kingsong wheels at the moment. Might work with Gotway as well since the protocols are very similar.
 ## Screenshot
-First version of the new design, there are still some more things to add.
+Version 0.4, getting close, there are still some more things to add.
 <div>
-  <img src="https://github.com/Pickelhaupt/EUC-Dash-ESP32/raw/master/Images/ride-crop-small.jpg" width="30%" align="left"/>
-  <img src="https://github.com/Pickelhaupt/EUC-Dash-ESP32/raw/master/Images/watch-crop-small.jpg" width="30%" align="center"/>
+  <img src="https://github.com/Pickelhaupt/EUC-Dash-ESP32/raw/master/Images/fulldash-0.4-small.jpg" width="30%" align="left"/>
+  <img src="https://github.com/Pickelhaupt/EUC-Dash-ESP32/raw/master/Images/clock-0.4-small.jpg" width="30%" align="center"/>
 </div>
 
 ## Dependencies
@@ -53,9 +53,7 @@ First version of the new design, there are still some more things to add.
 - TTGO T-Watch Library
 - LVGL (The lvgl library that comes with the TTGO T-Watch Library needs to be updated to ver 7.5+)
 ## Bugs and issues
-- Sometimes hangs and require a restart
-- Does not properly remove tasks when switching modes
-- Backlight adjustment does not work at the moment
+
 ## Todo
 - Add haptic feedback to alarms
 - Add missing dashboard objects
