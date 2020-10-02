@@ -570,27 +570,29 @@ void updateTime()
       lv_label_set_text (dateLabel, buf);
       lv_obj_align(dateLabel, NULL, LV_ALIGN_CENTER, 0, 47);
     }
-    if (battLabel_bg != nullptr) {
-      lv_label_set_text (battLabel_bg, LV_SYMBOL_STOP " " LV_SYMBOL_STOP " " LV_SYMBOL_STOP " " LV_SYMBOL_STOP " " LV_SYMBOL_STOP);
-      lv_label_set_align(battLabel_bg, LV_LABEL_ALIGN_LEFT);
-      lv_obj_align(battLabel_bg, NULL, LV_ALIGN_IN_TOP_LEFT, 0, 0);
-    }
+    //if (battLabel_bg != nullptr) {
+    //  lv_label_set_text (battLabel_bg, LV_SYMBOL_STOP " " LV_SYMBOL_STOP " " LV_SYMBOL_STOP " " LV_SYMBOL_STOP " " LV_SYMBOL_STOP);
+    //  lv_label_set_align(battLabel_bg, LV_LABEL_ALIGN_LEFT);
+    //  lv_obj_align(battLabel_bg, NULL, LV_ALIGN_IN_TOP_LEFT, 0, 0);
+    //}
+    char watchbattstring[4];
+    dtostrf(watchbatt, 2, 0, watchbattstring);
     if (battLabel != nullptr) {
       if (watchbatt > 80) {
-        lv_label_set_text (battLabel, LV_SYMBOL_STOP " " LV_SYMBOL_STOP " " LV_SYMBOL_STOP " " LV_SYMBOL_STOP " " LV_SYMBOL_STOP);
+        lv_label_set_text (battLabel, LV_SYMBOL_BATTERY_FULL);
       } else if (watchbatt > 60) {
-        lv_label_set_text (battLabel, LV_SYMBOL_STOP " " LV_SYMBOL_STOP " " LV_SYMBOL_STOP " " LV_SYMBOL_STOP);
+        lv_label_set_text (battLabel, LV_SYMBOL_BATTERY_2);
       } else if (watchbatt > 40) {
-        lv_label_set_text (battLabel, LV_SYMBOL_STOP " " LV_SYMBOL_STOP " " LV_SYMBOL_STOP);
+        lv_label_set_text (battLabel, LV_SYMBOL_BATTERY_2);
       } else if (watchbatt > 20 ) {
-        lv_label_set_text (battLabel, LV_SYMBOL_STOP " " LV_SYMBOL_STOP);
+        lv_label_set_text (battLabel, LV_SYMBOL_BATTERY_1);
       } else if (watchbatt > 5 ) {
-        lv_label_set_text (battLabel, LV_SYMBOL_STOP);
+        lv_label_set_text (battLabel, LV_SYMBOL_BATTERY_EMPTY);
       } else {
-        lv_label_set_text (battLabel, LV_SYMBOL_CLOSE);
+        lv_label_set_text (battLabel, LV_SYMBOL_CLOSE " " LV_SYMBOL_BATTERY_EMPTY);
       }
-      lv_label_set_align(battLabel, LV_LABEL_ALIGN_LEFT);
-      lv_obj_align(battLabel, NULL, LV_ALIGN_IN_TOP_LEFT, 0, 0);
+      lv_label_set_align(battLabel, LV_LABEL_ALIGN_RIGHT);
+      lv_obj_align(battLabel, NULL, LV_ALIGN_IN_TOP_RIGHT, 0, 0);
     }
   }
   ttgo->rtc->syncToRtc();
@@ -673,21 +675,21 @@ void setup_timeGui(void) {
   lv_obj_align(dateLabel, temp_arc, LV_ALIGN_CENTER, 0, 47);
 
   lv_style_init(&batt_fg_style);
-  lv_style_set_text_color(&batt_fg_style, LV_STATE_DEFAULT, watch_colour);
+  lv_style_set_text_color(&batt_fg_style, LV_STATE_DEFAULT, watch_bg_colour);
 
   lv_style_init(&batt_bg_style);
   lv_style_set_text_color(&batt_bg_style, LV_STATE_DEFAULT, watch_bg_colour);
-  
+
   // battery indicator
-  battLabel_bg = lv_label_create(lv_scr_act(), NULL);
-  lv_obj_add_style(battLabel_bg, LV_OBJ_PART_MAIN, &batt_bg_style);
-  lv_label_set_align(battLabel_bg, LV_LABEL_ALIGN_LEFT);
-  lv_obj_align(battLabel_bg, temp_arc, LV_ALIGN_IN_TOP_LEFT, 0, 0);
+  //battLabel_bg = lv_label_create(lv_scr_act(), NULL);
+  //lv_obj_add_style(battLabel_bg, LV_OBJ_PART_MAIN, &batt_bg_style);
+  //lv_label_set_align(battLabel_bg, LV_LABEL_ALIGN_LEFT);
+  //lv_obj_align(battLabel_bg, temp_arc, LV_ALIGN_IN_TOP_LEFT, 0, 0);
 
   battLabel = lv_label_create(lv_scr_act(), NULL);
   lv_obj_add_style(battLabel, LV_OBJ_PART_MAIN, &batt_fg_style);
-  lv_label_set_align(battLabel, LV_LABEL_ALIGN_LEFT);
-  lv_obj_align(battLabel, temp_arc, LV_ALIGN_IN_TOP_LEFT, 0, 0);
+  lv_label_set_align(battLabel, LV_LABEL_ALIGN_RIGHT);
+  lv_obj_align(battLabel, temp_arc, LV_ALIGN_IN_TOP_RIGHT, 0, 0);
 
   //run time update task
   time_task = lv_task_create(lv_time_task, 2000, LV_TASK_PRIO_LOWEST, NULL);

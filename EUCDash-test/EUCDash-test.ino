@@ -7,8 +7,8 @@
 
    BLE code is based on the BLE client example ftom the ESP library
 
-   Wheel data decoding is based on Wheellog by Kevin Cooper, Cedric Hauber and Palachzzz,
-   would have been a lot of work without that code to reference.
+   Wheel data decoding is based on Wheellog by Kevin Cooper
+   it would have been a lot of work without that code to reference.
 
    Requires LVGL 7.5+ as aec drawing in earlier versions is incomplete
    Replace the lvgl library in TTGO_TWatch_Library as the included version is 7.3
@@ -458,8 +458,8 @@ void setup()
 
   //Turn off unused power
   ttgo->power->setPowerOutPut(AXP202_EXTEN, AXP202_OFF);
-  ttgo->power->setPowerOutPut(AXP202_DCDC2, AXP202_OFF);
-  //ttgo->power->setPowerOutPut(AXP202_LDO3, AXP202_OFF);
+  //ttgo->power->setPowerOutPut(AXP202_DCDC2, AXP202_OFF);
+  ttgo->power->setPowerOutPut(AXP202_LDO3, AXP202_OFF);
   ttgo->power->setPowerOutPut(AXP202_LDO4, AXP202_OFF);
 
   //Initialize lvgl
