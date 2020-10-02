@@ -43,8 +43,8 @@ Only supports Kingsong wheels at the moment. Might work with Gotway as well sinc
 ## Screenshot
 First version of the new design, there are still some more things to add.
 <div>
-  <img src="https://github.com/Pickelhaupt/EUC-Dash-ESP32/raw/master/Images/ride-crop-small.jpg" width="30%" align="left"/>
-  <img src="https://github.com/Pickelhaupt/EUC-Dash-ESP32/raw/master/Images/watch-crop-small.jpg" width="30%" align="center"/>
+  <img src="https://github.com/Pickelhaupt/EUC-Dash-ESP32/raw/master/Images/fulldash-0.4-small.jpg" width="30%" align="left"/>
+  <img src="https://github.com/Pickelhaupt/EUC-Dash-ESP32/raw/master/Images/clock-0.4-small.jpg" width="30%" align="center"/>
 </div>
 
 ## Dependencies
