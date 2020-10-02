@@ -33,10 +33,17 @@ Reads BLE notifications from the electric unicycle and display data on the ESP32
 - EUC temperature
 ### Data displayed 
 - Current speed
-- Battery level
+- Max speed
+- Wheel battery level
+- Wheel max battery
+- Wheel min battery
 - Current
+- Max current
 - Temperature
+- Max temperature
+- Trip meter
 - Current time
+- Watch battery level
 - Time and date when disconnected
 ### Supported Models
 Only supports Kingsong wheels at the moment. Might work with Gotway as well since the protocols are very similar.
