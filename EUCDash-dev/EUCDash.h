@@ -87,6 +87,10 @@ void stop_speed_shake();
 void stop_current_shake();
 void stop_temp_shake();
 void setbrightness();
+void decodeKS(byte KSData[]);
+void initks();
+void ks_ble_request(byte);
+void writeBLE (byte*, int);
 
 /**********************************************
    Define custom colours for the EUC gauges
@@ -117,7 +121,6 @@ static lv_color_t watch_bg_colour = lv_color_make(0xAF, 0x00, 0x00); // (Dark Re
    https://lvgl.io/tools/fontconverter
    All custom fonts reside in the sketch directory
  ***********************************************************/
-
 LV_FONT_DECLARE(DIN1451_m_cond_24);
 LV_FONT_DECLARE(DIN1451_m_cond_28);
 LV_FONT_DECLARE(DIN1451_m_cond_36);
@@ -128,6 +131,7 @@ LV_FONT_DECLARE(DIN1451_m_cond_80);
 LV_FONT_DECLARE(DIN1451_m_cond_120);
 LV_FONT_DECLARE(DIN1451_m_cond_150);
 LV_FONT_DECLARE(DIN1451_m_cond_180);
+
 
 extern unsigned int screenTimeout;
 extern unsigned int defaultScreenTimeout;
