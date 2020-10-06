@@ -5,6 +5,7 @@
 #include "string.h"
 #include <Ticker.h>
 #include "BLEDevice.h"
+#include "lv_gui.h"
 
 /***********************************************
    Mike, Change these to false if you want the simple dash
@@ -17,88 +18,28 @@ bool dspeedarc = true;
 
 extern float wheeldata[];
 
-lv_task_t *dash_task = nullptr;
-lv_task_t *time_task = nullptr;
-lv_task_t *speed_shake = nullptr;
-//lv_task_t *current_shake = nullptr;
-//lv_task_t *temp_shake = nullptr;
-
-// Function declarations
-static void lv_dash_task(lv_task_t *dash_task);
-static void lv_time_task(lv_task_t *time_task);
-static void lv_speed_shake(lv_task_t *speed_shake);
-//static void lv_current_shake(lv_task_t *current_shake);
-//static void lv_temp_shake(lv_task_t *temp_shake);
-
-/*
-   Declare LVGL Dashboard objects and styles
-*/
-
-// static void updateTime();
-
-// Arc gauges and labels
-static lv_obj_t *speed_arc = nullptr;
-static lv_obj_t *speed_label = nullptr;
-static lv_style_t speed_indic_style;
-static lv_style_t speed_main_style;
-static lv_style_t speed_label_style;
-static lv_style_t speed_label_style_smpl;
-
-static lv_obj_t *batt_arc = nullptr;
-static lv_obj_t *batt_label = nullptr;
-static lv_style_t batt_indic_style;
-static lv_style_t batt_main_style;
-static lv_style_t batt_label_style;
-static lv_style_t batt_label_style_smpl;
-
-static lv_obj_t *current_arc = nullptr;
-static lv_obj_t *current_label = nullptr;
-static lv_style_t current_indic_style;
-static lv_style_t current_main_style;
-static lv_style_t current_label_style;
-
-static lv_obj_t *temp_arc = nullptr;
-static lv_obj_t *temp_label = nullptr;
-static lv_style_t temp_indic_style;
-static lv_style_t temp_main_style;
-static lv_style_t temp_label_style;
-static lv_obj_t *speed_avg_bar = nullptr;
-static lv_obj_t *speed_max_bar = nullptr;
-static lv_obj_t *batt_max_bar = nullptr;
-static lv_obj_t *batt_min_bar = nullptr;
-static lv_obj_t *current_max_bar = nullptr;
-static lv_obj_t *temp_max_bar = nullptr;
-static lv_style_t max_bar_indic_style;
-static lv_style_t max_bar_main_style;
-static lv_style_t min_bar_indic_style;
-static lv_style_t min_bar_main_style;
-
-//Dashclock objects and styles
-static lv_obj_t *dashtime = nullptr;
-static lv_obj_t *wbatt = nullptr;
-static lv_obj_t *trip = nullptr;
-static lv_style_t dashtime_style;
-
-//Clock objects and styles
-static lv_obj_t *timeLabel = nullptr;
-static lv_style_t time_style;
-static lv_style_t timeLabel_style;
-static lv_style_t timeLabel_bg_style;
-static lv_obj_t *dateLabel = nullptr;
-static lv_style_t dateLabel_style;
-
-static lv_obj_t *battLabel = nullptr;
-static lv_obj_t *battLabel_bg = nullptr;
-static lv_style_t batt_fg_style;
-static lv_style_t batt_bg_style;
-
-// Text labels
-
-// Bitmaps
-
 /******************************
    LVGL Gui code
  ******************************/
+
+
+typedef struct {
+  lv_obj_t *bgarc;
+  lv_style_t *bgarc_style;
+  lv_style_t *fgarc_style;
+} arc_obj_t;
+
+arc_obj_t *speedarc;
+
+void lv_draw_arc(int arcbegin, int arcend, int minvalue, float maxvalue, int sizex, int sizey, lv_style_t bg_style, lv_style_t fg_style, lv_obj_t* object) {
+  object = lv_arc_create(lv_scr_act(), NULL);
+  lv_obj_add_style(object, LV_ARC_PART_INDIC, &bg_style);
+  lv_obj_add_style(object, LV_OBJ_PART_MAIN, &fg_style);
+  lv_arc_set_bg_angles(object, arcbegin, arcend);
+  lv_arc_set_range(object, minvalue, maxvalue);
+  lv_obj_set_size(object, sizex, sizey);
+  lv_obj_align(object, NULL, LV_ALIGN_CENTER, 0, 0);
+}
 
 /************************************
    Define LVGL default object styles
@@ -209,6 +150,8 @@ void lv_define_styles_1(void) {
   lv_style_init(&dashtime_style);
   lv_style_set_text_color(&dashtime_style, LV_STATE_DEFAULT, watch_info_colour);
   lv_style_set_text_font(&dashtime_style, LV_STATE_DEFAULT, &DIN1451_m_cond_28);
+  //arc_obj_t *speedarc = (arc_obj_t *)(&speed_arc, &speed_main_style, &speed_indic_style);
+
 } //End Define LVGL default object styles
 
 /***************************
@@ -216,8 +159,13 @@ void lv_define_styles_1(void) {
  ***************************/
 void lv_speed_arc_1(void)
 {
+//  if (speed_main_style != nullptr) {
+ //   lv_draw_arc(160, 20, 0, (wheeldata[15] + 5), 268, 268, speedarc->bgarc_style, speedarc->fgarc_style, speedarc->bgarc);
+ // }
+  // lv_draw_arc(160, 20, 0, (wheeldata[15] + 5), 268, 268, speed_main_style, speed_indic_style, speed_arc);
   /*Create speed gauge arc*/
   //Arc
+  
   speed_arc = lv_arc_create(lv_scr_act(), NULL);
   lv_obj_add_style(speed_arc, LV_ARC_PART_INDIC, &speed_indic_style);
   lv_obj_add_style(speed_arc, LV_OBJ_PART_MAIN, &speed_main_style);
@@ -226,6 +174,7 @@ void lv_speed_arc_1(void)
   lv_arc_set_value(speed_arc, wheeldata[1]);
   lv_obj_set_size(speed_arc, 268, 268);
   lv_obj_align(speed_arc, NULL, LV_ALIGN_CENTER, 0, 0);
+  
 
   if (dspeedarc) {
     //Max bar
@@ -384,6 +333,27 @@ void lv_dashtime(void) {
   lv_obj_align(trip, NULL, LV_ALIGN_IN_TOP_MID, 0, 25);
 } //End Create Dashboard objects
 
+int value2angle(int arcstart, int arcstop, float minvalue, float maxvalue, float arcvalue, bool reverse) {
+  int rAngle;
+  int arcdegrees;
+  if (arcstop < arcstart) {
+    arcdegrees = (arcstop + 360) - arcstart;
+  } else {
+    arcdegrees = arcstop - arcstart;
+  }
+  if (reverse) {
+    rAngle = arcstop - (arcvalue * arcdegrees / (maxvalue - minvalue));
+  } else {
+    rAngle = arcstart + (arcvalue * arcdegrees / (maxvalue - minvalue));
+  }
+  if (rAngle >= 360) {
+    rAngle = rAngle - 360;
+  } else if (rAngle < 0) {
+    rAngle = rAngle + 360;
+  }
+  return rAngle;
+}
+
 /***************************************************************
    Dashboard GUI Update Functions, called via the task handler
    runs every 250ms
@@ -521,7 +491,12 @@ void lv_temp_update(void) {
   lv_obj_add_style(temp_arc, LV_ARC_PART_INDIC, &temp_indic_style);
   lv_arc_set_value(temp_arc, ((crittemp + 10) - wheeldata[4]));
 
-  lv_arc_set_angles(temp_max_bar, (50 - (max_temp * 100 / (crittemp + 10))), (53 - (max_temp * 100 / (crittemp + 10))));
+  int ang_max = value2angle(310, 50, 0, (crittemp + 10), max_temp, true);
+  int ang_max2 = ang_max + 3;
+  if (ang_max2 >= 360) {
+    ang_max2 = ang_max2 - 360;
+  }
+  lv_arc_set_angles(temp_max_bar, ang_max, ang_max2);
   lv_obj_add_style(temp_label, LV_OBJ_PART_MAIN, &temp_label_style);
 
   char tempstring[4];
@@ -531,6 +506,26 @@ void lv_temp_update(void) {
   lv_obj_align(temp_label, NULL, LV_ALIGN_CENTER, 64, 0);
 }
 
+
+
+/*
+    int ang_max_1 = (160 + (max_speed * 220 / (wheeldata[15] + 5)));
+    if (ang_max_1 >= 360) {
+      ang_max_1 = (ang_max_1 - 360);
+    }
+    int ang_max_2 = (163 + (max_speed * 220 / (wheeldata[15] + 5)));
+    if (ang_max_2 >= 360) {
+      ang_max_2 = (ang_max_2 - 360);
+    }
+    int ang_avg_1 = (160 + (avg_speed * 220 / (wheeldata[15] + 5)));
+    if (ang_avg_1 >= 360) {
+      ang_avg_1 = (ang_avg_1 - 360);
+    }
+    int ang_avg_2 = (163 + (avg_speed * 220 / (wheeldata[15] + 5)));
+    if (ang_avg_2 >= 360) {
+      ang_avg_2 = (ang_avg_2 - 360);
+    }
+*/
 
 //Update function for the clock display when wheel is disconnected
 void updateTime()
@@ -567,6 +562,7 @@ void updateTime()
     }
     if (dateLabel != nullptr) {
       strftime(buf, sizeof(buf), "%a %h %d %Y", &info);
+      Serial.println(buf);
       lv_label_set_text (dateLabel, buf);
       lv_obj_align(dateLabel, NULL, LV_ALIGN_CENTER, 0, 47);
     }

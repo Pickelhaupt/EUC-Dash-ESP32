@@ -12,9 +12,18 @@ float max_temp = 0;
 int maxcurrent;
 int crittemp;
 int warntemp;
+/*
+int maxcurrent = 35;
+int crittemp = 65;
+int warntemp = 50;
+*/
 byte KS_BLEreq[20];
 
 float wheeldata[16] = {0.0};
+//float wheeldata[16] = {67.1, 12.3, 23.4, 8.4, 33.2, 0.0, 88.3, 543.0, 46.7, 443, 28.4, 0.0, 0.0, 0.0, 28.0, 30.0};
+
+
+
 
 //temporary model strings, Todo: implement automated id
 String wheelmodel = "KS14SMD";

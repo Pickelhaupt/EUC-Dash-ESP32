@@ -389,6 +389,7 @@ void loop()
     if (!watch_running) {
       stop_dash_task();
       setup_timeGui();
+      //setup_LVGui();
       watch_running = true;
       //Serial.println(watch_running);
     }
@@ -462,11 +463,11 @@ void loop()
             screenTimeout--;
             ttgo->setBrightness(255);
           } else if (screenTimeout == ridingScreenTimeout) {
-            if (wheeldata[1] > 2) {
+            if (wheeldata[1] > 1.5) {
               ks_ble_request(0x9B);
-              //  } else {
-              //    add lights off here
-              //  }
+        //  } else {
+        //    add lights off here
+        //  }
             }
           }
           else
