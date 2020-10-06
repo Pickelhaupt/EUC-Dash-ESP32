@@ -12,6 +12,15 @@ I got a lot of help from reading the code from the WheelLogAndroid project, it s
 
 ## Features
 Reads BLE notifications from the electric unicycle and display data on the ESP32 display
+- Reads KS BLE notifications
+- Full and simple dashboard
+- Clock display when not connected to wheel
+- Power saving implemented, will go to sleep when wheel is disconnected and display is off. Not optimised when connected yet. Currently the battery lasts for:
+  - Around 3 days not connected
+  - Around 6 hours when continuously connected
+  - Around 1 day of standby and 4-5 hours of continuous riding
+- Wake up from accelerometer, button and double tap
+
 ### Data read and decoded
 - Current speed
 - Voltage
