@@ -12,11 +12,12 @@
  ***********************************************/
 bool fulldash = true;
 bool dspeedarc = true;
-
+bool shakeoff = true;
 //bool fulldash = false;
 //bool dspeedarc = false;
 
 extern float wheeldata[];
+//extern struct Wheel_constants wheelconst;
 
 /******************************
    LVGL Gui code
@@ -159,13 +160,13 @@ void lv_define_styles_1(void) {
  ***************************/
 void lv_speed_arc_1(void)
 {
-//  if (speed_main_style != nullptr) {
- //   lv_draw_arc(160, 20, 0, (wheeldata[15] + 5), 268, 268, speedarc->bgarc_style, speedarc->fgarc_style, speedarc->bgarc);
- // }
+  //  if (speed_main_style != nullptr) {
+  //   lv_draw_arc(160, 20, 0, (wheeldata[15] + 5), 268, 268, speedarc->bgarc_style, speedarc->fgarc_style, speedarc->bgarc);
+  // }
   // lv_draw_arc(160, 20, 0, (wheeldata[15] + 5), 268, 268, speed_main_style, speed_indic_style, speed_arc);
   /*Create speed gauge arc*/
   //Arc
-  
+
   speed_arc = lv_arc_create(lv_scr_act(), NULL);
   lv_obj_add_style(speed_arc, LV_ARC_PART_INDIC, &speed_indic_style);
   lv_obj_add_style(speed_arc, LV_OBJ_PART_MAIN, &speed_main_style);
@@ -174,7 +175,7 @@ void lv_speed_arc_1(void)
   lv_arc_set_value(speed_arc, wheeldata[1]);
   lv_obj_set_size(speed_arc, 268, 268);
   lv_obj_align(speed_arc, NULL, LV_ALIGN_CENTER, 0, 0);
-  
+
 
   if (dspeedarc) {
     //Max bar
@@ -263,7 +264,7 @@ void lv_current_arc_1(void)
   lv_obj_add_style(current_arc, LV_ARC_PART_INDIC, &current_indic_style);
   lv_obj_add_style(current_arc, LV_OBJ_PART_MAIN, &current_main_style);
   lv_arc_set_bg_angles(current_arc, 130, 230);
-  lv_arc_set_range(current_arc, 0, maxcurrent);
+  lv_arc_set_range(current_arc, 0, wheelconst.maxcurrent);
   lv_arc_set_value(current_arc, wheeldata[3]);
   lv_obj_set_size(current_arc, 225, 225);
   lv_obj_align(current_arc, NULL, LV_ALIGN_CENTER, 0, 0);
@@ -273,7 +274,7 @@ void lv_current_arc_1(void)
   lv_obj_add_style(current_max_bar, LV_ARC_PART_INDIC, &max_bar_indic_style);
   lv_obj_add_style(current_max_bar, LV_OBJ_PART_MAIN, &max_bar_main_style);
   lv_arc_set_bg_angles(current_max_bar, 130, 230);
-  lv_arc_set_range(current_max_bar, 0, maxcurrent);
+  lv_arc_set_range(current_max_bar, 0, wheelconst.maxcurrent);
   lv_obj_set_size(current_max_bar, 225, 225);
   lv_obj_align(current_max_bar, NULL, LV_ALIGN_CENTER, 0, 0);
 
@@ -297,8 +298,8 @@ void lv_temp_arc_1(void)
   lv_arc_set_type(temp_arc, LV_ARC_TYPE_REVERSE);
   lv_arc_set_bg_angles(temp_arc, 310, 50);
   lv_arc_set_angles(temp_arc, 310, 50);
-  lv_arc_set_range(temp_arc, 0, (crittemp + 10));
-  lv_arc_set_value(temp_arc, ((crittemp + 10) - wheeldata[4]));
+  lv_arc_set_range(temp_arc, 0, (wheelconst.crittemp + 10));
+  lv_arc_set_value(temp_arc, ((wheelconst.crittemp + 10) - wheeldata[4]));
   lv_obj_set_size(temp_arc, 225, 225);
   lv_obj_align(temp_arc, NULL, LV_ALIGN_CENTER, 0, 0);
 
@@ -307,7 +308,7 @@ void lv_temp_arc_1(void)
   lv_obj_add_style(temp_max_bar, LV_ARC_PART_INDIC, &max_bar_indic_style);
   lv_obj_add_style(temp_max_bar, LV_OBJ_PART_MAIN, &max_bar_main_style);
   lv_arc_set_bg_angles(temp_max_bar, 310, 50);
-  lv_arc_set_range(temp_max_bar, 0, (crittemp + 10));
+  lv_arc_set_range(temp_max_bar, 0, (wheelconst.crittemp + 10));
   lv_obj_set_size(temp_max_bar, 225, 225);
   lv_obj_align(temp_max_bar, NULL, LV_ALIGN_CENTER, 0, 0);
 
@@ -365,12 +366,9 @@ static void lv_speed_update(void) {
   } else if (wheeldata[1] >= wheeldata[14]) {
     lv_style_set_line_color(&speed_indic_style, LV_STATE_DEFAULT, LV_COLOR_YELLOW);
     lv_style_set_text_color(&speed_label_style, LV_STATE_DEFAULT, LV_COLOR_YELLOW);
-    //speed_shake = lv_task_create(lv_speed_shake, 750, LV_TASK_PRIO_LOWEST, NULL);
-    //lv_task_ready(speed_shake);
   } else {
     lv_style_set_line_color(&speed_indic_style, LV_STATE_DEFAULT, speed_fg_clr);
     lv_style_set_text_color(&speed_label_style, LV_STATE_DEFAULT, speed_fg_clr);
-    //stop_speed_shake();
   }
   if (dspeedarc) {
     lv_obj_add_style(speed_arc, LV_ARC_PART_INDIC, &speed_indic_style);
@@ -443,14 +441,12 @@ void lv_batt_update(void) {
 void lv_current_update(void) {
   // Set warning and alert colour
   float amps = wheeldata[3];
-  if (wheeldata[3] > (maxcurrent * 0.75)) {
+  if (wheeldata[3] > (wheelconst.maxcurrent * 0.75)) {
     lv_style_set_line_color(&current_indic_style, LV_STATE_DEFAULT, LV_COLOR_RED);
     lv_style_set_text_color(&current_label_style, LV_STATE_DEFAULT, LV_COLOR_RED);
-    //current_shake = lv_task_create(lv_current_shake, 200, LV_TASK_PRIO_LOWEST, NULL);
-  } else if (wheeldata[3] > (maxcurrent * 0.5)) {
+  } else if (wheeldata[3] > (wheelconst.maxcurrent * 0.5)) {
     lv_style_set_line_color(&current_indic_style, LV_STATE_DEFAULT, LV_COLOR_YELLOW);
     lv_style_set_text_color(&current_label_style, LV_STATE_DEFAULT, LV_COLOR_YELLOW);
-    //stop_current_shake();
   } else if (wheeldata[3] < 0) {
     lv_style_set_line_color(&current_indic_style, LV_STATE_DEFAULT, speed_fg_clr);
     lv_style_set_text_color(&current_label_style, LV_STATE_DEFAULT, speed_fg_clr);
@@ -463,7 +459,14 @@ void lv_current_update(void) {
   lv_obj_add_style(current_arc, LV_ARC_PART_INDIC, &current_indic_style);
   lv_arc_set_value(current_arc, amps);
 
-  lv_arc_set_angles(current_max_bar, (130 + (max_current * 100 / maxcurrent)), (133 + (max_current * 100 / maxcurrent)));
+  int ang_max = value2angle(130, 230, 0, wheelconst.maxcurrent, max_current, false);
+  int ang_max2 = ang_max + 3;
+  if (ang_max2 >= 360) {
+    ang_max2 = ang_max2 - 360;
+  }
+  lv_arc_set_angles(temp_max_bar, ang_max, ang_max2);
+
+  //lv_arc_set_angles(current_max_bar, (130 + (max_current * 100 / wheelconst.maxcurrent)), (133 + (max_current * 100 / wheelconst.maxcurrent)));
 
   lv_obj_add_style(current_label, LV_OBJ_PART_MAIN, &current_label_style);
   char currentstring[4];
@@ -475,23 +478,20 @@ void lv_current_update(void) {
 
 void lv_temp_update(void) {
   // Set warning and alert colour
-  if (wheeldata[4] > crittemp) {
+  if (wheeldata[4] > wheelconst.crittemp) {
     lv_style_set_line_color(&temp_indic_style, LV_STATE_DEFAULT, LV_COLOR_RED);
     lv_style_set_text_color(&temp_label_style, LV_STATE_DEFAULT, LV_COLOR_RED);
-    //temp_shake = lv_task_create(lv_temp_shake, 500, LV_TASK_PRIO_LOWEST, NULL);
-  } else if (wheeldata[4] > warntemp) {
+  } else if (wheeldata[4] > wheelconst.warntemp) {
     lv_style_set_line_color(&temp_indic_style, LV_STATE_DEFAULT, LV_COLOR_YELLOW);
     lv_style_set_text_color(&temp_label_style, LV_STATE_DEFAULT, LV_COLOR_YELLOW);
-    //stop_temp_shake();
   } else {
     lv_style_set_line_color(&temp_indic_style, LV_STATE_DEFAULT, temp_fg_clr);
     lv_style_set_text_color(&temp_label_style, LV_STATE_DEFAULT, temp_fg_clr);
-    //stop_temp_shake();
   }
   lv_obj_add_style(temp_arc, LV_ARC_PART_INDIC, &temp_indic_style);
-  lv_arc_set_value(temp_arc, ((crittemp + 10) - wheeldata[4]));
+  lv_arc_set_value(temp_arc, ((wheelconst.crittemp + 10) - wheeldata[4]));
 
-  int ang_max = value2angle(310, 50, 0, (crittemp + 10), max_temp, true);
+  int ang_max = value2angle(310, 50, 0, (wheelconst.crittemp + 10), max_temp, true);
   int ang_max2 = ang_max + 3;
   if (ang_max2 >= 360) {
     ang_max2 = ang_max2 - 360;
@@ -505,27 +505,6 @@ void lv_temp_update(void) {
   lv_label_set_align(temp_label, LV_LABEL_ALIGN_CENTER);
   lv_obj_align(temp_label, NULL, LV_ALIGN_CENTER, 64, 0);
 }
-
-
-
-/*
-    int ang_max_1 = (160 + (max_speed * 220 / (wheeldata[15] + 5)));
-    if (ang_max_1 >= 360) {
-      ang_max_1 = (ang_max_1 - 360);
-    }
-    int ang_max_2 = (163 + (max_speed * 220 / (wheeldata[15] + 5)));
-    if (ang_max_2 >= 360) {
-      ang_max_2 = (ang_max_2 - 360);
-    }
-    int ang_avg_1 = (160 + (avg_speed * 220 / (wheeldata[15] + 5)));
-    if (ang_avg_1 >= 360) {
-      ang_avg_1 = (ang_avg_1 - 360);
-    }
-    int ang_avg_2 = (163 + (avg_speed * 220 / (wheeldata[15] + 5)));
-    if (ang_avg_2 >= 360) {
-      ang_avg_2 = (ang_avg_2 - 360);
-    }
-*/
 
 //Update function for the clock display when wheel is disconnected
 void updateTime()
@@ -565,11 +544,6 @@ void updateTime()
       lv_label_set_text (dateLabel, buf);
       lv_obj_align(dateLabel, NULL, LV_ALIGN_CENTER, 0, 47);
     }
-    //if (battLabel_bg != nullptr) {
-    //  lv_label_set_text (battLabel_bg, LV_SYMBOL_STOP " " LV_SYMBOL_STOP " " LV_SYMBOL_STOP " " LV_SYMBOL_STOP " " LV_SYMBOL_STOP);
-    //  lv_label_set_align(battLabel_bg, LV_LABEL_ALIGN_LEFT);
-    //  lv_obj_align(battLabel_bg, NULL, LV_ALIGN_IN_TOP_LEFT, 0, 0);
-    //}
     char watchbattstring[4];
     dtostrf(watchbatt, 2, 0, watchbattstring);
     if (battLabel != nullptr) {
@@ -601,37 +575,71 @@ void updateTime()
    todo: add a separate task that runs less often for this
 */
 
+void update_speed_shake(void) {
+  if (wheeldata[1] >= wheeldata[14] && shakeoff) {
+  //Serial.println("Speed-shake");
+  //if (wheeldata[1] >= 22 && shakeoff) {
+    speed_shake = lv_task_create(lv_speed_shake, 750, LV_TASK_PRIO_LOWEST, NULL);
+    lv_task_ready(speed_shake);
+    shakeoff = false;
+  } else if (!shakeoff) {
+    stop_speed_shake();
+  }
+}
+
+void update_current_shake(void) {
+  if (wheeldata[3] > (wheelconst.maxcurrent * 0.75) && shakeoff) {
+    current_shake = lv_task_create(lv_current_shake, 200, LV_TASK_PRIO_LOWEST, NULL);
+    lv_task_ready(current_shake);
+  } else if (!shakeoff) {
+    stop_current_shake();
+  }
+}
+
+void update_temp_shake(void) {
+  if (wheeldata[4] > wheelconst.crittemp && shakeoff) {
+    temp_shake = lv_task_create(lv_temp_shake, 1000, LV_TASK_PRIO_LOWEST, NULL);
+    lv_task_ready(temp_shake);
+    shakeoff = false;
+  } else if (!shakeoff) {
+    stop_temp_shake();
+  }
+}
 
 /************************
    Task update functions
  ***********************/
 static void lv_dash_task(lv_task_t * dash_task) {
-  lv_speed_update();
-  lv_batt_update();
-  if (fulldash) {
-    lv_current_update();
-    lv_temp_update();
+  if (!displayOff) {
+    lv_speed_update();
+    lv_batt_update();
+    if (fulldash) {
+      lv_current_update();
+      lv_temp_update();
+    }
   }
+  update_speed_shake();
+  update_current_shake();
+  update_current_shake();
 }
 static void lv_time_task(lv_task_t * time_task) {
   updateTime();
 }
-/*
-  static void lv_current_shake(lv_task_t * current_shake) {
+
+static void lv_current_shake(lv_task_t * current_shake) {
   TTGOClass *ttgo = TTGOClass::getWatch();
   ttgo->shake ();
-  }
-  static void lv_temp_shake(lv_task_t * temp_shake) {
+}
+static void lv_temp_shake(lv_task_t * temp_shake) {
   TTGOClass *ttgo = TTGOClass::getWatch();
   ttgo->shake ();
-  }
-*/
+  delay(250);
+  ttgo->shake ();
+}
 
 static void lv_speed_shake(lv_task_t * speed_shake) {
   TTGOClass *ttgo = TTGOClass::getWatch();
   ttgo->shake ();
-  //delay(250);
-  //ttgo->shake ();
 }
 
 
@@ -733,21 +741,24 @@ void stop_dash_task() {
 void stop_speed_shake() {
   if (speed_shake != nullptr) {
     lv_task_del(speed_shake);
+    shakeoff = true;
   }
 }
-/*
-  void stop_current_shake() {
+
+void stop_current_shake() {
   if (current_shake != nullptr) {
     lv_task_del(current_shake);
+    shakeoff = true;
   }
-  }
+}
 
-  void stop_temp_shake() {
+void stop_temp_shake() {
   if (temp_shake != nullptr) {
     lv_task_del(temp_shake);
+    shakeoff = true;
   }
-  }
-*/
+}
+
 /*******************
    End LVGL GUI Code
  *******************/

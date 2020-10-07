@@ -76,6 +76,16 @@ typedef struct
   void      *data;
 } TileDesc_t;
 
+struct Wheel_constants {
+  byte maxcurrent;
+  byte crittemp;
+  byte warntemp;
+  byte battvolt;
+  byte battwarn;
+};
+
+extern struct Wheel_constants wheelconst;
+
 //Global function declarations
 void setup_timeGui();
 void setup_LVGui();
@@ -99,6 +109,7 @@ extern unsigned int ridingScreenTimeout;
 extern unsigned int defaultCpuFrequency;
 extern int ride_mode;
 extern boolean connected;
+extern bool displayOff;
 extern int maxcurrent;
 extern int crittemp;
 extern int warntemp;
@@ -108,7 +119,8 @@ extern float max_batt;
 extern float min_batt;
 extern float max_current;
 extern float max_temp;
-extern struct KSmodel;
+extern String wheelmodel;
+extern String Wheel_brand;
 
 extern "C" {
   extern void lv_keyboard_def_event_cb(lv_obj_t * kb, lv_event_t event);

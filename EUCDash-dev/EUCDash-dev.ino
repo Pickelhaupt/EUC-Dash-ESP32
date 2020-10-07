@@ -53,7 +53,6 @@ unsigned int defaultScreenTimeout = DEFAULT_SCREEN_TIMEOUT;
 unsigned int ridingScreenTimeout = RIDING_SCREEN_TIMEOUT;
 unsigned int screenTimeout = DEFAULT_SCREEN_TIMEOUT;
 
-SemaphoreHandle_t dash_xSemaphore = xSemaphoreCreateMutex();
 boolean doConnect = false;
 boolean connected = false;
 boolean doScan = false;
@@ -63,7 +62,12 @@ static BLEAdvertisedDevice* myDevice;
 int ride_mode = 0;
 int scandelay = 0;
 boolean bleConn;
-extern float wheeldata[];
+float wheeldata[16];
+struct Wheel_constants wheelconst;
+String wheelmodel;
+//todo, implement auto detect of wheel brand
+String Wheel_brand = "KingSong";
+
 
 /************************************************
    For Kingsong and Gotway EUCs
@@ -92,14 +96,13 @@ void low_energy()
   if (ttgo->bl->isOn()) { //Go to sleep / switch off display
     log_i("low_energy() - BL is on");
     xEventGroupSetBits(isr_group, WATCH_FLAG_SLEEP_MODE);
-
     ttgo->closeBL();
-    ttgo->stopLvglTick();
+    //ttgo->stopLvglTick();
     ttgo->bma->enableStepCountInterrupt(false);
     ttgo->displaySleep();
     displayOff = true;
+    lenergy = true;
     if (!connected) { // Only enter sleep mode if there is no wheel connected
-      lenergy = true;
       setCpuFrequencyMhz (CPU_FREQ_MIN);
       gpio_wakeup_enable ((gpio_num_t)AXP202_INT, GPIO_INTR_LOW_LEVEL);
       gpio_wakeup_enable ((gpio_num_t)BMA423_INT1, GPIO_INTR_HIGH_LEVEL);
@@ -117,7 +120,7 @@ void low_energy()
     lv_disp_trig_activity(NULL);
     setbrightness();
     ttgo->openBL();
-    displayOff = true;
+    displayOff = false;
     if (connected) {
       screenTimeout = ridingScreenTimeout;
     } else {
@@ -389,7 +392,6 @@ void loop()
     if (!watch_running) {
       stop_dash_task();
       setup_timeGui();
-      //setup_LVGui();
       watch_running = true;
       //Serial.println(watch_running);
     }
@@ -397,18 +399,25 @@ void loop()
   if (doConnect == true) {
     if (connectToServer()) {
       Serial.println("We are now connected to the BLE Server.");
+      Serial.println("initialising KingSong");
+      //setCpuFrequencyMhz (CPU_FREQ_MEDIUM);
+      initks();
+      stop_time_task();
+      watch_running = false;
+      screenTimeout = ridingScreenTimeout;
+      setup_LVGui();
     } else {
       Serial.println("We have failed to connect to the server;");
     }
     doConnect = false;
 
     //    Send necessary initialisation packages to start BLE notifications, do not know why this is needed though
-    Serial.println("initialising KingSong");
-    //setCpuFrequencyMhz (CPU_FREQ_MEDIUM);
-    initks();
-    stop_time_task();
-    watch_running = false;
-    setup_LVGui();
+    /*Serial.println("initialising KingSong");
+      //setCpuFrequencyMhz (CPU_FREQ_MEDIUM);
+      initks();
+      stop_time_task();
+      watch_running = false;
+      setup_LVGui();*/
   }
   if (!connected && doScan && (ttgo->bl->isOn())) {
     Serial.println("Disconnected... starting scan");
@@ -465,9 +474,9 @@ void loop()
           } else if (screenTimeout == ridingScreenTimeout) {
             if (wheeldata[1] > 1.5) {
               ks_ble_request(0x9B);
-        //  } else {
-        //    add lights off here
-        //  }
+              //  } else {
+              //    add lights off here
+              //  }
             }
           }
           else
@@ -492,7 +501,7 @@ void loop()
         break;
     }
   }
-  if (lv_disp_get_inactive_time(NULL) < screenTimeout) {
+  if (lv_disp_get_inactive_time(NULL) < screenTimeout || connected) {
     lv_task_handler(); //Since this function will loop, it's necessary to manage lv tasks
   } else {
     low_energy();

@@ -3,15 +3,15 @@
 static void lv_dash_task(lv_task_t *dash_task);
 static void lv_time_task(lv_task_t *time_task);
 static void lv_speed_shake(lv_task_t *speed_shake);
-//static void lv_current_shake(lv_task_t *current_shake);
-//static void lv_temp_shake(lv_task_t *temp_shake);
+static void lv_current_shake(lv_task_t *current_shake);
+static void lv_temp_shake(lv_task_t *temp_shake);
 
 //task declarations
 lv_task_t *dash_task = nullptr;
 lv_task_t *time_task = nullptr;
 lv_task_t *speed_shake = nullptr;
-//lv_task_t *current_shake = nullptr;
-//lv_task_t *temp_shake = nullptr;
+lv_task_t *current_shake = nullptr;
+lv_task_t *temp_shake = nullptr;
 
 /**********************************************
    Define custom colours for the EUC gauges
