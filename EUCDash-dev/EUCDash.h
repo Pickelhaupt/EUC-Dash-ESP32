@@ -108,6 +108,7 @@ extern float max_batt;
 extern float min_batt;
 extern float max_current;
 extern float max_temp;
+extern struct KSmodel;
 
 extern "C" {
   extern void lv_keyboard_def_event_cb(lv_obj_t * kb, lv_event_t event);
