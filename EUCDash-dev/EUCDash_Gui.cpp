@@ -458,15 +458,15 @@ void lv_current_update(void) {
   }
   lv_obj_add_style(current_arc, LV_ARC_PART_INDIC, &current_indic_style);
   lv_arc_set_value(current_arc, amps);
-
+/*
   int ang_max = value2angle(130, 230, 0, wheelconst.maxcurrent, max_current, false);
   int ang_max2 = ang_max + 3;
   if (ang_max2 >= 360) {
     ang_max2 = ang_max2 - 360;
   }
   lv_arc_set_angles(temp_max_bar, ang_max, ang_max2);
-
-  //lv_arc_set_angles(current_max_bar, (130 + (max_current * 100 / wheelconst.maxcurrent)), (133 + (max_current * 100 / wheelconst.maxcurrent)));
+*/
+  lv_arc_set_angles(current_max_bar, (130 + (max_current * 100 / wheelconst.maxcurrent)), (133 + (max_current * 100 / wheelconst.maxcurrent)));
 
   lv_obj_add_style(current_label, LV_OBJ_PART_MAIN, &current_label_style);
   char currentstring[4];
