@@ -562,7 +562,6 @@ void updateTime()
     }
     if (dateLabel != nullptr) {
       strftime(buf, sizeof(buf), "%a %h %d %Y", &info);
-      Serial.println(buf);
       lv_label_set_text (dateLabel, buf);
       lv_obj_align(dateLabel, NULL, LV_ALIGN_CENTER, 0, 47);
     }
