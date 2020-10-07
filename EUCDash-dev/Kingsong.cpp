@@ -12,6 +12,15 @@ float max_temp = 0;
 int maxcurrent;
 int crittemp;
 int warntemp;
+
+struct KSmodel {
+  byte maxcurrent;
+  byte crittemp;
+  byte warntemp;
+  byte battvolt;
+  byte battwarn;
+};
+
 /*
 int maxcurrent = 35;
 int crittemp = 65;
@@ -22,17 +31,13 @@ byte KS_BLEreq[20];
 float wheeldata[16] = {0.0};
 //float wheeldata[16] = {67.1, 12.3, 23.4, 8.4, 33.2, 0.0, 88.3, 543.0, 46.7, 443, 28.4, 0.0, 0.0, 0.0, 28.0, 30.0};
 
-
-
-
 //temporary model strings, Todo: implement automated id
 String wheelmodel = "KS14SMD";
 //String wheelmodel = "KS16S";
 
-
-/*
+/**************************************************
  * Decode big endian multi byte data from KS wheels
- */
+ **************************************************/
 static int decode2byte(byte byte1, byte byte2) { //converts big endian 2 byte value to int
   int val;
   val = (byte1 & 0xFF) + (byte2 << 8);
@@ -45,10 +50,39 @@ static int decode4byte(byte byte1, byte byte2, byte byte3, byte byte4) { //conve
   return val;
 }
 
+void setKSconstants(void) {
+  struct KSmodel KSconst;
+  if (wheelmodel = KS14SMD) {
+    KSconst.maxcurrent = 35;
+    KSconst.crittemp = 65;
+    KSconst.warntemp = 50;
+    KSconst.battvolt = 67;
+    KSconst.battwarn = 40;
+  } else if (wheelmodel = KS16S) {
+    KSconst.maxcurrent = 40;
+    KSconst.crittemp = 65;
+    KSconst.warntemp = 50;
+    KSconst.battvolt = 67;
+    KSconst.battwarn = 30;
+  } else if (wheelmodel = KS16X) {
+    KSconst.maxcurrent = 45;
+    KSconst.crittemp = 65;
+    KSconst.warntemp = 50;
+    KSconst.battvolt = 82;
+    KSconst.battwarn = 20;
+  } else {
+    KSconst.maxcurrent = 40;
+    KSconst.crittemp = 65;
+    KSconst.warntemp = 50;
+    KSconst.battvolt = 67;
+    KSconst.battwarn = 30;
+  }
+}
+
 /*************************************************************
     Kingsong wheel data decoder adds current values to
     the wheeldata array. Prootocol decoding from Wheellog by
-    Kevin Cooper, Cedric Hauber and Palachzzz,
+    Kevin Cooper,
     would have been a lot of work without that code
     to reference.
     Should be fairly easy to adapt this to Gotway as well.
@@ -182,6 +216,7 @@ void initks() {
   TTGOClass *ttgo = TTGOClass::getWatch();
   //Setting of some model specific parametes,
   //Todo: automatic model identification
+  setKSconstants();
   if (wheelmodel = "KS14SMD") {
     maxcurrent = 35;
     crittemp = 65;
