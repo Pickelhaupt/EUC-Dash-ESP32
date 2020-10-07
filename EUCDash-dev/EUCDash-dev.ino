@@ -96,8 +96,9 @@ void low_energy()
   if (ttgo->bl->isOn()) { //Go to sleep / switch off display
     log_i("low_energy() - BL is on");
     xEventGroupSetBits(isr_group, WATCH_FLAG_SLEEP_MODE);
+
     ttgo->closeBL();
-    //ttgo->stopLvglTick();
+    ttgo->stopLvglTick();
     ttgo->bma->enableStepCountInterrupt(false);
     ttgo->displaySleep();
     displayOff = true;
@@ -399,25 +400,18 @@ void loop()
   if (doConnect == true) {
     if (connectToServer()) {
       Serial.println("We are now connected to the BLE Server.");
-      Serial.println("initialising KingSong");
-      //setCpuFrequencyMhz (CPU_FREQ_MEDIUM);
-      initks();
-      stop_time_task();
-      watch_running = false;
-      screenTimeout = ridingScreenTimeout;
-      setup_LVGui();
+        Serial.println("initialising KingSong");
+        //setCpuFrequencyMhz (CPU_FREQ_MEDIUM);
+        initks();
+        stop_time_task();
+        watch_running = false;
+        screenTimeout = ridingScreenTimeout;
+        setup_LVGui();
     } else {
       Serial.println("We have failed to connect to the server;");
     }
     doConnect = false;
-
     //    Send necessary initialisation packages to start BLE notifications, do not know why this is needed though
-    /*Serial.println("initialising KingSong");
-      //setCpuFrequencyMhz (CPU_FREQ_MEDIUM);
-      initks();
-      stop_time_task();
-      watch_running = false;
-      setup_LVGui();*/
   }
   if (!connected && doScan && (ttgo->bl->isOn())) {
     Serial.println("Disconnected... starting scan");
@@ -461,7 +455,6 @@ void loop()
     switch (data) {
       case Q_EVENT_BMA_INT:
         log_i("Q_EVENT_BMA_IRQ");
-
         do {
           rlst =  ttgo->bma->readInterrupt();
         } while (!rlst);
@@ -501,7 +494,7 @@ void loop()
         break;
     }
   }
-  if (lv_disp_get_inactive_time(NULL) < screenTimeout || connected) {
+  if (lv_disp_get_inactive_time(NULL) < screenTimeout) {
     lv_task_handler(); //Since this function will loop, it's necessary to manage lv tasks
   } else {
     low_energy();
