@@ -98,7 +98,7 @@ void low_energy()
     xEventGroupSetBits(isr_group, WATCH_FLAG_SLEEP_MODE);
 
     ttgo->closeBL();
-    ttgo->stopLvglTick();
+    // ttgo->stopLvglTick();
     ttgo->bma->enableStepCountInterrupt(false);
     ttgo->displaySleep();
     displayOff = true;
