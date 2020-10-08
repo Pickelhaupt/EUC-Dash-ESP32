@@ -1,3 +1,6 @@
+#ifndef LV_GUI_H
+#define LV_GUI_H
+
 // Function declarations
 static void lv_dash_task(lv_task_t *dash_task);
 static void lv_time_task(lv_task_t *time_task);
@@ -106,7 +109,6 @@ Clock display objects and styles
 */
 //Clock objects and styles
 static lv_obj_t *timeLabel = nullptr;
-static lv_style_t time_style;
 static lv_style_t timeLabel_style;
 static lv_style_t timeLabel_bg_style;
 static lv_obj_t *dateLabel = nullptr;
@@ -120,3 +122,5 @@ static lv_style_t batt_bg_style;
 // Text labels
 
 // Bitmaps
+
+#endif

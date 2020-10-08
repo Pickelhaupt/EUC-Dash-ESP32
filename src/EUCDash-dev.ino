@@ -24,21 +24,22 @@
 #include "EUCDash.h"
 #include "BLEDevice.h"
 
-#define G_EVENT_VBUS_PLUGIN         _BV(0)
-#define G_EVENT_VBUS_REMOVE         _BV(1)
-#define G_EVENT_CHARGE_DONE         _BV(2)
+#define G_EVENT_VBUS_PLUGIN _BV(0)
+#define G_EVENT_VBUS_REMOVE _BV(1)
+#define G_EVENT_CHARGE_DONE _BV(2)
 
-enum {
+enum
+{
   Q_EVENT_WIFI_SCAN_DONE,
   Q_EVENT_WIFI_CONNECT,
   Q_EVENT_BMA_INT,
   Q_EVENT_AXP_INT,
-} ;
+};
 
-#define WATCH_FLAG_SLEEP_MODE   _BV(1)
-#define WATCH_FLAG_SLEEP_EXIT   _BV(2)
-#define WATCH_FLAG_BMA_IRQ      _BV(3)
-#define WATCH_FLAG_AXP_IRQ      _BV(4)
+#define WATCH_FLAG_SLEEP_MODE _BV(1)
+#define WATCH_FLAG_SLEEP_EXIT _BV(2)
+#define WATCH_FLAG_BMA_IRQ _BV(3)
+#define WATCH_FLAG_AXP_IRQ _BV(4)
 
 QueueHandle_t g_event_queue_handle = NULL;
 EventGroupHandle_t g_event_group = NULL;
@@ -53,15 +54,12 @@ unsigned int defaultScreenTimeout = DEFAULT_SCREEN_TIMEOUT;
 unsigned int ridingScreenTimeout = RIDING_SCREEN_TIMEOUT;
 unsigned int screenTimeout = DEFAULT_SCREEN_TIMEOUT;
 
-boolean doConnect = false;
+//boolean doConnect = false;
 boolean connected = false;
-boolean doScan = false;
+//boolean doScan = false;
 boolean watch_running = false;
-static BLERemoteCharacteristic* pRemoteCharacteristic;
-static BLEAdvertisedDevice* myDevice;
 int ride_mode = 0;
 int scandelay = 0;
-boolean bleConn;
 float wheeldata[16];
 //float wheeldata[16] = {67.1, 12.3, 23.4, 8.4, 33.2, 0.0, 88.3, 543.0, 46.7, 443, 28.4, 0.0, 0.0, 0.0, 28.0, 30.0};
 struct Wheel_constants wheelconst;
@@ -69,32 +67,13 @@ String wheelmodel;
 //todo, implement auto detect of wheel brand
 String Wheel_brand = "KingSong";
 
-
-/************************************************
-   For Kingsong and Gotway EUCs
-   Inmotion/Solowheel and Ninebot/Segway use
-   different UUIDs, I do not have any of those
-   wheels so cannot test, Might need a different
-   init procedure as well. Edit this if you want
-   to support additional manufacturers. It would
-   be possible to automate this as well.
- *************************************************/
-/*
-   For some reason the KS wheels announce 2 UUIDs, the first one
-   "FFF0" does not contain the data we are looking for
-*/
-static BLEUUID serviceUUID("0000fff0-0000-1000-8000-00805f9b34fb");
-//The Service UUID that contains the useful notifications
-static BLEUUID serviceUUID2("0000ffe0-0000-1000-8000-00805f9b34fb");
-// The characteristic UUID of all wheel notifications
-static BLEUUID charUUID("0000ffe1-0000-1000-8000-00805f9b34fb");
-
 /******************************************************************
    Function managing the entry and exit from sleep/power save mode
  ******************************************************************/
 void low_energy()
 {
-  if (ttgo->bl->isOn()) { //Go to sleep / switch off display
+  if (ttgo->bl->isOn())
+  { //Go to sleep / switch off display
     log_i("low_energy() - BL is on");
     xEventGroupSetBits(isr_group, WATCH_FLAG_SLEEP_MODE);
 
@@ -104,14 +83,17 @@ void low_energy()
     ttgo->displaySleep();
     displayOff = true;
     lenergy = true;
-    if (!connected) { // Only enter sleep mode if there is no wheel connected
-      setCpuFrequencyMhz (CPU_FREQ_MIN);
-      gpio_wakeup_enable ((gpio_num_t)AXP202_INT, GPIO_INTR_LOW_LEVEL);
-      gpio_wakeup_enable ((gpio_num_t)BMA423_INT1, GPIO_INTR_HIGH_LEVEL);
-      esp_sleep_enable_gpio_wakeup ();
+    if (!connected)
+    { // Only enter sleep mode if there is no wheel connected
+      setCpuFrequencyMhz(CPU_FREQ_MIN);
+      gpio_wakeup_enable((gpio_num_t)AXP202_INT, GPIO_INTR_LOW_LEVEL);
+      gpio_wakeup_enable((gpio_num_t)BMA423_INT1, GPIO_INTR_HIGH_LEVEL);
+      esp_sleep_enable_gpio_wakeup();
       esp_light_sleep_start();
     }
-  } else { //Wake from sleep mode
+  }
+  else
+  { //Wake from sleep mode
     Serial.println("waking up");
     log_i("low_energy() - BL is off");
     ttgo->startLvglTick();
@@ -123,136 +105,52 @@ void low_energy()
     setbrightness();
     ttgo->openBL();
     displayOff = false;
-    if (connected) {
+    if (connected)
+    {
       screenTimeout = ridingScreenTimeout;
-    } else {
+    }
+    else
+    {
       screenTimeout = defaultScreenTimeout;
     }
   }
 }
 
-void setbrightness() {
+void setbrightness()
+{
   time_t now;
-  struct tm  info;
+  struct tm info;
   char buf[64];
   time(&now);
   localtime_r(&now, &info);
   strftime(buf, sizeof(buf), "%H", &info);
-  if (connected) {
-    if (info.tm_hour > 19 || info.tm_hour < 6) {
+  if (connected)
+  {
+    if (info.tm_hour > 19 || info.tm_hour < 6)
+    {
       ttgo->setBrightness(96);
-    } else {
+    }
+    else
+    {
       ttgo->setBrightness(255);
     }
-  } else {
-    if (info.tm_hour > 19 || info.tm_hour < 6) {
+  }
+  else
+  {
+    if (info.tm_hour > 19 || info.tm_hour < 6)
+    {
       ttgo->setBrightness(32);
-    } else {
+    }
+    else
+    {
       ttgo->setBrightness(128);
     }
   }
 }
 
-void writeBLE (byte* wBLEbyte, int alength) {
-  pRemoteCharacteristic->writeValue(wBLEbyte, alength);
-}
-
-/*******************************************************************
-   BLE Callback notify, will loop here when wheel is connected
-   Decoding is only done if the data format is correct
-   This might need to be changed if adapted to other manufacturers
- ******************************************************************/
-static void notifyCallback(
-  BLERemoteCharacteristic* pBLERemoteCharacteristic,
-  uint8_t* pData,
-  size_t length,
-  bool isNotify) {
-  //Only decode if package contains relevant data
-  if (length == 20) {
-    if (pData[0] == 0xAA && pData[1] == 0x55) {
-      decodeKS(pData); // For Kingsong only atm.
-    }
-  }
-}
-
-class MyClientCallback : public BLEClientCallbacks {
-    void onConnect(BLEClient* pclient) {
-    }
-    void onDisconnect(BLEClient* pclient) {
-      connected = false;
-      Serial.println("onDisconnect");
-    }
-};
-
-bool connectToServer() {
-  Serial.print("Forming a connection to ");
-  Serial.println(myDevice->getAddress().toString().c_str());
-
-  BLEClient*  pClient  = BLEDevice::createClient();
-  Serial.println(" - Created client");
-
-  pClient->setClientCallbacks(new MyClientCallback());
-
-  // Connect to the remove BLE Server.
-  pClient->connect(myDevice);  // if you pass BLEAdvertisedDevice instead of address, it will be recognized type of peer device address (public or private)
-  Serial.println(" - Connected to server");
-
-  // Obtain a reference to the service we are after in the remote BLE server.
-  BLERemoteService* pRemoteService = pClient->getService(serviceUUID2);
-  if (pRemoteService == nullptr) {
-    Serial.print("Failed to find our service UUID: ");
-    Serial.println(serviceUUID.toString().c_str());
-    pClient->disconnect();
-    return false;
-  }
-  Serial.println(" - Found our service");
-
-  // Obtain a reference to the characteristic in the service of the remote BLE server.
-  pRemoteCharacteristic = pRemoteService->getCharacteristic(charUUID);
-  if (pRemoteCharacteristic == nullptr) {
-    Serial.print("Failed to find our characteristic UUID: ");
-    Serial.println(charUUID.toString().c_str());
-    pClient->disconnect();
-    return false;
-  }
-
-  Serial.println(" - Found our characteristic");
-  // Read the value of the characteristic.
-  if (pRemoteCharacteristic->canRead()) {
-    std::string value = pRemoteCharacteristic->readValue();
-  }
-
-  // Register for notify
-  if (pRemoteCharacteristic->canNotify() == true) {
-    pRemoteCharacteristic->registerForNotify(notifyCallback);
-  }
-  connected = true;
-  return connected;
-}
-
-class MyAdvertisedDeviceCallbacks: public BLEAdvertisedDeviceCallbacks {
-    /**
-        Called for each advertising BLE server.
-    */
-    void onResult(BLEAdvertisedDevice advertisedDevice) {
-      Serial.print("BLE Advertised Device found: ");
-      Serial.println(advertisedDevice.toString().c_str());
-
-      // We have found a device, let us now see if it contains the service we are looking for.
-      if (advertisedDevice.haveServiceUUID() && advertisedDevice.isAdvertisingService(serviceUUID)) {
-
-        BLEDevice::getScan()->stop();
-        myDevice = new BLEAdvertisedDevice(advertisedDevice);
-        doConnect = true;
-        doScan = true;
-
-      } // Found our server
-    } // onResult
-}; // MyAdvertisedDeviceCallbacks
-
 void setup()
 {
-  Serial.begin (115200);
+  Serial.begin(115200);
 
   //Create a program that allows the required message objects and group flags
   g_event_queue_handle = xQueueCreate(20, sizeof(uint8_t));
@@ -287,46 +185,52 @@ void setup()
 
   //Connection interrupted to the specified pin
   pinMode(BMA423_INT1, INPUT);
-  attachInterrupt(BMA423_INT1, [] {
-    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-    EventBits_t  bits = xEventGroupGetBitsFromISR(isr_group);
-    if (bits & WATCH_FLAG_SLEEP_MODE)
-    {
-      // Use an XEvent when waking from low energy sleep mode.
-      xEventGroupSetBitsFromISR(isr_group, WATCH_FLAG_SLEEP_EXIT | WATCH_FLAG_BMA_IRQ, &xHigherPriorityTaskWoken);
-    } else
-    {
-      // Use the XQueue mechanism when we are already awake.
-      uint8_t data = Q_EVENT_BMA_INT;
-      xQueueSendFromISR(g_event_queue_handle, &data, &xHigherPriorityTaskWoken);
-    }
+  attachInterrupt(
+      BMA423_INT1, [] {
+        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+        EventBits_t bits = xEventGroupGetBitsFromISR(isr_group);
+        if (bits & WATCH_FLAG_SLEEP_MODE)
+        {
+          // Use an XEvent when waking from low energy sleep mode.
+          xEventGroupSetBitsFromISR(isr_group, WATCH_FLAG_SLEEP_EXIT | WATCH_FLAG_BMA_IRQ, &xHigherPriorityTaskWoken);
+        }
+        else
+        {
+          // Use the XQueue mechanism when we are already awake.
+          uint8_t data = Q_EVENT_BMA_INT;
+          xQueueSendFromISR(g_event_queue_handle, &data, &xHigherPriorityTaskWoken);
+        }
 
-    if (xHigherPriorityTaskWoken)
-    {
-      portYIELD_FROM_ISR ();
-    }
-  }, RISING);
+        if (xHigherPriorityTaskWoken)
+        {
+          portYIELD_FROM_ISR();
+        }
+      },
+      RISING);
 
   // Connection interrupted to the specified pin
   pinMode(AXP202_INT, INPUT);
-  attachInterrupt(AXP202_INT, [] {
-    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-    EventBits_t  bits = xEventGroupGetBitsFromISR(isr_group);
-    if (bits & WATCH_FLAG_SLEEP_MODE)
-    {
-      // Use an XEvent when waking from low energy sleep mode.
-      xEventGroupSetBitsFromISR(isr_group, WATCH_FLAG_SLEEP_EXIT | WATCH_FLAG_AXP_IRQ, &xHigherPriorityTaskWoken);
-    } else
-    {
-      // Use the XQueue mechanism when we are already awake.
-      uint8_t data = Q_EVENT_AXP_INT;
-      xQueueSendFromISR(g_event_queue_handle, &data, &xHigherPriorityTaskWoken);
-    }
-    if (xHigherPriorityTaskWoken)
-    {
-      portYIELD_FROM_ISR ();
-    }
-  }, FALLING);
+  attachInterrupt(
+      AXP202_INT, [] {
+        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+        EventBits_t bits = xEventGroupGetBitsFromISR(isr_group);
+        if (bits & WATCH_FLAG_SLEEP_MODE)
+        {
+          // Use an XEvent when waking from low energy sleep mode.
+          xEventGroupSetBitsFromISR(isr_group, WATCH_FLAG_SLEEP_EXIT | WATCH_FLAG_AXP_IRQ, &xHigherPriorityTaskWoken);
+        }
+        else
+        {
+          // Use the XQueue mechanism when we are already awake.
+          uint8_t data = Q_EVENT_AXP_INT;
+          xQueueSendFromISR(g_event_queue_handle, &data, &xHigherPriorityTaskWoken);
+        }
+        if (xHigherPriorityTaskWoken)
+        {
+          portYIELD_FROM_ISR();
+        }
+      },
+      FALLING);
 
   //Check if the RTC clock matches, if not, use compile time
   ttgo->rtc->check();
@@ -355,67 +259,65 @@ void setup()
   remap_data.x_axis_sign = 1;
   remap_data.y_axis = 1;
   remap_data.y_axis_sign = 0;
-  remap_data.z_axis  = 2;
-  remap_data.z_axis_sign  = 1;
+  remap_data.z_axis = 2;
+  remap_data.z_axis_sign = 1;
 
   ttgo->bma->set_remap_axes(&remap_data);
 
   /*
      Enable the double tap wakeup.
   */
-  ttgo->bma->enableWakeupInterrupt (true);
+  ttgo->bma->enableWakeupInterrupt(true);
 
   /*****************
      Setup BLE
   ********************/
-  Serial.println("Starting Arduino BLE Client application...");
-  BLEDevice::init("");
-  // Retrieve a Scanner and set the callback we want to use to be informed when we
-  // have detected a new device.  Specify that we want active scanning and start the
-  // scan to run for 5 seconds.
-  BLEScan* pBLEScan = BLEDevice::getScan();
-  pBLEScan->setAdvertisedDeviceCallbacks(new MyAdvertisedDeviceCallbacks());
-  pBLEScan->setInterval(1349);
-  pBLEScan->setWindow(449);
-  pBLEScan->setActiveScan(true);
-  pBLEScan->start(2, false);
+  BLE_setup();
 }
 
 void loop()
 {
-  bool  rlst;
+  bool rlst;
   uint8_t data;
   //static uint32_t start = 0;
-  if (!connected) {
-    if (scandelay > 1000) { //Scan for BLE devices around every 5 seconds when not connected
+  if (!connected)
+  {
+    if (scandelay > 1000)
+    { //Scan for BLE devices around every 5 seconds when not connected
       doScan = true;
     }
     scandelay++;
     //Serial.print("scandelay: "); Serial.println(scandelay);
-    if (!watch_running) {
+    if (!watch_running)
+    {
       stop_dash_task();
       setup_timeGui();
       watch_running = true;
       //Serial.println(watch_running);
     }
   }
-  if (doConnect == true) {
-    if (connectToServer()) {
+  if (doConnect == true)
+  {
+    if (connectToServer())
+    {
       Serial.println("We are now connected to the BLE Server.");
-        Serial.println("initialising KingSong");
-        //setCpuFrequencyMhz (CPU_FREQ_MEDIUM);
-        initks();
-        stop_time_task();
-        watch_running = false;
-        screenTimeout = ridingScreenTimeout;
-        setup_LVGui();
-    } else {
+      Serial.println("initialising KingSong");
+      //setCpuFrequencyMhz (CPU_FREQ_MEDIUM);
+      initks();
+      stop_time_task();
+      watch_running = false;
+      screenTimeout = ridingScreenTimeout;
+      setup_LVGui();
+    }
+    else
+    {
       Serial.println("We have failed to connect to the server;");
     }
     doConnect = false;
     //    Send necessary initialisation packages to start BLE notifications, do not know why this is needed though
   }
-  if (!connected && doScan && (ttgo->bl->isOn())) {
+  if (!connected && doScan && (ttgo->bl->isOn()))
+  {
     Serial.println("Disconnected... starting scan");
     BLEDevice::getScan()->start(2);
     scandelay = 0;
@@ -423,22 +325,27 @@ void loop()
   }
 
   // An XEvent signifies that there has been a wakeup interrupt, bring the CPU out of low energy mode
-  EventBits_t  bits = xEventGroupGetBits(isr_group);
-  if (bits & WATCH_FLAG_SLEEP_EXIT) {
-    if (lenergy) {
+  EventBits_t bits = xEventGroupGetBits(isr_group);
+  if (bits & WATCH_FLAG_SLEEP_EXIT)
+  {
+    if (lenergy)
+    {
       lenergy = false;
-      setCpuFrequencyMhz (defaultCpuFrequency);
+      setCpuFrequencyMhz(defaultCpuFrequency);
     }
     low_energy();
 
-    if (bits & WATCH_FLAG_BMA_IRQ) {
+    if (bits & WATCH_FLAG_BMA_IRQ)
+    {
       log_i("WATCH_FLAG_BMA_IRQ");
-      do {
-        rlst =  ttgo->bma->readInterrupt();
+      do
+      {
+        rlst = ttgo->bma->readInterrupt();
       } while (!rlst);
       xEventGroupClearBits(isr_group, WATCH_FLAG_BMA_IRQ);
     }
-    if (bits & WATCH_FLAG_AXP_IRQ) {
+    if (bits & WATCH_FLAG_AXP_IRQ)
+    {
       log_i("WATCH_FLAG_AXP_IRQ");
       ttgo->power->readIRQ();
       ttgo->power->clearIRQ();
@@ -447,58 +354,70 @@ void loop()
     xEventGroupClearBits(isr_group, WATCH_FLAG_SLEEP_EXIT);
     xEventGroupClearBits(isr_group, WATCH_FLAG_SLEEP_MODE);
   }
-  if ((bits & WATCH_FLAG_SLEEP_MODE)) {
+  if ((bits & WATCH_FLAG_SLEEP_MODE))
+  {
     //! No event processing after entering the information screen
     return;
   }
 
   //! Normal polling
-  if (xQueueReceive(g_event_queue_handle, &data, 5 / portTICK_RATE_MS) == pdPASS) {
-    switch (data) {
-      case Q_EVENT_BMA_INT:
-        log_i("Q_EVENT_BMA_IRQ");
-        do {
-          rlst =  ttgo->bma->readInterrupt();
-        } while (!rlst);
+  if (xQueueReceive(g_event_queue_handle, &data, 5 / portTICK_RATE_MS) == pdPASS)
+  {
+    switch (data)
+    {
+    case Q_EVENT_BMA_INT:
+      log_i("Q_EVENT_BMA_IRQ");
+      do
+      {
+        rlst = ttgo->bma->readInterrupt();
+      } while (!rlst);
 
-        if (ttgo->bma->isDoubleClick()) {
-          if (screenTimeout == defaultScreenTimeout)
+      if (ttgo->bma->isDoubleClick())
+      {
+        if (screenTimeout == defaultScreenTimeout)
+        {
+          screenTimeout--;
+          ttgo->setBrightness(255);
+        }
+        else if (screenTimeout == ridingScreenTimeout)
+        {
+          if (wheeldata[1] > 1.5)
           {
-            screenTimeout--;
-            ttgo->setBrightness(255);
-          } else if (screenTimeout == ridingScreenTimeout) {
-            if (wheeldata[1] > 1.5) {
-              ks_ble_request(0x9B);
-              //  } else {
-              //    add lights off here
-              //  }
-            }
-          }
-          else
-          {
-            // screenTimeout = 5 * 60 * 1000;
-            // torchOn();
-            // setCpuFrequencyMhz (CPU_FREQ_MIN);
+            ks_ble_request(0x9B);
+            //  } else {
+            //    add lights off here
+            //  }
           }
         }
-        break;
-
-      case Q_EVENT_AXP_INT:
-        log_i("Q_EVENT_AXP_INT");
-
-        ttgo->power->readIRQ();
-        if (ttgo->power->isPEKShortPressIRQ()) {
-          ttgo->power->clearIRQ();
-          low_energy();
-          return;
+        else
+        {
+          // screenTimeout = 5 * 60 * 1000;
+          // torchOn();
+          // setCpuFrequencyMhz (CPU_FREQ_MIN);
         }
+      }
+      break;
+
+    case Q_EVENT_AXP_INT:
+      log_i("Q_EVENT_AXP_INT");
+
+      ttgo->power->readIRQ();
+      if (ttgo->power->isPEKShortPressIRQ())
+      {
         ttgo->power->clearIRQ();
-        break;
+        low_energy();
+        return;
+      }
+      ttgo->power->clearIRQ();
+      break;
     }
   }
-  if (lv_disp_get_inactive_time(NULL) < screenTimeout) {
+  if (lv_disp_get_inactive_time(NULL) < screenTimeout)
+  {
     lv_task_handler(); //Since this function will loop, it's necessary to manage lv tasks
-  } else {
+  }
+  else
+  {
     low_energy();
   }
 }

@@ -161,7 +161,7 @@ void decodeKS (byte KSdata[]) {
   //Serial.print(wheeldata[12]); Serial.println(" alarm1");
   //Serial.print(wheeldata[13]); Serial.println(" alarm2");
   //Serial.print(wheeldata[14]); Serial.println(" alarm3");
-  // Serial.print(wheeldata[15]); Serial.println(" maxspeed");
+  //Serial.print(wheeldata[15]); Serial.println(" maxspeed");
   //Serial.print(max_speed); Serial.println(" max_speed");
   //Serial.print(max_batt); Serial.println(" max_batt");
   //Serial.print(min_batt); Serial.println(" min_batt");
@@ -209,8 +209,10 @@ void initks() {
   //TTGOClass *ttgo = TTGOClass::getWatch();
   Serial.println("requesting model..");
   ks_ble_request(0x9B);
+  delay(200);
   Serial.println("requesting serial..");
   ks_ble_request(0x63);
+  delay(200);
   Serial.println("requesting speed settings..");
   ks_ble_request(0x98);
 } //End of initks
