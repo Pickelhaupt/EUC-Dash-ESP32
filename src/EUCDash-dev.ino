@@ -63,6 +63,7 @@ int ride_mode = 0;
 int scandelay = 0;
 boolean bleConn;
 float wheeldata[16];
+//float wheeldata[16] = {67.1, 12.3, 23.4, 8.4, 33.2, 0.0, 88.3, 543.0, 46.7, 443, 28.4, 0.0, 0.0, 0.0, 28.0, 30.0};
 struct Wheel_constants wheelconst;
 String wheelmodel;
 //todo, implement auto detect of wheel brand

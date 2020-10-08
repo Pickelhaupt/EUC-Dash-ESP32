@@ -194,9 +194,7 @@ void ks_ble_request(byte reqtype) {
 }
 
 void initks() {
-  TTGOClass *ttgo = TTGOClass::getWatch();
   if (Wheel_brand = "KingSong") {
-    //float wheeldata[16] = {67.1, 12.3, 23.4, 8.4, 33.2, 0.0, 88.3, 543.0, 46.7, 443, 28.4, 0.0, 0.0, 0.0, 28.0, 30.0};
     //temporary model strings, Todo: implement automated id
     wheelmodel = "KS14SMD";
     //wheelmodel = "KS16S";
@@ -211,12 +209,8 @@ void initks() {
   //TTGOClass *ttgo = TTGOClass::getWatch();
   Serial.println("requesting model..");
   ks_ble_request(0x9B);
-  ttgo->shake ();
-  delay(200);
   Serial.println("requesting serial..");
   ks_ble_request(0x63);
-  delay(200);
   Serial.println("requesting speed settings..");
   ks_ble_request(0x98);
-  delay(200);
 } //End of initks
