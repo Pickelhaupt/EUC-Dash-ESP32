@@ -1,5 +1,5 @@
 /*
-  GPLv3 Jesper Ortlund Sept 2020
+  GPLv3 Sept 2020
   Derived from:
   agoodwatch Copyright (c) 2020 Alex Goodyear
   Derived from:
