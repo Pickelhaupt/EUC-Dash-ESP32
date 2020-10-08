@@ -63,14 +63,12 @@ static lv_obj_t *speed_label = nullptr;
 static lv_style_t speed_indic_style;
 static lv_style_t speed_main_style;
 static lv_style_t speed_label_style;
-static lv_style_t speed_label_style_smpl;
 //Battery
 static lv_obj_t *batt_arc = nullptr;
 static lv_obj_t *batt_label = nullptr;
 static lv_style_t batt_indic_style;
 static lv_style_t batt_main_style;
 static lv_style_t batt_label_style;
-static lv_style_t batt_label_style_smpl;
 //Current
 static lv_obj_t *current_arc = nullptr;
 static lv_obj_t *current_label = nullptr;

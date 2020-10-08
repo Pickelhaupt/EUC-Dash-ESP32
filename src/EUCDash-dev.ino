@@ -226,6 +226,7 @@ bool connectToServer() {
     pRemoteCharacteristic->registerForNotify(notifyCallback);
   }
   connected = true;
+  return connected;
 }
 
 class MyAdvertisedDeviceCallbacks: public BLEAdvertisedDeviceCallbacks {
@@ -383,7 +384,7 @@ void loop()
 {
   bool  rlst;
   uint8_t data;
-  static uint32_t start = 0;
+  //static uint32_t start = 0;
   if (!connected) {
     if (scandelay > 1000) { //Scan for BLE devices around every 5 seconds when not connected
       doScan = true;
