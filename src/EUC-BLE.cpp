@@ -2,8 +2,8 @@
 #include "EUCDash.h"
 #include "BLEDevice.h"
 
-boolean doConnect = false;
-boolean doScan = false;
+//boolean doConnect = false;
+//boolean doScan = false;
 static BLERemoteCharacteristic *pRemoteCharacteristic;
 static BLEAdvertisedDevice *myDevice;
 

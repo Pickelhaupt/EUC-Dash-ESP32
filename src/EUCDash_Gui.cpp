@@ -4,7 +4,6 @@
 #include "EUCDash.h"
 #include "string.h"
 #include <Ticker.h>
-#include "BLEDevice.h"
 #include "lv_gui.h"
 
 /***********************************************

@@ -54,9 +54,9 @@ unsigned int defaultScreenTimeout = DEFAULT_SCREEN_TIMEOUT;
 unsigned int ridingScreenTimeout = RIDING_SCREEN_TIMEOUT;
 unsigned int screenTimeout = DEFAULT_SCREEN_TIMEOUT;
 
-//boolean doConnect = false;
+boolean doConnect = false;
 boolean connected = false;
-//boolean doScan = false;
+boolean doScan = false;
 boolean watch_running = false;
 int ride_mode = 0;
 int scandelay = 0;
@@ -74,17 +74,17 @@ void low_energy()
 {
   if (ttgo->bl->isOn())
   { //Go to sleep / switch off display
-    log_i("low_energy() - BL is on");
+    log_i("low_energy() - BL is off");
     xEventGroupSetBits(isr_group, WATCH_FLAG_SLEEP_MODE);
-
     ttgo->closeBL();
     // ttgo->stopLvglTick();
-    ttgo->bma->enableStepCountInterrupt(false);
+    //ttgo->bma->enableStepCountInterrupt(false);
     ttgo->displaySleep();
     displayOff = true;
     lenergy = true;
     if (!connected)
     { // Only enter sleep mode if there is no wheel connected
+      ttgo->stopLvglTick();
       setCpuFrequencyMhz(CPU_FREQ_MIN);
       gpio_wakeup_enable((gpio_num_t)AXP202_INT, GPIO_INTR_LOW_LEVEL);
       gpio_wakeup_enable((gpio_num_t)BMA423_INT1, GPIO_INTR_HIGH_LEVEL);
@@ -95,8 +95,12 @@ void low_energy()
   else
   { //Wake from sleep mode
     Serial.println("waking up");
+    Serial.println(connected);
     log_i("low_energy() - BL is off");
-    ttgo->startLvglTick();
+    if (!connected)
+    {
+      ttgo->startLvglTick();
+    }
     ttgo->displayWakeup();
     ttgo->rtc->syncToSystem();
     // updateBatteryLevel();
