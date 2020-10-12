@@ -4,7 +4,6 @@
 #include "EUCDash.h"
 #include "string.h"
 #include <Ticker.h>
-#include "BLEDevice.h"
 #include "lv_gui.h"
 
 /***********************************************
@@ -12,7 +11,7 @@
  ***********************************************/
 bool fulldash = true;
 bool dspeedarc = true;
-bool shakeoff = true;
+bool shakeoff[3] = {true, true, true};
 //bool fulldash = false;
 //bool dspeedarc = false;
 
@@ -151,6 +150,10 @@ void lv_define_styles_1(void) {
   lv_style_init(&dashtime_style);
   lv_style_set_text_color(&dashtime_style, LV_STATE_DEFAULT, watch_info_colour);
   lv_style_set_text_font(&dashtime_style, LV_STATE_DEFAULT, &DIN1451_m_cond_28);
+  
+  lv_style_init(&trip_label_style);
+  lv_style_set_text_color(&trip_label_style, LV_STATE_DEFAULT, current_fg_clr);
+  lv_style_set_text_font(&trip_label_style, LV_STATE_DEFAULT, &DIN1451_m_cond_44);
   //arc_obj_t *speedarc = (arc_obj_t *)(&speed_arc, &speed_main_style, &speed_indic_style);
 
 } //End Define LVGL default object styles
@@ -330,7 +333,7 @@ void lv_dashtime(void) {
   lv_obj_add_style(wbatt, LV_OBJ_PART_MAIN, &dashtime_style);
   lv_obj_align(wbatt, NULL, LV_ALIGN_IN_BOTTOM_RIGHT, 0, -25);
   trip = lv_label_create(lv_scr_act(), NULL);
-  lv_obj_add_style(trip, LV_OBJ_PART_MAIN, &current_label_style);
+  lv_obj_add_style(trip, LV_OBJ_PART_MAIN, &trip_label_style);
   lv_obj_align(trip, NULL, LV_ALIGN_IN_TOP_MID, 0, 25);
 } //End Create Dashboard objects
 
@@ -576,32 +579,31 @@ void updateTime()
 */
 
 void update_speed_shake(void) {
-  if (wheeldata[1] >= wheeldata[14] && shakeoff) {
-  //Serial.println("Speed-shake");
-  //if (wheeldata[1] >= 22 && shakeoff) {
+  if (wheeldata[1] >= wheeldata[14] && shakeoff[0]) {
     speed_shake = lv_task_create(lv_speed_shake, 750, LV_TASK_PRIO_LOWEST, NULL);
     lv_task_ready(speed_shake);
-    shakeoff = false;
-  } else if (!shakeoff) {
+    shakeoff[0] = false;
+  } else if (!shakeoff[0]) {
     stop_speed_shake();
   }
 }
 
 void update_current_shake(void) {
-  if (wheeldata[3] > (wheelconst.maxcurrent * 0.75) && shakeoff) {
+  if (wheeldata[3] > (wheelconst.maxcurrent * 0.75) && shakeoff[1]) {
     current_shake = lv_task_create(lv_current_shake, 200, LV_TASK_PRIO_LOWEST, NULL);
     lv_task_ready(current_shake);
-  } else if (!shakeoff) {
+    shakeoff[1] = false;
+  } else if (!shakeoff[1]) {
     stop_current_shake();
   }
 }
 
 void update_temp_shake(void) {
-  if (wheeldata[4] > wheelconst.crittemp && shakeoff) {
+  if (wheeldata[4] > wheelconst.crittemp && shakeoff[2]) {
     temp_shake = lv_task_create(lv_temp_shake, 1000, LV_TASK_PRIO_LOWEST, NULL);
     lv_task_ready(temp_shake);
-    shakeoff = false;
-  } else if (!shakeoff) {
+    shakeoff[2] = false;
+  } else if (!shakeoff[2]) {
     stop_temp_shake();
   }
 }
@@ -741,21 +743,21 @@ void stop_dash_task() {
 void stop_speed_shake() {
   if (speed_shake != nullptr) {
     lv_task_del(speed_shake);
-    shakeoff = true;
+    shakeoff[0] = true;
   }
 }
 
 void stop_current_shake() {
   if (current_shake != nullptr) {
     lv_task_del(current_shake);
-    shakeoff = true;
+    shakeoff[1] = true;
   }
 }
 
 void stop_temp_shake() {
   if (temp_shake != nullptr) {
     lv_task_del(temp_shake);
-    shakeoff = true;
+    shakeoff[2] = true;
   }
 }
 

@@ -1,5 +1,5 @@
 /*
-  GPLv3 Jesper Ortlund Sept 2020
+  GPLv3 Sept 2020
   Derived from:
   agoodwatch Copyright (c) 2020 Alex Goodyear
   Derived from:
@@ -87,6 +87,7 @@ struct Wheel_constants {
 extern struct Wheel_constants wheelconst;
 
 //Global function declarations
+//LVGL
 void setup_timeGui();
 void setup_LVGui();
 void updateBatteryIcon(lv_icon_battery_t index);
@@ -97,7 +98,15 @@ void stop_dash_task();
 void stop_speed_shake();
 void stop_current_shake();
 void stop_temp_shake();
+//BLE
+void BLE_setup();
+//class MyAdvertisedDeviceCallbacks: public BLEAdvertisedDeviceCallbacks {
+//  void onResult();
+//};
+bool connectToServer();
+//General
 void setbrightness();
+//Kingsong
 void decodeKS(byte KSData[]);
 void initks();
 void ks_ble_request(byte);
@@ -109,6 +118,8 @@ extern unsigned int ridingScreenTimeout;
 extern unsigned int defaultCpuFrequency;
 extern int ride_mode;
 extern boolean connected;
+extern boolean doScan;
+extern boolean doConnect;
 extern bool displayOff;
 extern int maxcurrent;
 extern int crittemp;

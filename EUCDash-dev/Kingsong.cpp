@@ -10,7 +10,8 @@ float max_batt = 0;
 float min_batt = 100;
 float max_current = 0;
 float max_temp = 0;
-
+String wheelmodel;
+struct Wheel_constants wheelconst;
 
 
 /**************************************************
@@ -29,7 +30,6 @@ static int decode4byte(byte byte1, byte byte2, byte byte3, byte byte4) { //conve
 }
 
 void setKSconstants(void) {
-  //struct Wheel_constants wheelconst;
   if (wheelmodel = "KS14SMD") {
     wheelconst.maxcurrent = 35;
     wheelconst.crittemp = 65;
@@ -161,7 +161,7 @@ void decodeKS (byte KSdata[]) {
   //Serial.print(wheeldata[12]); Serial.println(" alarm1");
   //Serial.print(wheeldata[13]); Serial.println(" alarm2");
   //Serial.print(wheeldata[14]); Serial.println(" alarm3");
-  // Serial.print(wheeldata[15]); Serial.println(" maxspeed");
+  //Serial.print(wheeldata[15]); Serial.println(" maxspeed");
   //Serial.print(max_speed); Serial.println(" max_speed");
   //Serial.print(max_batt); Serial.println(" max_batt");
   //Serial.print(min_batt); Serial.println(" min_batt");
@@ -194,9 +194,7 @@ void ks_ble_request(byte reqtype) {
 }
 
 void initks() {
-  TTGOClass *ttgo = TTGOClass::getWatch();
   if (Wheel_brand = "KingSong") {
-    //float wheeldata[16] = {67.1, 12.3, 23.4, 8.4, 33.2, 0.0, 88.3, 543.0, 46.7, 443, 28.4, 0.0, 0.0, 0.0, 28.0, 30.0};
     //temporary model strings, Todo: implement automated id
     wheelmodel = "KS14SMD";
     //wheelmodel = "KS16S";
@@ -211,7 +209,6 @@ void initks() {
   //TTGOClass *ttgo = TTGOClass::getWatch();
   Serial.println("requesting model..");
   ks_ble_request(0x9B);
-  ttgo->shake ();
   delay(200);
   Serial.println("requesting serial..");
   ks_ble_request(0x63);
