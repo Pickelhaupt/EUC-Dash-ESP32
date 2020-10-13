@@ -247,6 +247,11 @@ void setup()
   setbrightness();
   ttgo->openBL();
 
+  //Execute watch only GUI interface
+  //if (!connected) {
+  //  setup_timeGui();
+  //}
+
   /*
      Setup the axes for the TWatch-2020-V1 for the tilt detection.
   */

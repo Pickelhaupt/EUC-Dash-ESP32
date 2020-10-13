@@ -3,12 +3,14 @@
 #include "BLEDevice.h"
 
 byte KS_BLEreq[20];
+
 extern float wheeldata[];
 float max_speed = 0;
 float avg_speed = 0;
 float max_batt = 0;
 float min_batt = 100;
 float max_current = 0;
+float regen_current = 0;
 float max_temp = 0;
 String wheelmodel;
 struct Wheel_constants wheelconst;
@@ -75,6 +77,7 @@ void decodeKS (byte KSdata[]) {
 
   int rMode;
   float Battpct;
+  float negamp;
 
   //Parse incoming BLE Notifications
   if (KSdata[16] == 0xa9) { // Data package type 1 voltage/speed/odo/current/temperature
@@ -142,6 +145,12 @@ void decodeKS (byte KSdata[]) {
   if (wheeldata[3] > max_current && wheeldata[3] <= wheelconst.maxcurrent) {
     max_current = wheeldata[3];
   }
+  if (wheeldata[3] < 0) {
+    negamp = (wheeldata[3] * -1);
+    if (negamp > regen_current) {
+      regen_current = negamp;
+    }
+  }
   if (wheeldata[4] > max_temp) {
     max_temp = wheeldata[4];
   }
@@ -151,13 +160,13 @@ void decodeKS (byte KSdata[]) {
   // Serial.print(wheeldata[2]); Serial.println(" km");
   //Serial.print(wheeldata[3]); Serial.println(" A");
   // Serial.print(wheeldata[4]); Serial.println(" C");
-  Serial.print(wheeldata[5]); Serial.println(" rmode");
+  //Serial.print(wheeldata[5]); Serial.println(" rmode");
   // Serial.print(wheeldata[6]); Serial.println(" %");
   // Serial.print(wheeldata[7]); Serial.println(" W");
   // Serial.print(wheeldata[8]); Serial.println(" km");
   // Serial.print(wheeldata[9]); Serial.println(" time");
   //Serial.print(wheeldata[10]); Serial.println(" kmh");
-  Serial.print(wheeldata[11]); Serial.println(" fan");
+  // Serial.print(wheeldata[11]); Serial.println(" fan");
   //Serial.print(wheeldata[12]); Serial.println(" alarm1");
   //Serial.print(wheeldata[13]); Serial.println(" alarm2");
   //Serial.print(wheeldata[14]); Serial.println(" alarm3");
