@@ -11,10 +11,11 @@
  ***********************************************/
 bool fulldash = true;
 bool dspeedarc = true;
-bool shakeoff[3] = {true, true, true};
 //bool fulldash = false;
 //bool dspeedarc = false;
+/************End dash customisation************/
 
+bool shakeoff[3] = {true, true, true};
 extern float wheeldata[];
 //extern struct Wheel_constants wheelconst;
 
