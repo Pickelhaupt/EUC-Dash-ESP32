@@ -11,8 +11,8 @@
  ***********************************************/
 //bool fulldash = true; // display the full or the simple dash version?
 //bool dcurrentarc = true; //display current arc on the simple dash?
-bool fulldash = false;
-bool dcurrentarc = false;
+bool fulldash = true;
+bool dcurrentarc = true;
 /**************End Dash settings****************/
 
 bool rev_current_arc = false; //default direction of current arc
