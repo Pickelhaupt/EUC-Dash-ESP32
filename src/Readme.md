@@ -5,7 +5,6 @@ This is where all new features are added.
 - Restructuring of the GUI code to make it easier to modify and add dashboards
 ## Next steps
 - Add tileview to enable multiple screens
-- Redo the simple version of the dash
 - Add rudimentary settings screens
 - Add gesture to turn off lights
 ## Still todo
