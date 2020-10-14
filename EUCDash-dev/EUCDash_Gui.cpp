@@ -9,10 +9,10 @@
 /***********************************************
    Mike, Change these to false if you want the simple dash
  ***********************************************/
-//bool fulldash = true; // display the full or the simple dash version?
-//bool dcurrentarc = true; //display current arc on the simple dash?
-bool fulldash = true;
-bool dcurrentarc = true;
+bool fulldash = true; // display the full or the simple dash version?
+bool dcurrentarc = true; //display current arc on the simple dash?
+//bool fulldash = false;
+//bool dcurrentarc = false;
 /**************End Dash settings****************/
 
 bool rev_current_arc = false; //default direction of current arc
@@ -69,8 +69,8 @@ void lv_setup_dashstyle() {
     rev_current_arc = true;
   } else {
     arclinew = 25;
-    batt_arc_start = 110;
-    batt_arc_end = 250;
+    batt_arc_start = 20;
+    batt_arc_end = 340;
     rev_batt_arc = false;
   }
 }
@@ -635,23 +635,14 @@ void updateTime()
       lv_obj_align(dateLabel, NULL, LV_ALIGN_CENTER, 0, 47);
     }
     char watchbattstring[4];
+    char wbs[6] = {0};
+    char pctst[2] = "%";
     dtostrf(watchbatt, 2, 0, watchbattstring);
+    snprintf(wbs, sizeof(wbs), "%s%s", watchbattstring, pctst);
     if (battLabel != nullptr) {
-      if (watchbatt > 80) {
-        lv_label_set_text (battLabel, LV_SYMBOL_BATTERY_FULL);
-      } else if (watchbatt > 60) {
-        lv_label_set_text (battLabel, LV_SYMBOL_BATTERY_2);
-      } else if (watchbatt > 40) {
-        lv_label_set_text (battLabel, LV_SYMBOL_BATTERY_2);
-      } else if (watchbatt > 20 ) {
-        lv_label_set_text (battLabel, LV_SYMBOL_BATTERY_1);
-      } else if (watchbatt > 5 ) {
-        lv_label_set_text (battLabel, LV_SYMBOL_BATTERY_EMPTY);
-      } else {
-        lv_label_set_text (battLabel, LV_SYMBOL_CLOSE " " LV_SYMBOL_BATTERY_EMPTY);
-      }
-      lv_label_set_align(battLabel, LV_LABEL_ALIGN_RIGHT);
-      lv_obj_align(battLabel, NULL, LV_ALIGN_IN_TOP_RIGHT, 0, 0);
+      lv_label_set_text (battLabel, wbs);
+      lv_label_set_align(battLabel, LV_LABEL_ALIGN_CENTER);
+      lv_obj_align(battLabel, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, -5);
     }
   }
   ttgo->rtc->syncToRtc();
@@ -783,10 +774,8 @@ void setup_timeGui(void) {
   lv_obj_align(dateLabel, temp_arc, LV_ALIGN_CENTER, 0, 47);
 
   lv_style_init(&batt_fg_style);
+  lv_style_set_text_font(&batt_fg_style, LV_STATE_DEFAULT, &DIN1451_m_cond_28);
   lv_style_set_text_color(&batt_fg_style, LV_STATE_DEFAULT, watch_bg_colour);
-
-  lv_style_init(&batt_bg_style);
-  lv_style_set_text_color(&batt_bg_style, LV_STATE_DEFAULT, watch_bg_colour);
 
   battLabel = lv_label_create(lv_scr_act(), NULL);
   lv_obj_add_style(battLabel, LV_OBJ_PART_MAIN, &batt_fg_style);
