@@ -47,7 +47,7 @@ EventGroupHandle_t isr_group = NULL;
 bool lenergy = false;
 bool displayOff = false;
 TTGOClass *ttgo;
-lv_icon_battery_t batState = LV_ICON_CALCULATION;
+//lv_icon_battery_t batState = LV_ICON_CALCULATION;
 
 unsigned int defaultCpuFrequency = CPU_FREQ_NORM;
 unsigned int defaultScreenTimeout = DEFAULT_SCREEN_TIMEOUT;
@@ -58,14 +58,12 @@ boolean doConnect = false;
 boolean connected = false;
 boolean doScan = false;
 boolean watch_running = false;
-int ride_mode = 0;
 int scandelay = 0;
 float wheeldata[16];
 //float wheeldata[16] = {67.1, 12.3, 23.4, 8.4, 33.2, 0.0, 88.3, 543.0, 46.7, 443, 28.4, 0.0, 0.0, 0.0, 28.0, 30.0};
-struct Wheel_constants wheelconst;
-String wheelmodel;
+
 //todo, implement auto detect of wheel brand
-String Wheel_brand = "KingSong";
+
 
 /******************************************************************
    Function managing the entry and exit from sleep/power save mode

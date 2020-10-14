@@ -3,14 +3,17 @@
 #include "BLEDevice.h"
 
 byte KS_BLEreq[20];
+
 extern float wheeldata[];
 float max_speed = 0;
 float avg_speed = 0;
 float max_batt = 0;
 float min_batt = 100;
 float max_current = 0;
+float regen_current = 0;
 float max_temp = 0;
-
+String wheelmodel;
+struct Wheel_constants wheelconst;
 
 
 /**************************************************
@@ -29,7 +32,6 @@ static int decode4byte(byte byte1, byte byte2, byte byte3, byte byte4) { //conve
 }
 
 void setKSconstants(void) {
-  //struct Wheel_constants wheelconst;
   if (wheelmodel = "KS14SMD") {
     wheelconst.maxcurrent = 35;
     wheelconst.crittemp = 65;
@@ -75,6 +77,7 @@ void decodeKS (byte KSdata[]) {
 
   int rMode;
   float Battpct;
+  float negamp;
 
   //Parse incoming BLE Notifications
   if (KSdata[16] == 0xa9) { // Data package type 1 voltage/speed/odo/current/temperature
@@ -141,6 +144,12 @@ void decodeKS (byte KSdata[]) {
   }
   if (wheeldata[3] > max_current && wheeldata[3] <= wheelconst.maxcurrent) {
     max_current = wheeldata[3];
+  }
+  if (wheeldata[3] < 0) {
+    negamp = (wheeldata[3] * -1);
+    if (negamp > regen_current) {
+      regen_current = negamp;
+    }
   }
   if (wheeldata[4] > max_temp) {
     max_temp = wheeldata[4];
@@ -215,4 +224,5 @@ void initks() {
   delay(200);
   Serial.println("requesting speed settings..");
   ks_ble_request(0x98);
+  delay(200);
 } //End of initks
