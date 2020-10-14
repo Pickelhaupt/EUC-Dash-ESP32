@@ -29,7 +29,7 @@ However LVGL must be updated.
   - Wait for PlatformIO to install completely, this might take some time.
   - Restart VSCode
   - Click the Source control icon on the left bar
-  - Choose clone and enter ...
+  - Choose clone and enter https://github.com/Pickelhaupt/EUC-Dash-ESP32.git
   - Click on clone from URL
   - Once the repository has been cloned you can build it by hitting the tick sign on the bottom bar
   - To upload to the watch, make sure it is connected to USB and click the arrow icon on the bottom bar
