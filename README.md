@@ -1,5 +1,7 @@
 # EUC-Dash-ESP32
-Stand-alone Bluetooth dashboard for electric unicycles (EUCs) for ESP32, Arduino sketch
+Stand-alone Bluetooth dashboard for electric unicycles (EUCs) for ESP32.
+You can build it with both the Arduino IDE and with PlatformIO.
+For instructions on how to setup PlatformIO and building the project see the README.md file in the src directory.
 
 ## Introduction
 There are now two versions, one stable(ish) and one for development, I will add new features to the development version and merge when it is stable.
