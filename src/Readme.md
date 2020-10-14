@@ -15,10 +15,8 @@ This is where all new features are added.
 - Add wheel selection setting
 - Add missing dash elements (ride mode and alert indicators)
 
-This version requires the TTGO_TWatch_Library https://github.com/Xinyuan-LilyGO/TTGO_TWatch_Library
-However LVGL must be updated.
-- Get the latest version via the Manage Libraries in Arduino
-- Find the location if the library, replace the src directory: <arduino user library location>\TTGO_TWatch_Library-master\src\lvgl\src with the src directory from the new LVGL library
+This version requires the TTGO_TWatch_Library, this will automatically be downloaded when building the project the first time.
+I have forked the Twatch library and upgraded the LCGL version, the forked version is the one that is downloaded when building the project.
 ## Setting up PlatformIO (on windows VScode)
   - install Visual Studio Code
   - Install Git
