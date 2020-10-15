@@ -4,7 +4,7 @@ You can build it with both the Arduino IDE and with PlatformIO.
 For instructions on how to setup PlatformIO and building the project see the README.md file in the src directory.
 
 ## Introduction
-There are now two versions, one stable(ish) and one for development, I will add new features to the development version and merge when it is stable.
+There are now two versions, one stable(ish) and one for development, I will add new features to the development version and merge when it is stable. At the moment I would recommend using the dev version as the stable version is a bit out of date.
 
 This is early version of a dashboard for electric unicycles. It currently only supports KingSong 67V wheels and ttgo t-watch 2020. The code is still quite unpolished and there are probably some bugs. 
 Even though there are still a lot of functions missing, the dashboard now works quite well.
