@@ -176,9 +176,6 @@ void decodeKS (byte KSdata[]) {
   //Serial.print(min_batt); Serial.println(" min_batt");
   //Serial.print(max_current); Serial.println(" max_current");
   //Serial.print(max_temp); Serial.println(" max_temp");
-  if (connected && displayOff) {
-    lv_task_handler();
-  }
 } // End decodeKS
 
 

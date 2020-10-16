@@ -69,8 +69,8 @@ void lv_setup_dashstyle() {
     rev_current_arc = true;
   } else {
     arclinew = 25;
-    batt_arc_start = 20;
-    batt_arc_end = 340;
+    batt_arc_start = 70;
+    batt_arc_end = 290;
     rev_batt_arc = false;
   }
 }
