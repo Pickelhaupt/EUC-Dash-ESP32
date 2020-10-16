@@ -69,8 +69,11 @@ void lv_setup_dashstyle() {
     rev_current_arc = true;
   } else {
     arclinew = 25;
-    batt_arc_start = 70;
-    batt_arc_end = 290;
+    
+    // changed size of battery arc on simple MJR 16-OCT-2020
+    batt_arc_start = 65;
+    batt_arc_end = 295;
+
     rev_batt_arc = false;
   }
 }
@@ -481,29 +484,33 @@ void lv_batt_update(void) {
     lv_style_set_text_color(&batt_label_style, LV_STATE_DEFAULT, batt_fg_clr);
   }
   lv_obj_add_style(batt_arc, LV_ARC_PART_INDIC, &batt_indic_style);
+   
+  // draw batt arc
   if (rev_batt_arc) {
     lv_arc_set_value(batt_arc, (100 - wheeldata[6]));
   } else {
     lv_arc_set_value(batt_arc, wheeldata[6]);
   }
-  int ang_max = value2angle(batt_arc_start, batt_arc_end, 0, 100, max_batt, rev_batt_arc);
-  int ang_max2 = ang_max + 3;
-  if (ang_max2 >= 360) {
-    ang_max2 = ang_max2 - 360;
-  }
-  lv_arc_set_angles(batt_max_bar, ang_max, ang_max2);
-
-  int ang_min = value2angle(batt_arc_start, batt_arc_end, 0, 100, min_batt, rev_batt_arc);
-  int ang_min2 = ang_min + 3;
-  if (ang_min2 >= 360) {
-    ang_min2 = ang_min2 - 360;
-  }
-  lv_arc_set_angles(batt_min_bar, ang_min, ang_min2);
-
-  //lv_arc_set_angles(batt_max_bar, (142 - (max_batt * 110 / 100)), (144 - (max_batt * 110 / 100)));
-  //lv_arc_set_angles(batt_min_bar, (142 - (min_batt * 110 / 100)), (144 - (min_batt * 110 / 100)));
-
+  
   if (fulldash) {
+    // no min max markers on simple for batt arc MJR 16-OCT-2020
+    int ang_max = value2angle(batt_arc_start, batt_arc_end, 0, 100, max_batt, rev_batt_arc);
+    int ang_max2 = ang_max + 3;
+    if (ang_max2 >= 360) {
+      ang_max2 = ang_max2 - 360;
+    }
+    lv_arc_set_angles(batt_max_bar, ang_max, ang_max2);
+
+    int ang_min = value2angle(batt_arc_start, batt_arc_end, 0, 100, min_batt, rev_batt_arc);
+    int ang_min2 = ang_min + 3;
+    if (ang_min2 >= 360) {
+      ang_min2 = ang_min2 - 360;
+    }
+    lv_arc_set_angles(batt_min_bar, ang_min, ang_min2);
+
+    //lv_arc_set_angles(batt_max_bar, (142 - (max_batt * 110 / 100)), (144 - (max_batt * 110 / 100)));
+    //lv_arc_set_angles(batt_min_bar, (142 - (min_batt * 110 / 100)), (144 - (min_batt * 110 / 100)));
+
     lv_obj_add_style(batt_label, LV_OBJ_PART_MAIN, &batt_label_style);
     char battstring[4];
     if (wheeldata[6] > 10) {
