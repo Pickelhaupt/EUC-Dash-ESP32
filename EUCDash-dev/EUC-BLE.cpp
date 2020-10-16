@@ -49,6 +49,9 @@ static void notifyCallback(
     if (pData[0] == 0xAA && pData[1] == 0x55)
     {
       decodeKS(pData); // For Kingsong only atm.
+      if (connected && displayOff) {
+        lv_task_handler();
+      }
     }
   }
 }
