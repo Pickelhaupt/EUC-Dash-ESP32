@@ -57,7 +57,7 @@ void lv_setup_dashstyle() {
     current_arc_end = 230;
     temp_arc_start = 310;
     temp_arc_end = 50;
-    bool rev_batt_arc = true;
+    rev_batt_arc = true;
     rev_current_arc = false;
   } else if (dcurrentarc) {
     arclinew = 25;
@@ -69,8 +69,8 @@ void lv_setup_dashstyle() {
     rev_current_arc = true;
   } else {
     arclinew = 25;
-    batt_arc_start = 20;
-    batt_arc_end = 340;
+    batt_arc_start = 70;
+    batt_arc_end = 290;
     rev_batt_arc = false;
   }
 }
@@ -122,6 +122,9 @@ void lv_define_styles_1(void) {
   lv_style_set_line_width(&batt_main_style, LV_STATE_DEFAULT, arclinew);
   lv_style_set_bg_opa(&batt_main_style, LV_STATE_DEFAULT, LV_OPA_TRANSP);
   lv_style_set_line_color(&batt_main_style, LV_STATE_DEFAULT, batt_bg_clr);
+  if (!fulldash) {
+    lv_style_set_line_color(&batt_main_style, LV_STATE_DEFAULT, batt_light_bg_clr);
+  }
 
   lv_style_init(&batt_label_style);
   lv_style_set_text_font(&batt_label_style, LV_STATE_DEFAULT, &DIN1451_m_cond_66);
