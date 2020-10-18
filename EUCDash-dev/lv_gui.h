@@ -28,8 +28,9 @@ static lv_color_t speed_bg_clr = lv_color_make(0x05, 0x2a, 0x05); //Speed gauge 
 static lv_color_t speed_fg_clr = lv_color_make(0x00, 0xfa, 0x0f); //Speed gauge indicator color (default = green)
 static lv_color_t batt_bg_clr = lv_color_make(0x05, 0x2a, 0x05); //Battery gauge arc background (default = dark green)
 
-// change default bg col for batt arc MJR 14-OCT-2020
-static lv_color_t batt_light_bg_clr = ( fulldash ? lv_color_make(0x05, 0x4a, 0x15) : lv_color_make(0xff, 0x00, 0x00) ); // green or red
+// change default bg col for batt arc MJR 14-OCT-2020 -- could not get this to compile, reverted to original CJO 18-10
+//static lv_color_t batt_light_bg_clr = ( fulldash ? lv_color_make(0x05, 0x4a, 0x15) : lv_color_make(0xff, 0x00, 0x00) ); // green or red
+static lv_color_t batt_light_bg_clr = lv_color_make(0x05, 0x4a, 0x15); //Battery gauge arc background (default = dark green)
 
 static lv_color_t batt_fg_clr = lv_color_make(0x00, 0xfa, 0x0f); //Battery gauge indicator color (default = green)
 static lv_color_t temp_bg_clr = lv_color_make(0x05, 0x05, 0x3a); //Temperature gauge arc background (dark blue)
