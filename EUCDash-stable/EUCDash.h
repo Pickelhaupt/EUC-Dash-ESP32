@@ -1,5 +1,5 @@
 /*
-  GPLv3 Jesper Ortlund Sept 2020
+  GPLv3 Sept 2020
   Derived from:
   agoodwatch Copyright (c) 2020 Alex Goodyear
   Derived from:
@@ -76,6 +76,18 @@ typedef struct
   void      *data;
 } TileDesc_t;
 
+struct Wheel_constants {
+  byte maxcurrent;
+  byte crittemp;
+  byte warntemp;
+  byte battvolt;
+  byte battwarn;
+};
+
+extern struct Wheel_constants wheelconst;
+
+//Global function declarations
+//LVGL
 void setup_timeGui();
 void setup_LVGui();
 void updateBatteryIcon(lv_icon_battery_t index);
@@ -86,48 +98,19 @@ void stop_dash_task();
 void stop_speed_shake();
 void stop_current_shake();
 void stop_temp_shake();
+//BLE
+void BLE_setup();
+//class MyAdvertisedDeviceCallbacks: public BLEAdvertisedDeviceCallbacks {
+//  void onResult();
+//};
+bool connectToServer();
+//General
 void setbrightness();
-
-/**********************************************
-   Define custom colours for the EUC gauges
-   Edit if you want to change colour scheme
-   All arcs will turn yellow and red when there
-   is a warning or critical state
- **********************************************/
-// Gauge colours
-static lv_color_t current_bg_clr = lv_color_make(0x25, 0x25, 0x25); //Current gauge arc background (default = dark gray)
-static lv_color_t current_fg_clr = lv_color_make(0xff, 0xff, 0xff); //Current gauge arc background (default = white)
-static lv_color_t speed_bg_clr = lv_color_make(0x05, 0x2a, 0x05); //Speed gauge arc background (default = dark green)
-static lv_color_t speed_fg_clr = lv_color_make(0x00, 0xfa, 0x0f); //Speed gauge indicator color (default = green)
-static lv_color_t batt_bg_clr = lv_color_make(0x05, 0x2a, 0x05); //Battery gauge arc background (default = dark green)
-static lv_color_t batt_fg_clr = lv_color_make(0x00, 0xfa, 0x0f); //Battery gauge indicator color (default = green)
-static lv_color_t temp_bg_clr = lv_color_make(0x05, 0x05, 0x3a); //Temperature gauge arc background (dark blue)
-static lv_color_t temp_fg_clr = lv_color_make(0x2a, 0x1f, 0xff); //Temperature gauge indicator color (light blue)
-//Misc colours
-static lv_color_t ride_mode_clr = lv_color_make(0xFF, 0x00, 0xFF); //The H M S ride mode indicator (Magenta)
-static lv_color_t max_bar_clr = lv_color_make(0xFF, 0x00, 0xFF); //The H M S ride mode indicator (Magenta)
-static lv_color_t min_bar_clr = lv_color_make(0x2a, 0x1f, 0xff); //The H M S ride mode indicator (light blue)
-static lv_color_t watch_info_colour = lv_color_make(0xe0, 0xe0, 0xe0); //Watch battery level and time (Gray)
-//Disconnected time display colour
-static lv_color_t watch_colour = lv_color_make(0xFF, 0x00, 0x00); // (Red)
-static lv_color_t watch_bg_colour = lv_color_make(0xAF, 0x00, 0x00); // (Dark Red)
-
-/***********************************************************
-   Declare custom fonts, TTF fonts can be converted to C at:
-   https://lvgl.io/tools/fontconverter
-   All custom fonts reside in the sketch directory
- ***********************************************************/
-
-LV_FONT_DECLARE(DIN1451_m_cond_24);
-LV_FONT_DECLARE(DIN1451_m_cond_28);
-LV_FONT_DECLARE(DIN1451_m_cond_36);
-LV_FONT_DECLARE(DIN1451_m_cond_44);
-LV_FONT_DECLARE(DIN1451_m_cond_66);
-LV_FONT_DECLARE(DIN1451_m_cond_72);
-LV_FONT_DECLARE(DIN1451_m_cond_80);
-LV_FONT_DECLARE(DIN1451_m_cond_120);
-LV_FONT_DECLARE(DIN1451_m_cond_150);
-LV_FONT_DECLARE(DIN1451_m_cond_180);
+//Kingsong
+void decodeKS(byte KSData[]);
+void initks();
+void ks_ble_request(byte);
+void writeBLE (byte*, int);
 
 extern unsigned int screenTimeout;
 extern unsigned int defaultScreenTimeout;
@@ -135,6 +118,9 @@ extern unsigned int ridingScreenTimeout;
 extern unsigned int defaultCpuFrequency;
 extern int ride_mode;
 extern boolean connected;
+extern boolean doScan;
+extern boolean doConnect;
+extern bool displayOff;
 extern int maxcurrent;
 extern int crittemp;
 extern int warntemp;
@@ -143,7 +129,11 @@ extern float avg_speed;
 extern float max_batt;
 extern float min_batt;
 extern float max_current;
+extern float regen_current;
 extern float max_temp;
+extern String wheelmodel;
+extern String Wheel_brand;
+//extern float wheeldata[];
 
 extern "C" {
   extern void lv_keyboard_def_event_cb(lv_obj_t * kb, lv_event_t event);

@@ -4,4 +4,7 @@
 #define LILYGO_WATCH_2020_V1                //T-watch_2020
 
 #define LILYGO_WATCH_LVGL
+#define TWATCH_LVGL_DOUBLE_BUFFER
+#define TWATCH_USE_PSRAM_ALLOC_LVGL
+#define LVGL_BUFFER_SIZE        (240*240)
 #include <LilyGoWatch.h>
