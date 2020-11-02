@@ -144,7 +144,7 @@ static lv_style_t batt_bg_style;
 
 // Bitmaps
 
-//variable devlarations
+//variable declarations
 
 // default dashboard arc satart and end points
 int speed_arc_start = 160;

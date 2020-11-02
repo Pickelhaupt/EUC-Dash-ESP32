@@ -141,11 +141,11 @@ void setbrightness()
   {
     if (info.tm_hour > 19 || info.tm_hour < 6)
     {
-      ttgo->setBrightness(32);
+      ttgo->setBrightness(96);
     }
     else
     {
-      ttgo->setBrightness(128);
+      ttgo->setBrightness(250);
     }
   }
 }

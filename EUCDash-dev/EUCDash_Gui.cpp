@@ -658,13 +658,6 @@ void updateTime()
   ttgo->rtc->syncToRtc();
 }
 
-/*
-   sets the backlight level according to the time of day
-   adjust this to your local conditions,
-   would be nice to have a functione to set this
-   automatically according to latitude and day of year
-   todo: add a separate task that runs less often for this
-*/
 
 void update_speed_shake(void) {
   if (wheeldata[1] >= wheeldata[14] && shakeoff[0]) {

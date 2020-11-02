@@ -60,6 +60,7 @@ class MyClientCallback : public BLEClientCallbacks
 {
     void onConnect(BLEClient *pclient)
     {
+      Serial.println("onConnect");
     }
     void onDisconnect(BLEClient *pclient)
     {
@@ -73,6 +74,7 @@ bool connectToServer()
   Serial.print("Forming a connection to ");
 
   Serial.println(myDevice->getAddress().toString().c_str());
+  Serial.println(myDevice->toString().c_str());
 
   BLEClient *pClient = BLEDevice::createClient();
   Serial.println(" - Created client");
