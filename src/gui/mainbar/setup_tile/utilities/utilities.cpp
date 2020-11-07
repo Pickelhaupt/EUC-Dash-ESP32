@@ -1,4 +1,6 @@
 /****************************************************************************
+ *  Modified 2020 Jesper Ortlund
+ * 
  *  utilities.cpp
  *  Copyright  2020  David Stewart
  *  Email: genericsoftwaredeveloper@gmail.com

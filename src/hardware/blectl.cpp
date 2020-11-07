@@ -1,7 +1,6 @@
 /****************************************************************************
- *   Aug 11 17:13:51 2020
- *   Copyright  2020  Dirk Brosswick
- *   Email: dirk.brosswick@googlemail.com
+ *   2020 Jesper Ortlund
+ *   Snippets from My-TTGO-Watch by Dirk Brosswick
  ****************************************************************************/
 
 /*

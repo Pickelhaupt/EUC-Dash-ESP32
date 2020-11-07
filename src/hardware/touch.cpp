@@ -1,5 +1,5 @@
 /****************************************************************************
- *   Tu May 22 21:23:51 2020
+ *   Modified to support the latest ttgo-watch library Jesper Ortlund 2020
  *   Copyright  2020  Dirk Brosswick
  *   Email: dirk.brosswick@googlemail.com
  ****************************************************************************/
