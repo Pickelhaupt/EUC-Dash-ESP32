@@ -71,7 +71,7 @@ Reads BLE notifications from the electric unicycle and display data on the ESP32
 ### Supported Models
 Only supports Kingsong wheels at the moment. Might work with Gotway as well since the protocols are very similar.
 ## Screenshot
-Version 0.4, getting close, there are still some more things to add.
+No screenshots for the new version yet, will add when I get the time. Screenshots are from Version 0.4
 <div>
   <img src="https://github.com/Pickelhaupt/EUC-Dash-ESP32/raw/master/Images/fulldash-0.4-small.jpg" width="30%" align="left"/>
   <img src="https://github.com/Pickelhaupt/EUC-Dash-ESP32/raw/master/Images/clock-0.4-small.jpg" width="30%" align="center"/>
@@ -100,7 +100,7 @@ Version 0.4, getting close, there are still some more things to add.
 - Support for more wheel models
 - Autodetection of wheel make and model
 
-Below are mockups of the planned end state for version 1.0
+Below are old mockups of the planned end state for version 1.0 this has changed a bit and I will add new images when I find the time.
 
 All dashboard functions explained:
 
