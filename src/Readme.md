@@ -23,6 +23,7 @@ Completely rewritten using the My-TTGO-Watch as template, still only works with 
 - Fix non working haptic feedback
 ## Next steps
 - Add gesture to turn off lights
+- Add info screens with trip data and wheel info
 ## Still todo
 - Add support for more wheel models
 - Add more advanced settings options
