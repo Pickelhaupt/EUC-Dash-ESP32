@@ -26,6 +26,7 @@ I have forked the Twatch library and upgraded the LCGL version, the forked versi
     - Hit install
   - Wait for PlatformIO to install completely, this might take some time.
   - Restart VSCode
+  - If you don't have a working Arduino IDE set up you will probably have to install the CP210x USB UART drivers for the watch: https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers
   - Click the Source control icon on the left bar
   - Choose clone and enter https://github.com/Pickelhaupt/EUC-Dash-ESP32.git
   - Click on clone from URL
