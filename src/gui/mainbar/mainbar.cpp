@@ -29,7 +29,7 @@
 #include "simpledash_tile/simpledash_tile.h"
 #include "gui/keyboard.h"
 #include "hardware/blectl.h"
-
+#include "hardware/dashboard.h"
 #include "setup_tile/battery_settings/battery_settings.h"
 #include "setup_tile/wlan_settings/wlan_settings.h"
 #include "setup_tile/move_settings/move_settings.h"
@@ -224,15 +224,14 @@ lv_obj_t *mainbar_get_tile_obj( uint32_t tile_number ) {
 void mainbar_jump_to_maintile( lv_anim_enable_t anim ) {
     if ( tile_entrys != 0 ) {
         if (blectl_cli_getconnected()){
-            if (fulldash_default) {
-                main_tile_nr = fulldash_get_tile();
-            }
-            else if (!fulldash_default) {
+            if (dashboard_get_config(DASHBOARD_SIMPLE)) {
                 main_tile_nr = simpledash_get_tile();
             }
             else {
                 main_tile_nr = fulldash_get_tile();
             }
+        } else {
+            main_tile_nr = main_tile_get_tile_num();
         }
         mainbar_jump_to_tilenumber( main_tile_nr, anim );
         keyboard_hide();

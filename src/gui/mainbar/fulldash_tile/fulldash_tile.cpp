@@ -595,6 +595,7 @@ void lv_current_update(void)
     else
     {
         lv_arc_set_value(current_arc, amps);
+
     }
 
     int ang_max = value2angle(current_arc_start, current_arc_end, 0, wheelconst.maxcurrent, max_current, rev_current_arc);
@@ -643,7 +644,7 @@ void lv_temp_update(void)
     }
     lv_obj_add_style(temp_arc, LV_ARC_PART_INDIC, &temp_indic_style);
     lv_arc_set_value(temp_arc, ((wheelconst.crittemp + 10) - wheeldata[4]));
-
+    
     int ang_max = value2angle(temp_arc_start, temp_arc_end, 0, (wheelconst.crittemp + 10), max_temp, true);
     int ang_max2 = ang_max + 3;
     if (ang_max2 >= 360)
@@ -655,7 +656,7 @@ void lv_temp_update(void)
     lv_obj_add_style(temp_label, LV_OBJ_PART_MAIN, &temp_label_style);
     char tempstring[4];
     float converted_temp = wheeldata[4];
-        if (dashboard_get_config(DASHBOARD_IMPDIST)) {
+        if (dashboard_get_config(DASHBOARD_IMPTEMP)) {
             converted_temp = (wheeldata[4] * 1.8) + 32;
         }
     dtostrf(converted_temp, 2, 0, tempstring);
@@ -740,13 +741,18 @@ uint32_t fulldash_get_tile (void)
     return fulldash_tile_num;
 }
 
+void fulldash_tile_reload ( void ) {
+    lv_obj_del(fulldash_cont);
+    fulldash_tile_setup();
+}
+
 void fulldash_tile_setup(void)
 {
     fulldash_tile_num = mainbar_add_tile( 1, 0, "fd tile" );
     fulldash_cont = mainbar_get_tile_obj( fulldash_tile_num );
     //fulldash_cont = mainbar_get_tile_obj( mainbar_add_tile( 1, 0, "fulldash tile" ) );
     style = mainbar_get_style();
-
+    //wheelconst.crittemp = 65;
     Serial.println("setting up dashboard");
     //lv_set_dash_bg();
     lv_define_styles_1();

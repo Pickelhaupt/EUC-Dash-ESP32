@@ -37,6 +37,11 @@
 #include "callback.h"
 #include "json_psram_allocator.h"
 #include "alloc.h"
+#include "alloc.h"
+#include "gui/mainbar/fulldash_tile/fulldash_tile.h"
+#include "gui/mainbar/simpledash_tile/simpledash_tile.h"
+#include "gui/mainbar/mainbar.h"
+#include "gui/mainbar/mainbar.h"
 
 #include "Kingsong.h"
 
@@ -353,6 +358,9 @@ void blectl_cli_loop(void)
             {
                 Serial.println("initialising KingSong");
                 initks();
+                fulldash_tile_reload();
+                simpledash_tile_reload();
+                mainbar_jump_to_maintile(LV_ANIM_OFF);
             }
         }
         else

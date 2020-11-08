@@ -249,7 +249,7 @@ void decodeKS(byte KSdata[])
     //Serial.print(wheeldata[1]); Serial.println(" kmh");
     // Serial.print(wheeldata[2]); Serial.println(" km");
     //Serial.print(wheeldata[3]); Serial.println(" A");
-    // Serial.print(wheeldata[4]); Serial.println(" C");
+    //Serial.print(wheeldata[4]); Serial.println(" C");
     //Serial.print(wheeldata[5]); Serial.println(" rmode");
     // Serial.print(wheeldata[6]); Serial.println(" %");
     // Serial.print(wheeldata[7]); Serial.println(" W");

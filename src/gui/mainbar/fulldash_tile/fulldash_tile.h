@@ -79,10 +79,11 @@ LV_FONT_DECLARE(DIN1451_m_cond_180);
 
 //Functions
 void fulldash_tile_setup(void);
+void fulldash_tile_reload ( void );
 uint32_t fulldash_get_tile (void);
 
 //variable declarations
-extern struct Wheel_constants wheelconst;
+// extern struct Wheel_constants wheelconst;
 extern float max_speed;
 extern float avg_speed;
 extern float max_batt;

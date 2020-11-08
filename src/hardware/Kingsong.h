@@ -61,7 +61,7 @@ struct Wheel_constants
     byte battvolt;
     byte battwarn;
 };
-
+extern struct Wheel_constants wheelconst;
 void decodeKS(byte KSData[]);
 void initks();
 

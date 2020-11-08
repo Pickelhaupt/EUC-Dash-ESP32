@@ -237,20 +237,19 @@ void lv_sd_current_arc_1(void)
 {
     //Create current gauge arc
 
-    int arcw = 225;
-    int arch = 225;
-
     //Arc
     sd_current_arc = lv_arc_create(simpledash_cont, NULL);
     lv_obj_reset_style_list(sd_current_arc, LV_OBJ_PART_MAIN);
     lv_obj_add_style(sd_current_arc, LV_ARC_PART_INDIC, &sd_current_indic_style);
     lv_obj_add_style(sd_current_arc, LV_OBJ_PART_MAIN, &sd_current_main_style);
+    lv_arc_set_type(sd_current_arc, LV_ARC_TYPE_REVERSE);
     lv_arc_set_bg_angles(sd_current_arc, sd_current_arc_start, sd_current_arc_end);
     lv_arc_set_angles(sd_current_arc, sd_current_arc_start, sd_current_arc_end);
     lv_arc_set_range(sd_current_arc, 0, wheelconst.maxcurrent);
     lv_obj_set_size(sd_current_arc, sd_out_arc_x, sd_out_arc_y);
     lv_obj_align(sd_current_arc, NULL, LV_ALIGN_CENTER, 0, 0);
     mainbar_add_slide_element(sd_current_arc);
+
     if (dashboard_get_config(DASHBOARD_BARS))
     {
         //Max bar
