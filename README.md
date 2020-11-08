@@ -1,6 +1,6 @@
 # EUC-Dash-ESP32
 
-**fixed a couple bugs causing issues with current and temperature bars**
+**fixed a couple bugs causing issues with current and temperature arcs**
 
 
 Complete rewrite added, only buildable with PlatformIO please see https://github.com/Pickelhaupt/EUC-Dash-ESP32/tree/master/src for more info
