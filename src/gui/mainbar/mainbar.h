@@ -158,5 +158,7 @@
 
     void mainbar_tilevent_action();
 
+    void mainbar_event_cb(lv_obj_t * obj, lv_event_t event);
+
 
 #endif // _MAINBAR_H

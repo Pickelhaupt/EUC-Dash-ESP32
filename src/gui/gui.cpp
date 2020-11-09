@@ -63,8 +63,8 @@ void gui_setup( void )
     mainbar_setup();
     /* add the four mainbar screens */
     main_tile_setup();
-    simpledash_tile_setup();
     fulldash_tile_setup();
+    simpledash_tile_setup();
     setup_tile_setup();
 
     /* add setup */

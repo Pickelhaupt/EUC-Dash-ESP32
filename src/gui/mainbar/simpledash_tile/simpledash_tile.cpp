@@ -465,6 +465,16 @@ uint32_t simpledash_get_tile(void)
     return simpledash_tile_num;
 }
 
+void simpledash_activate_cb( void ) {
+    sd_dash_task = lv_task_create(lv_sd_dash_task, 250, LV_TASK_PRIO_LOWEST, NULL);
+    lv_task_ready(sd_dash_task);
+}
+
+void simpledash_hibernate_cb( void ) {
+    lv_task_del( sd_dash_task );
+}
+
+
 void simpledash_tile_reload ( void ) {
     lv_obj_del(simpledash_cont);
     simpledash_tile_setup();
@@ -487,6 +497,8 @@ void simpledash_tile_setup(void)
         lv_sd_current_arc_1();
     }
     //Create task -- update freq 4/s
-    sd_dash_task = lv_task_create(lv_sd_dash_task, 250, LV_TASK_PRIO_LOWEST, NULL);
-    lv_task_ready(sd_dash_task);
+    mainbar_add_tile_activate_cb( simpledash_tile_num, simpledash_activate_cb );
+    mainbar_add_tile_hibernate_cb( simpledash_tile_num, simpledash_hibernate_cb );
+    //sd_dash_task = lv_task_create(lv_sd_dash_task, 250, LV_TASK_PRIO_LOWEST, NULL);
+    //lv_task_ready(sd_dash_task);
 }

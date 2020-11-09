@@ -778,9 +778,9 @@ void fulldash_tile_setup(void)
     mainbar_add_tile_activate_cb( fulldash_tile_num, fulldash_activate_cb );
     mainbar_add_tile_hibernate_cb( fulldash_tile_num, fulldash_hibernate_cb );
 
-    time_task = lv_task_create(lv_time_task, 2000, LV_TASK_PRIO_LOWEST, NULL);
-    lv_task_ready(time_task);
-    dash_task = lv_task_create(lv_dash_task, 250, LV_TASK_PRIO_LOWEST, NULL);
-    lv_task_ready(dash_task);
+    //time_task = lv_task_create(lv_time_task, 2000, LV_TASK_PRIO_LOWEST, NULL);
+    //lv_task_ready(time_task);
+    //dash_task = lv_task_create(lv_dash_task, 250, LV_TASK_PRIO_LOWEST, NULL);
+    //lv_task_ready(dash_task);
 
 }

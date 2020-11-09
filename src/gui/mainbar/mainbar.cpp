@@ -51,6 +51,7 @@ static lv_obj_t *mainbar = NULL;
 static lv_tile_t *tile = NULL;
 static lv_point_t *tile_pos_table = NULL;
 static uint32_t current_tile = 0;
+static uint32_t old_tile = 0;
 static uint32_t tile_entrys = 0;
 static uint32_t app_tile_pos = MAINBAR_APP_TILE_X_START;
 uint32_t main_tile_nr = 0;
@@ -94,6 +95,26 @@ void mainbar_setup( void ) {
     lv_tileview_set_edge_flash( mainbar, false);
     lv_obj_add_style( mainbar, LV_OBJ_PART_MAIN, &mainbar_style );
     lv_page_set_scrlbar_mode( mainbar, LV_SCRLBAR_MODE_OFF);
+
+    lv_obj_set_event_cb( mainbar, mainbar_event_cb );
+
+}
+
+void mainbar_event_cb(lv_obj_t * obj, lv_event_t event) {
+    if(event == LV_EVENT_VALUE_CHANGED)
+    { 
+        uint32_t tile_number = *((uint32_t *)lv_event_get_data ());
+        if ( tile[ current_tile ].hibernate_cb != NULL ) {
+            log_i("call hibernate cb for tile: %d", current_tile );
+            tile[ current_tile ].hibernate_cb();
+        }
+        // call activate callback for the new tile if exist
+        if ( tile[ tile_number ].activate_cb != NULL ) { 
+            log_i("call activate cb for tile: %d", tile_number );
+            tile[ tile_number ].activate_cb();
+        }
+        current_tile = tile_number;
+    }
 }
 
 uint32_t mainbar_add_tile( uint16_t x, uint16_t y, const char *id ) {
