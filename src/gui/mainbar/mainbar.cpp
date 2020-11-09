@@ -51,7 +51,6 @@ static lv_obj_t *mainbar = NULL;
 static lv_tile_t *tile = NULL;
 static lv_point_t *tile_pos_table = NULL;
 static uint32_t current_tile = 0;
-static uint32_t old_tile = 0;
 static uint32_t tile_entrys = 0;
 static uint32_t app_tile_pos = MAINBAR_APP_TILE_X_START;
 uint32_t main_tile_nr = 0;

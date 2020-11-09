@@ -27,7 +27,7 @@
     #define UPDATE_CONFIG_FILE             "/update.cfg"
     #define UPDATE_JSON_CONFIG_FILE        "/update.json"
 
-    #define FIRMWARE_UPDATE_URL            "http://www.neo-guerillaz.de/ttgo-t-watch2020_v1.version.json"
+    #define FIRMWARE_UPDATE_URL            "http://gl.pogop.org/EUC-Dash-latest.json"
 
     typedef struct {
         bool autosync = true;
