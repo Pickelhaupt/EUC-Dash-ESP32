@@ -165,6 +165,9 @@ bool gui_powermgm_loop_event_cb( EventBits_t event, void *arg ) {
     switch ( event ) {
         case POWERMGM_WAKEUP:           if ( lv_disp_get_inactive_time( NULL ) < display_get_timeout() * 1000 || display_get_timeout() == DISPLAY_MAX_TIMEOUT ) {
                                             lv_task_handler();
+                                            if(LV_EVENT_VALUE_CHANGED) {
+                                               // mainbar_tilevent_action();
+                                            }
                                         }
                                         else {
                                             powermgm_set_event( POWERMGM_STANDBY_REQUEST );

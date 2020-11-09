@@ -178,6 +178,7 @@ void display_read_config( void ) {
         if ( error ) {
             log_e("update check deserializeJson() failed: %s", error.c_str() );
         }
+      
         else {
             display_config.brightness = doc["brightness"] | DISPLAY_MAX_BRIGHTNESS / 2;
             display_config.rotation = doc["rotation"] | DISPLAY_MIN_ROTATE;

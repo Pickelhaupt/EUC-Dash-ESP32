@@ -741,6 +741,19 @@ uint32_t fulldash_get_tile (void)
     return fulldash_tile_num;
 }
 
+void fulldash_activate_cb( void ) {
+    time_task = lv_task_create(lv_time_task, 2000, LV_TASK_PRIO_LOWEST, NULL);
+    lv_task_ready(time_task);
+    dash_task = lv_task_create(lv_dash_task, 250, LV_TASK_PRIO_LOWEST, NULL);
+    lv_task_ready(dash_task);
+}
+
+void fulldash_hibernate_cb( void ) {
+    lv_task_del( time_task );
+    lv_task_del( dash_task );
+}
+
+
 void fulldash_tile_reload ( void ) {
     lv_obj_del(fulldash_cont);
     fulldash_tile_setup();
@@ -761,9 +774,13 @@ void fulldash_tile_setup(void)
     lv_current_arc_1();
     lv_temp_arc_1();
     lv_dashtime();
+
+    mainbar_add_tile_activate_cb( fulldash_tile_num, fulldash_activate_cb );
+    mainbar_add_tile_hibernate_cb( fulldash_tile_num, fulldash_hibernate_cb );
+
     time_task = lv_task_create(lv_time_task, 2000, LV_TASK_PRIO_LOWEST, NULL);
     lv_task_ready(time_task);
-    //Create task -- update freq 4/s
     dash_task = lv_task_create(lv_dash_task, 250, LV_TASK_PRIO_LOWEST, NULL);
     lv_task_ready(dash_task);
+
 }

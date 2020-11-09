@@ -156,5 +156,7 @@
      */
     void mainbar_add_slide_element( lv_obj_t *element );
 
+    void mainbar_tilevent_action();
+
 
 #endif // _MAINBAR_H

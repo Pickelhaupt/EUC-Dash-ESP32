@@ -78,8 +78,20 @@ LV_FONT_DECLARE(DIN1451_m_cond_180);
 // Bitmaps
 
 //Functions
+    /**
+     * @brief setup the full dashboard tile
+     */
 void fulldash_tile_setup(void);
+//Functions
+    /**
+     * @brief reload the full dashboard tile
+     */
 void fulldash_tile_reload ( void );
+/**
+     * @brief get the tile number for the full dashboard tile
+     * 
+     * @return  tile number
+     */
 uint32_t fulldash_get_tile (void);
 
 //variable declarations
