@@ -100,23 +100,6 @@ void mainbar_setup( void ) {
 
 }
 
-void mainbar_event_cb(lv_obj_t * obj, lv_event_t event) {
-    if(event == LV_EVENT_VALUE_CHANGED)
-    { 
-        uint32_t tile_number = *((uint32_t *)lv_event_get_data ());
-        if ( tile[ current_tile ].hibernate_cb != NULL ) {
-            log_i("call hibernate cb for tile: %d", current_tile );
-            tile[ current_tile ].hibernate_cb();
-        }
-        // call activate callback for the new tile if exist
-        if ( tile[ tile_number ].activate_cb != NULL ) { 
-            log_i("call activate cb for tile: %d", tile_number );
-            tile[ tile_number ].activate_cb();
-        }
-        current_tile = tile_number;
-    }
-}
-
 uint32_t mainbar_add_tile( uint16_t x, uint16_t y, const char *id ) {
     
     tile_entrys++;
@@ -191,6 +174,24 @@ lv_style_t *mainbar_get_slider_style( void ) {
 
 lv_style_t *mainbar_get_knob_style( void ) {
      return( &mainbar_knob_style );
+}
+
+void mainbar_event_cb(lv_obj_t * obj, lv_event_t event) {
+    if(event == LV_EVENT_VALUE_CHANGED)
+    { 
+        uint32_t tile_number = *((uint32_t *)lv_event_get_data ());
+        // call hibernate callback for the old tile if exist
+        if ( tile[ current_tile ].hibernate_cb != NULL ) {
+            log_i("call hibernate cb for tile: %d", current_tile );
+            tile[ current_tile ].hibernate_cb();
+        }
+        // call activate callback for the new tile if exist
+        if ( tile[ tile_number ].activate_cb != NULL ) { 
+            log_i("call activate cb for tile: %d", tile_number );
+            tile[ tile_number ].activate_cb();
+        }
+        current_tile = tile_number;
+    }
 }
 
 bool mainbar_add_tile_hibernate_cb( uint32_t tile_number, MAINBAR_CALLBACK_FUNC hibernate_cb ) {

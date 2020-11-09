@@ -332,13 +332,13 @@ static void lv_sd_speed_update(void)
     if (dashboard_get_config(DASHBOARD_IMPDIST)) {
         converted_speed = wheeldata[1] / 1.6;
     }
-    if (wheeldata[1] > 10)
+    if (converted_speed > 10)
     {
-        dtostrf(wheeldata[1], 2, 0, speedstring);
+        dtostrf(converted_speed, 2, 0, speedstring);
     }
     else
     {
-        dtostrf(wheeldata[1], 1, 0, speedstring);
+        dtostrf(converted_speed, 1, 0, speedstring);
     }
     lv_label_set_text(sd_speed_label, speedstring);
     lv_label_set_align(sd_speed_label, LV_LABEL_ALIGN_CENTER);
@@ -473,7 +473,6 @@ void simpledash_activate_cb( void ) {
 void simpledash_hibernate_cb( void ) {
     lv_task_del( sd_dash_task );
 }
-
 
 void simpledash_tile_reload ( void ) {
     lv_obj_del(simpledash_cont);
