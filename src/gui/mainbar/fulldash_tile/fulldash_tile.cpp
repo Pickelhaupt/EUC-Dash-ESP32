@@ -22,6 +22,7 @@
 #include "gui/mainbar/mainbar.h"
 #include "fulldash_tile.h"
 #include "hardware/pmu.h"
+#include "hardware/blectl.h"
 #include "hardware/Kingsong.h"
 #include "hardware/dashboard.h"
 
@@ -32,10 +33,12 @@ lv_task_t *time_task = nullptr;
 // Function declarations
 static void lv_dash_task(lv_task_t *dash_task);
 static void lv_time_task(lv_task_t *time_task);
+static void overlay_event_cb(lv_obj_t * obj, lv_event_t event);
 
 void updateTime();
 void stop_time_task();
 void stop_dash_task();
+
 
 /*
    Declare LVGL Dashboard objects and styles
@@ -97,6 +100,10 @@ static lv_obj_t *wbatt = NULL;
 static lv_obj_t *trip = NULL;
 static lv_style_t trip_label_style;
 static lv_style_t dashtime_style;
+//Overlay objects and styles
+static lv_obj_t *overlay_bar = NULL;
+static lv_obj_t *overlay_line = NULL;
+static lv_style_t overlay_style;
 
 //End LV objects and styles
 
@@ -149,7 +156,7 @@ void lv_define_styles_1(void)
     lv_style_copy(&speed_indic_style, &arc_style);
     lv_style_copy(&speed_main_style, &arc_style);
     lv_style_set_line_color(&speed_main_style, LV_STATE_DEFAULT, speed_bg_clr);
-    
+
     lv_style_init(&speed_label_style);
     lv_style_set_text_color(&speed_label_style, LV_STATE_DEFAULT, speed_bg_clr);
     lv_style_set_text_font(&speed_label_style, LV_STATE_DEFAULT, &DIN1451_m_cond_120);
@@ -158,7 +165,7 @@ void lv_define_styles_1(void)
     lv_style_copy(&batt_indic_style, &arc_style);
     lv_style_copy(&batt_main_style, &arc_style);
     lv_style_set_line_color(&batt_main_style, LV_STATE_DEFAULT, batt_bg_clr);
-    
+
     lv_style_init(&batt_label_style);
     lv_style_set_text_font(&batt_label_style, LV_STATE_DEFAULT, &DIN1451_m_cond_66);
 
@@ -166,7 +173,7 @@ void lv_define_styles_1(void)
     lv_style_copy(&current_indic_style, &arc_style);
     lv_style_copy(&current_main_style, &arc_style);
     lv_style_set_line_color(&current_main_style, LV_STATE_DEFAULT, current_bg_clr);
-    
+
     lv_style_init(&current_label_style);
     lv_style_set_text_font(&current_label_style, LV_STATE_DEFAULT, &DIN1451_m_cond_44);
 
@@ -201,6 +208,14 @@ void lv_define_styles_1(void)
     lv_style_set_text_color(&trip_label_style, LV_STATE_DEFAULT, current_fg_clr);
     lv_style_set_text_font(&trip_label_style, LV_STATE_DEFAULT, &DIN1451_m_cond_44);
 
+    //overlay
+    lv_style_copy(&overlay_style, style);
+    lv_style_set_bg_color(&overlay_style, LV_STATE_DEFAULT, LV_COLOR_BLACK);
+    lv_style_set_line_color(&overlay_style, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+    lv_style_set_line_width(&overlay_style, LV_STATE_DEFAULT, 20);
+    lv_style_set_line_opa(&overlay_style, LV_STATE_DEFAULT, LV_OPA_20);
+    lv_style_set_bg_opa(&overlay_style, LV_STATE_DEFAULT, LV_OPA_20);
+
 } //End Define LVGL default object styles
 
 /***************************
@@ -211,7 +226,7 @@ void lv_speed_arc_1(void)
 {
 
     speed_arc = lv_arc_create(fulldash_cont, NULL);
-    lv_obj_reset_style_list( speed_arc, LV_OBJ_PART_MAIN );
+    lv_obj_reset_style_list(speed_arc, LV_OBJ_PART_MAIN);
     lv_obj_add_style(speed_arc, LV_ARC_PART_INDIC, &speed_indic_style);
     lv_obj_add_style(speed_arc, LV_OBJ_PART_MAIN, &speed_main_style);
     lv_arc_set_bg_angles(speed_arc, speed_arc_start, speed_arc_end);
@@ -222,7 +237,7 @@ void lv_speed_arc_1(void)
 
     //Max bar
     speed_max_bar = lv_arc_create(fulldash_cont, NULL);
-    lv_obj_reset_style_list( speed_max_bar, LV_OBJ_PART_MAIN );
+    lv_obj_reset_style_list(speed_max_bar, LV_OBJ_PART_MAIN);
     lv_obj_add_style(speed_max_bar, LV_ARC_PART_INDIC, &max_bar_indic_style);
     lv_obj_add_style(speed_max_bar, LV_OBJ_PART_MAIN, &bar_main_style);
     lv_arc_set_bg_angles(speed_max_bar, speed_arc_start, speed_arc_end);
@@ -232,7 +247,7 @@ void lv_speed_arc_1(void)
 
     //avg bar
     speed_avg_bar = lv_arc_create(fulldash_cont, NULL);
-    lv_obj_reset_style_list( speed_avg_bar, LV_OBJ_PART_MAIN );
+    lv_obj_reset_style_list(speed_avg_bar, LV_OBJ_PART_MAIN);
     lv_obj_add_style(speed_avg_bar, LV_ARC_PART_INDIC, &min_bar_indic_style);
     lv_obj_add_style(speed_avg_bar, LV_OBJ_PART_MAIN, &bar_main_style);
     lv_arc_set_bg_angles(speed_avg_bar, speed_arc_start, speed_arc_end);
@@ -242,8 +257,8 @@ void lv_speed_arc_1(void)
 
     //Label
     speed_label = lv_label_create(fulldash_cont, NULL);
-    lv_obj_reset_style_list( speed_label, LV_OBJ_PART_MAIN );
-    
+    lv_obj_reset_style_list(speed_label, LV_OBJ_PART_MAIN);
+
     lv_obj_add_style(speed_label, LV_LABEL_PART_MAIN, &speed_label_style);
     char speedstring[4];
     if (wheeldata[1] > 10)
@@ -263,10 +278,10 @@ void lv_speed_arc_1(void)
 void lv_batt_arc_1(void)
 {
     /*Create battery gauge arc*/
-    
+
     //Arc
     batt_arc = lv_arc_create(fulldash_cont, NULL);
-    lv_obj_reset_style_list( batt_arc, LV_OBJ_PART_MAIN );
+    lv_obj_reset_style_list(batt_arc, LV_OBJ_PART_MAIN);
     lv_obj_add_style(batt_arc, LV_ARC_PART_INDIC, &batt_indic_style);
     lv_obj_add_style(batt_arc, LV_OBJ_PART_MAIN, &batt_main_style);
     lv_arc_set_type(batt_arc, LV_ARC_TYPE_REVERSE);
@@ -278,7 +293,7 @@ void lv_batt_arc_1(void)
 
     //max bar
     batt_max_bar = lv_arc_create(fulldash_cont, NULL);
-    lv_obj_reset_style_list( batt_max_bar, LV_OBJ_PART_MAIN );
+    lv_obj_reset_style_list(batt_max_bar, LV_OBJ_PART_MAIN);
     lv_obj_add_style(batt_max_bar, LV_ARC_PART_INDIC, &max_bar_indic_style);
     lv_obj_add_style(batt_max_bar, LV_OBJ_PART_MAIN, &bar_main_style);
     lv_arc_set_bg_angles(batt_max_bar, batt_arc_start, batt_arc_end);
@@ -288,7 +303,7 @@ void lv_batt_arc_1(void)
 
     //min bar
     batt_min_bar = lv_arc_create(fulldash_cont, NULL);
-    lv_obj_reset_style_list( batt_min_bar, LV_OBJ_PART_MAIN );
+    lv_obj_reset_style_list(batt_min_bar, LV_OBJ_PART_MAIN);
     lv_obj_add_style(batt_min_bar, LV_ARC_PART_INDIC, &min_bar_indic_style);
     lv_obj_add_style(batt_min_bar, LV_OBJ_PART_MAIN, &bar_main_style);
     lv_arc_set_bg_angles(batt_min_bar, batt_arc_start, batt_arc_end);
@@ -299,7 +314,7 @@ void lv_batt_arc_1(void)
     //Label
 
     batt_label = lv_label_create(fulldash_cont, NULL);
-    lv_obj_reset_style_list( batt_label, LV_OBJ_PART_MAIN );
+    lv_obj_reset_style_list(batt_label, LV_OBJ_PART_MAIN);
     lv_obj_add_style(batt_label, LV_OBJ_PART_MAIN, &batt_label_style);
     char battstring[4];
     dtostrf(wheeldata[6], 2, 0, battstring);
@@ -311,10 +326,10 @@ void lv_batt_arc_1(void)
 void lv_current_arc_1(void)
 {
     //Create current gauge arc
-    
+
     //Arc
     current_arc = lv_arc_create(fulldash_cont, NULL);
-    lv_obj_reset_style_list( current_arc, LV_OBJ_PART_MAIN );
+    lv_obj_reset_style_list(current_arc, LV_OBJ_PART_MAIN);
     lv_obj_add_style(current_arc, LV_ARC_PART_INDIC, &current_indic_style);
     lv_obj_add_style(current_arc, LV_OBJ_PART_MAIN, &current_main_style);
     lv_arc_set_bg_angles(current_arc, current_arc_start, current_arc_end);
@@ -325,7 +340,7 @@ void lv_current_arc_1(void)
 
     //Max bar
     current_max_bar = lv_arc_create(fulldash_cont, NULL);
-    lv_obj_reset_style_list( current_max_bar, LV_OBJ_PART_MAIN );
+    lv_obj_reset_style_list(current_max_bar, LV_OBJ_PART_MAIN);
     lv_obj_add_style(current_max_bar, LV_ARC_PART_INDIC, &max_bar_indic_style);
     lv_obj_add_style(current_max_bar, LV_OBJ_PART_MAIN, &bar_main_style);
     lv_arc_set_bg_angles(current_max_bar, current_arc_start, current_arc_end);
@@ -335,7 +350,7 @@ void lv_current_arc_1(void)
 
     //regen bar
     current_regen_bar = lv_arc_create(fulldash_cont, NULL);
-    lv_obj_reset_style_list( current_regen_bar, LV_OBJ_PART_MAIN );
+    lv_obj_reset_style_list(current_regen_bar, LV_OBJ_PART_MAIN);
     lv_obj_add_style(current_regen_bar, LV_ARC_PART_INDIC, &regen_bar_indic_style);
     lv_obj_add_style(current_regen_bar, LV_OBJ_PART_MAIN, &bar_main_style);
     lv_arc_set_bg_angles(current_regen_bar, current_arc_start, current_arc_end);
@@ -345,7 +360,7 @@ void lv_current_arc_1(void)
 
     //Label
     current_label = lv_label_create(fulldash_cont, NULL);
-    lv_obj_reset_style_list( current_label, LV_OBJ_PART_MAIN );
+    lv_obj_reset_style_list(current_label, LV_OBJ_PART_MAIN);
     lv_obj_add_style(current_label, LV_OBJ_PART_MAIN, &current_label_style);
     char currentstring[4];
     dtostrf(wheeldata[3], 2, 0, currentstring);
@@ -357,10 +372,10 @@ void lv_current_arc_1(void)
 void lv_temp_arc_1(void)
 {
     /*Create temprature gauge arc*/
-    
+
     //Arc
     temp_arc = lv_arc_create(fulldash_cont, NULL);
-    lv_obj_reset_style_list( temp_arc, LV_OBJ_PART_MAIN );
+    lv_obj_reset_style_list(temp_arc, LV_OBJ_PART_MAIN);
     lv_obj_add_style(temp_arc, LV_ARC_PART_INDIC, &temp_indic_style);
     lv_obj_add_style(temp_arc, LV_OBJ_PART_MAIN, &temp_main_style);
     lv_arc_set_type(temp_arc, LV_ARC_TYPE_REVERSE);
@@ -374,7 +389,7 @@ void lv_temp_arc_1(void)
 
     //Max bar
     temp_max_bar = lv_arc_create(fulldash_cont, NULL);
-    lv_obj_reset_style_list( temp_max_bar, LV_OBJ_PART_MAIN );
+    lv_obj_reset_style_list(temp_max_bar, LV_OBJ_PART_MAIN);
     lv_obj_add_style(temp_max_bar, LV_ARC_PART_INDIC, &max_bar_indic_style);
     lv_obj_add_style(temp_max_bar, LV_OBJ_PART_MAIN, &bar_main_style);
     lv_arc_set_bg_angles(temp_max_bar, temp_arc_start, temp_arc_end);
@@ -385,7 +400,7 @@ void lv_temp_arc_1(void)
 
     //Label
     temp_label = lv_label_create(fulldash_cont, NULL);
-    lv_obj_reset_style_list( temp_label, LV_OBJ_PART_MAIN );
+    lv_obj_reset_style_list(temp_label, LV_OBJ_PART_MAIN);
     lv_obj_add_style(temp_label, LV_OBJ_PART_MAIN, &temp_label_style);
     char tempstring[4];
     dtostrf(wheeldata[4], 2, 0, tempstring);
@@ -397,19 +412,46 @@ void lv_temp_arc_1(void)
 void lv_dashtime(void)
 {
     dashtime = lv_label_create(fulldash_cont, NULL);
-    lv_obj_reset_style_list( dashtime, LV_OBJ_PART_MAIN );
+    lv_obj_reset_style_list(dashtime, LV_OBJ_PART_MAIN);
     lv_obj_add_style(dashtime, LV_OBJ_PART_MAIN, &dashtime_style);
     lv_obj_align(dashtime, NULL, LV_ALIGN_IN_BOTTOM_RIGHT, 0, 0);
     wbatt = lv_label_create(fulldash_cont, NULL);
-    lv_obj_reset_style_list( wbatt, LV_OBJ_PART_MAIN );
+    lv_obj_reset_style_list(wbatt, LV_OBJ_PART_MAIN);
     lv_obj_add_style(wbatt, LV_OBJ_PART_MAIN, &dashtime_style);
     lv_obj_align(wbatt, NULL, LV_ALIGN_IN_BOTTOM_RIGHT, 0, -25);
     trip = lv_label_create(fulldash_cont, NULL);
-    lv_obj_reset_style_list( trip, LV_OBJ_PART_MAIN );
+    lv_obj_reset_style_list(trip, LV_OBJ_PART_MAIN);
     lv_obj_add_style(trip, LV_OBJ_PART_MAIN, &trip_label_style);
     lv_obj_align(trip, NULL, LV_ALIGN_IN_TOP_MID, 0, 25);
-    
+}
+
+void lv_overlay(void)
+{
+    static lv_point_t line_points[] = {{0, lv_disp_get_ver_res(NULL)}, {lv_disp_get_hor_res(NULL), 0}};
+
+    overlay_bar = lv_bar_create(fulldash_cont, NULL);
+    lv_obj_reset_style_list(overlay_bar, LV_OBJ_PART_MAIN);
+    lv_obj_set_size(overlay_bar, lv_disp_get_hor_res(NULL), lv_disp_get_ver_res(NULL));
+    lv_obj_add_style(overlay_bar, LV_OBJ_PART_MAIN, &overlay_style);
+    lv_obj_align(overlay_bar, NULL, LV_ALIGN_CENTER, 0, 0);
+    mainbar_add_slide_element(overlay_bar);
+    lv_obj_set_event_cb( overlay_bar, overlay_event_cb );
+
+    overlay_line = lv_line_create(overlay_bar, NULL);
+    lv_line_set_points(overlay_line, line_points, 2);
+    lv_obj_reset_style_list(overlay_line, LV_OBJ_PART_MAIN);
+    lv_obj_add_style(overlay_line, LV_OBJ_PART_MAIN, &overlay_style);
+    lv_obj_align(overlay_line, NULL, LV_ALIGN_CENTER, 0, 0);
+    mainbar_add_slide_element(overlay_line);
+    lv_obj_set_event_cb( overlay_line, overlay_event_cb );
+
 } //End Create Dashboard objects
+
+static void overlay_event_cb(lv_obj_t * obj, lv_event_t event) {
+    switch( event ) {
+        case( LV_EVENT_LONG_PRESSED ):  Serial.println("long press on overlay");
+    }
+}
 
 int value2angle(int arcstart, int arcstop, float minvalue, float maxvalue, float arcvalue, bool reverse)
 {
@@ -446,7 +488,6 @@ int value2angle(int arcstart, int arcstop, float minvalue, float maxvalue, float
    Dashboard GUI Update Functions, called via the task handler
    runs every 250ms
  ***************************************************************/
-
 
 static void lv_speed_update(void)
 {
@@ -488,7 +529,8 @@ static void lv_speed_update(void)
 
     lv_obj_add_style(speed_label, LV_LABEL_PART_MAIN, &speed_label_style);
     float converted_speed = wheeldata[1];
-    if (dashboard_get_config(DASHBOARD_IMPDIST)) {
+    if (dashboard_get_config(DASHBOARD_IMPDIST))
+    {
         converted_speed = wheeldata[1] / 1.6;
     }
     char speedstring[4];
@@ -595,7 +637,6 @@ void lv_current_update(void)
     else
     {
         lv_arc_set_value(current_arc, amps);
-
     }
 
     int ang_max = value2angle(current_arc_start, current_arc_end, 0, wheelconst.maxcurrent, max_current, rev_current_arc);
@@ -644,7 +685,7 @@ void lv_temp_update(void)
     }
     lv_obj_add_style(temp_arc, LV_ARC_PART_INDIC, &temp_indic_style);
     lv_arc_set_value(temp_arc, ((wheelconst.crittemp + 10) - wheeldata[4]));
-    
+
     int ang_max = value2angle(temp_arc_start, temp_arc_end, 0, (wheelconst.crittemp + 10), max_temp, true);
     int ang_max2 = ang_max + 3;
     if (ang_max2 >= 360)
@@ -656,14 +697,33 @@ void lv_temp_update(void)
     lv_obj_add_style(temp_label, LV_OBJ_PART_MAIN, &temp_label_style);
     char tempstring[4];
     float converted_temp = wheeldata[4];
-        if (dashboard_get_config(DASHBOARD_IMPTEMP)) {
-            converted_temp = (wheeldata[4] * 1.8) + 32;
-        }
+    if (dashboard_get_config(DASHBOARD_IMPTEMP))
+    {
+        converted_temp = (wheeldata[4] * 1.8) + 32;
+    }
     dtostrf(converted_temp, 2, 0, tempstring);
     lv_label_set_text(temp_label, tempstring);
     lv_label_set_align(temp_label, LV_LABEL_ALIGN_CENTER);
     lv_obj_align(temp_label, fulldash_cont, LV_ALIGN_CENTER, 64, 0);
 } // update
+
+void lv_overlay_update()
+{
+    if (blectl_cli_getconnected())
+    {
+        lv_style_set_line_opa(&overlay_style, LV_STATE_DEFAULT, LV_OPA_TRANSP);
+        lv_style_set_bg_opa(&overlay_style, LV_STATE_DEFAULT, LV_OPA_TRANSP);
+        lv_obj_add_style(overlay_bar, LV_OBJ_PART_MAIN, &overlay_style);
+        lv_obj_add_style(overlay_line, LV_OBJ_PART_MAIN, &overlay_style);
+    }
+    else
+    {
+        lv_style_set_line_opa(&overlay_style, LV_STATE_DEFAULT, LV_OPA_20);
+        lv_style_set_bg_opa(&overlay_style, LV_STATE_DEFAULT, LV_OPA_20);
+        lv_obj_add_style(overlay_bar, LV_OBJ_PART_MAIN, &overlay_style);
+        lv_obj_add_style(overlay_line, LV_OBJ_PART_MAIN, &overlay_style);
+    }
+}
 
 void updateTime()
 {
@@ -695,7 +755,8 @@ void updateTime()
     {
         char tripstring[6];
         float converted_trip = wheeldata[8];
-        if (dashboard_get_config(DASHBOARD_IMPDIST)) {
+        if (dashboard_get_config(DASHBOARD_IMPDIST))
+        {
             converted_trip = wheeldata[8] / 1.6;
         }
         dtostrf(converted_trip, 2, 1, tripstring);
@@ -711,12 +772,14 @@ void updateTime()
 
 static void lv_dash_task(lv_task_t *dash_task)
 {
-    lv_speed_update();
-    lv_batt_update();
-    lv_current_update();
-    lv_temp_update();
-
-
+    if (blectl_cli_getconnected())
+    {
+        lv_speed_update();
+        lv_batt_update();
+        lv_current_update();
+        lv_temp_update();
+    }
+    lv_overlay_update();
 }
 
 static void lv_time_task(lv_task_t *time_task)
@@ -724,45 +787,50 @@ static void lv_time_task(lv_task_t *time_task)
     updateTime();
 }
 
-void stop_dash_task() {
-  Serial.println("check if dash is running");
-  if (dash_task != nullptr) {
-    Serial.println("shutting down dash");
-    lv_task_del(dash_task);
-  }
-  if (time_task != nullptr) {
-    Serial.println("shutting down dashclock");
-    lv_task_del(time_task);
-  }
+void stop_dash_task()
+{
+    Serial.println("check if dash is running");
+    if (dash_task != nullptr)
+    {
+        Serial.println("shutting down dash");
+        lv_task_del(dash_task);
+    }
+    if (time_task != nullptr)
+    {
+        Serial.println("shutting down dashclock");
+        lv_task_del(time_task);
+    }
 }
 
-uint32_t fulldash_get_tile (void)
+uint32_t fulldash_get_tile(void)
 {
     return fulldash_tile_num;
 }
 
-void fulldash_activate_cb( void ) {
+void fulldash_activate_cb(void)
+{
     time_task = lv_task_create(lv_time_task, 2000, LV_TASK_PRIO_LOWEST, NULL);
     lv_task_ready(time_task);
     dash_task = lv_task_create(lv_dash_task, 250, LV_TASK_PRIO_LOWEST, NULL);
     lv_task_ready(dash_task);
 }
 
-void fulldash_hibernate_cb( void ) {
-    lv_task_del( time_task );
-    lv_task_del( dash_task );
+void fulldash_hibernate_cb(void)
+{
+    lv_task_del(time_task);
+    lv_task_del(dash_task);
 }
 
-
-void fulldash_tile_reload ( void ) {
+void fulldash_tile_reload(void)
+{
     lv_obj_del(fulldash_cont);
     fulldash_tile_setup();
 }
 
 void fulldash_tile_setup(void)
 {
-    fulldash_tile_num = mainbar_add_tile( 1, 0, "fd tile" );
-    fulldash_cont = mainbar_get_tile_obj( fulldash_tile_num );
+    fulldash_tile_num = mainbar_add_tile(1, 0, "fd tile");
+    fulldash_cont = mainbar_get_tile_obj(fulldash_tile_num);
     //fulldash_cont = mainbar_get_tile_obj( mainbar_add_tile( 1, 0, "fulldash tile" ) );
     style = mainbar_get_style();
     //wheelconst.crittemp = 65;
@@ -774,13 +842,8 @@ void fulldash_tile_setup(void)
     lv_current_arc_1();
     lv_temp_arc_1();
     lv_dashtime();
+    lv_overlay();
 
-    mainbar_add_tile_activate_cb( fulldash_tile_num, fulldash_activate_cb );
-    mainbar_add_tile_hibernate_cb( fulldash_tile_num, fulldash_hibernate_cb );
-
-    //time_task = lv_task_create(lv_time_task, 2000, LV_TASK_PRIO_LOWEST, NULL);
-    //lv_task_ready(time_task);
-    //dash_task = lv_task_create(lv_dash_task, 250, LV_TASK_PRIO_LOWEST, NULL);
-    //lv_task_ready(dash_task);
-
+    mainbar_add_tile_activate_cb(fulldash_tile_num, fulldash_activate_cb);
+    mainbar_add_tile_hibernate_cb(fulldash_tile_num, fulldash_hibernate_cb);
 }

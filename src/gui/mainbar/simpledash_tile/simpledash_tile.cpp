@@ -24,12 +24,14 @@
 #include "hardware/pmu.h"
 #include "hardware/Kingsong.h"
 #include "hardware/dashboard.h"
+#include "hardware/blectl.h"
 
 //task declarations
 lv_task_t *sd_dash_task = nullptr;
 
 // Function declarations
 static void lv_sd_dash_task(lv_task_t *sd_dash_task);
+static void sd_overlay_event_cb(lv_obj_t * obj, lv_event_t event);
 
 void sd_stop_dash_task();
 
@@ -83,6 +85,11 @@ static lv_style_t sd_max_bar_indic_style;
 static lv_style_t sd_min_bar_indic_style; //also for avg speed
 static lv_style_t sd_regen_bar_indic_style;
 static lv_style_t sd_bar_main_style;
+
+//Overlay objects and styles
+static lv_obj_t *sd_overlay_bar = NULL;
+static lv_obj_t *sd_overlay_line = NULL;
+static lv_style_t sd_overlay_style;
 
 //End LV objects and styles
 
@@ -152,6 +159,14 @@ void lv_sd_define_styles_1(void)
     //regen bar
     lv_style_copy(&sd_regen_bar_indic_style, &sd_arc_style);
     lv_style_set_line_color(&sd_regen_bar_indic_style, LV_STATE_DEFAULT, sd_regen_bar_clr);
+
+    //overlay
+    lv_style_copy(&sd_overlay_style, style);
+    lv_style_set_bg_color(&sd_overlay_style, LV_STATE_DEFAULT, LV_COLOR_BLACK);
+    lv_style_set_line_color(&sd_overlay_style, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+    lv_style_set_line_width(&sd_overlay_style, LV_STATE_DEFAULT, 20);
+    lv_style_set_line_opa(&sd_overlay_style, LV_STATE_DEFAULT, LV_OPA_20);
+    lv_style_set_bg_opa(&sd_overlay_style, LV_STATE_DEFAULT, LV_OPA_20);
 
 } //End Define LVGL default object styles
 
@@ -272,6 +287,34 @@ void lv_sd_current_arc_1(void)
         lv_obj_set_size(sd_current_regen_bar, sd_out_arc_x, sd_out_arc_y);
         lv_obj_align(sd_current_regen_bar, NULL, LV_ALIGN_CENTER, 0, 0);
         mainbar_add_slide_element(sd_current_regen_bar);
+    }
+}
+
+void lv_sd_overlay(void)
+{
+    static lv_point_t line_points[] = {{0, lv_disp_get_ver_res(NULL)}, {lv_disp_get_hor_res(NULL), 0}};
+
+    sd_overlay_bar = lv_bar_create(simpledash_cont, NULL);
+    lv_obj_reset_style_list(sd_overlay_bar, LV_OBJ_PART_MAIN);
+    lv_obj_set_size(sd_overlay_bar, lv_disp_get_hor_res(NULL), lv_disp_get_ver_res(NULL));
+    lv_obj_add_style(sd_overlay_bar, LV_OBJ_PART_MAIN, &sd_overlay_style);
+    lv_obj_align(sd_overlay_bar, NULL, LV_ALIGN_CENTER, 0, 0);
+    mainbar_add_slide_element(sd_overlay_bar);
+    lv_obj_set_event_cb( sd_overlay_bar, sd_overlay_event_cb );
+
+    sd_overlay_line = lv_line_create(sd_overlay_bar, NULL);
+    lv_line_set_points(sd_overlay_line, line_points, 2);
+    lv_obj_reset_style_list(sd_overlay_line, LV_OBJ_PART_MAIN);
+    lv_obj_add_style(sd_overlay_line, LV_OBJ_PART_MAIN, &sd_overlay_style);
+    lv_obj_align(sd_overlay_line, NULL, LV_ALIGN_CENTER, 0, 0);
+    mainbar_add_slide_element(sd_overlay_line);
+    lv_obj_set_event_cb( sd_overlay_line, sd_overlay_event_cb );
+
+} //End Create Dashboard objects
+
+static void sd_overlay_event_cb(lv_obj_t * obj, lv_event_t event) {
+    switch( event ) {
+        case( LV_EVENT_LONG_PRESSED ):  Serial.println("long press on overlay");
     }
 }
 
@@ -436,6 +479,24 @@ void lv_sd_current_update(void)
     }
 }
 
+void lv_sd_overlay_update()
+{
+    if (blectl_cli_getconnected())
+    {
+        lv_style_set_line_opa(&sd_overlay_style, LV_STATE_DEFAULT, LV_OPA_TRANSP);
+        lv_style_set_bg_opa(&sd_overlay_style, LV_STATE_DEFAULT, LV_OPA_TRANSP);
+        lv_obj_add_style(sd_overlay_bar, LV_OBJ_PART_MAIN, &sd_overlay_style);
+        lv_obj_add_style(sd_overlay_line, LV_OBJ_PART_MAIN, &sd_overlay_style);
+    }
+    else
+    {
+        lv_style_set_line_opa(&sd_overlay_style, LV_STATE_DEFAULT, LV_OPA_20);
+        lv_style_set_bg_opa(&sd_overlay_style, LV_STATE_DEFAULT, LV_OPA_20);
+        lv_obj_add_style(sd_overlay_bar, LV_OBJ_PART_MAIN, &sd_overlay_style);
+        lv_obj_add_style(sd_overlay_line, LV_OBJ_PART_MAIN, &sd_overlay_style);
+    }
+}
+
 /************************
    Task update functions
  ***********************/
@@ -448,6 +509,7 @@ static void lv_sd_dash_task(lv_task_t *sd_dash_task)
     {
         lv_sd_current_update();
     }
+    lv_sd_overlay_update();
 }
 
 void sd_stop_dash_task()
@@ -495,6 +557,7 @@ void simpledash_tile_setup(void)
     {
         lv_sd_current_arc_1();
     }
+    lv_sd_overlay();
     //Create task -- update freq 4/s
     mainbar_add_tile_activate_cb( simpledash_tile_num, simpledash_activate_cb );
     mainbar_add_tile_hibernate_cb( simpledash_tile_num, simpledash_hibernate_cb );

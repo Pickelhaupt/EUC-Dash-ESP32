@@ -242,9 +242,15 @@
     void blectl_set_autoon( bool autoon );
 
     void writeBLE (byte*, int);
-
+    /**
+     * @brief ble client setup function
+     */
     void blectl_scan_setup(void);
-
+    /**
+     * @brief get BLE connection status
+     * 
+     * @return true if connected to the whhel, false if disconnected
+     */
     bool blectl_cli_getconnected( void );
 
 #endif // _BLECTL_H

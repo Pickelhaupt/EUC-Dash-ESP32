@@ -67,17 +67,17 @@
      */
     uint32_t mainbar_add_tile( uint16_t x, uint16_t y, const char *id );
     /**
-     * @brief add a independent app tile formation
+     * @brief add a independent sub tile formation
      * 
-     *  predefine tiles
+     *  predefined tiles
      * 
-     *  +---+---+       1 = main tile
-     *  | 1 | 2 |       2 = app tile
-     *  +---+---+       3 = note tile
-     *  | 3 | 4 |       4 = setup tile
-     *  +---+---+
+     *  +---+---+---+   1 = clock tile
+     *  | 1 | 2 | 3 |   2 = full dash tile
+     *  +---+---+---+   3 = simpe dash tile
+     *  | 4 |   |   |   4 = setup tile
+     *  +---+---+---+
      * 
-     *  app tile
+     *  sub tiles
      * 
      *  +---+---+    +---+   +---+---+
      *  | n |n+1|    | n |   | n |n+1|
