@@ -27,23 +27,12 @@
 #include "Kingsong.h"
 
 #include "blectl.h"
+#include "wheelctl.h"
 #include "callback.h"
 #include "json_psram_allocator.h"
 #include "alloc.h"
 
-lv_task_t *speed_shake = nullptr;
-lv_task_t *current_shake = nullptr;
-lv_task_t *temp_shake = nullptr;
 
-static void lv_speed_shake(lv_task_t *speed_shake);
-static void lv_current_shake(lv_task_t *current_shake);
-static void lv_temp_shake(lv_task_t *temp_shake);
-void stop_speed_shake();
-void stop_current_shake();
-void stop_temp_shake();
-void update_speed_shake(void);
-void update_current_shake(void);
-void update_temp_shake(void);
 int add_ride_millis (void);
 
 byte KS_BLEreq[20];
@@ -58,11 +47,10 @@ float min_batt = 100;
 float max_current = 0;
 float regen_current = 0;
 float max_temp = 0;
-String wheelmodel;
+String wheelmodel = "KS14D";
 struct Wheel_constants wheelconst;
 //remove when BLE_CLI is done
 bool tempconn = false;
-bool shakeoff[3] = {true, true, true};
 
 /**************************************************
    Decode big endian multi byte data from KS wheels
@@ -81,47 +69,73 @@ static int decode4byte(byte byte1, byte byte2, byte byte3, byte byte4)
     return val;
 }
 
-void setKSconstants(void)
+
+void setKSconstants(String model)
 {
-    if (wheelmodel = "KS14M")
+    if (model = "KS14D")
     {
         wheelconst.maxcurrent = KS_14D_MAXCURRENT;
         wheelconst.crittemp = KS_14D_CRITTEMP;
         wheelconst.warntemp = KS_14D_WARNTEMP;
         wheelconst.battvolt = KS_14D_BATTVOLT;
         wheelconst.battwarn = KS_14D_BATTWARN;
+        wheelctl_set_constant(WHEELCTL_CONST_MAXCURRENT, KS_14D_MAXCURRENT);
+        wheelctl_set_constant(WHEELCTL_CONST_CRITTEMP, KS_14D_CRITTEMP);
+        wheelctl_set_constant(WHEELCTL_CONST_WARNTEMP, KS_14D_WARNTEMP);
+        wheelctl_set_constant(WHEELCTL_CONST_BATTVOLT, KS_14D_BATTVOLT);
+        wheelctl_set_constant(WHEELCTL_CONST_BATTWARN, KS_14D_BATTWARN);
     }
-    else if (wheelmodel = "KS14S")
+    else if (model = "KS14S")
     {
         wheelconst.maxcurrent = KS_14S_MAXCURRENT;
         wheelconst.crittemp = KS_14S_CRITTEMP;
         wheelconst.warntemp = KS_14S_WARNTEMP;
         wheelconst.battvolt = KS_14S_BATTVOLT;
         wheelconst.battwarn = KS_14S_BATTWARN;
+        wheelctl_set_constant(WHEELCTL_CONST_MAXCURRENT, KS_14S_MAXCURRENT);
+        wheelctl_set_constant(WHEELCTL_CONST_CRITTEMP, KS_14S_CRITTEMP);
+        wheelctl_set_constant(WHEELCTL_CONST_WARNTEMP, KS_14S_WARNTEMP);
+        wheelctl_set_constant(WHEELCTL_CONST_BATTVOLT, KS_14S_BATTVOLT);
+        wheelctl_set_constant(WHEELCTL_CONST_BATTWARN, KS_14S_BATTWARN);
     }
-    else if (wheelmodel = "KS16S")
+    else if (model = "KS16S")
     {
         wheelconst.maxcurrent = KS_16S_MAXCURRENT;
         wheelconst.crittemp = KS_16S_CRITTEMP;
         wheelconst.warntemp = KS_16S_WARNTEMP;
         wheelconst.battvolt = KS_16S_BATTVOLT;
         wheelconst.battwarn = KS_16S_BATTWARN;
+        wheelctl_set_constant(WHEELCTL_CONST_MAXCURRENT, KS_16S_MAXCURRENT);
+        wheelctl_set_constant(WHEELCTL_CONST_CRITTEMP, KS_16S_CRITTEMP);
+        wheelctl_set_constant(WHEELCTL_CONST_WARNTEMP, KS_16S_WARNTEMP);
+        wheelctl_set_constant(WHEELCTL_CONST_BATTVOLT, KS_16S_BATTVOLT);
+        wheelctl_set_constant(WHEELCTL_CONST_BATTWARN, KS_16S_BATTWARN);
     }
-    else if (wheelmodel = "KS16X")
+    else if (model = "KS16X")
     {
         wheelconst.maxcurrent = KS_16X_MAXCURRENT;
         wheelconst.crittemp = KS_16X_CRITTEMP;
         wheelconst.warntemp = KS_16X_WARNTEMP;
         wheelconst.battvolt = KS_16X_BATTVOLT;
         wheelconst.battwarn = KS_16X_BATTWARN;
+        wheelctl_set_constant(WHEELCTL_CONST_MAXCURRENT, KS_16X_MAXCURRENT);
+        wheelctl_set_constant(WHEELCTL_CONST_CRITTEMP, KS_16X_CRITTEMP);
+        wheelctl_set_constant(WHEELCTL_CONST_WARNTEMP, KS_16X_WARNTEMP);
+        wheelctl_set_constant(WHEELCTL_CONST_BATTVOLT, KS_16X_BATTVOLT);
+        wheelctl_set_constant(WHEELCTL_CONST_BATTWARN, KS_16X_BATTWARN);
     }
     else
     {
-        wheelconst.maxcurrent = KS_14D_MAXCURRENT;
-        wheelconst.crittemp = KS_14D_CRITTEMP;
-        wheelconst.warntemp = KS_14D_WARNTEMP;
-        wheelconst.battvolt = KS_14D_BATTVOLT;
-        wheelconst.battwarn = KS_14D_BATTWARN;
+        wheelconst.maxcurrent = KS_DEFAULT_MAXCURRENT;
+        wheelconst.crittemp = KS_DEFAULT_CRITTEMP;
+        wheelconst.warntemp = KS_DEFAULT_WARNTEMP;
+        wheelconst.battvolt = KS_DEFAULT_BATTVOLT;
+        wheelconst.battwarn = KS_DEFAULT_BATTWARN;
+        wheelctl_set_constant(WHEELCTL_CONST_MAXCURRENT, KS_DEFAULT_MAXCURRENT);
+        wheelctl_set_constant(WHEELCTL_CONST_CRITTEMP, KS_DEFAULT_CRITTEMP);
+        wheelctl_set_constant(WHEELCTL_CONST_WARNTEMP, KS_DEFAULT_WARNTEMP);
+        wheelctl_set_constant(WHEELCTL_CONST_BATTVOLT, KS_DEFAULT_BATTVOLT);
+        wheelctl_set_constant(WHEELCTL_CONST_BATTWARN, KS_DEFAULT_BATTWARN);
     }
 }
 
@@ -149,6 +163,13 @@ void decodeKS(byte KSdata[])
     //Parse incoming BLE Notifications
     if (KSdata[16] == 0xa9)
     { // Data package type 1 voltage/speed/odo/current/temperature
+        wheelctl_set_data(WHEELCTL_VOLTAGE, (decode2byte(KSdata[2], KSdata[3]) / 100.0));
+        wheelctl_set_data(WHEELCTL_SPEED, (decode2byte(KSdata[4], KSdata[5]) / 100.0));
+        wheelctl_set_data(WHEELCTL_ODO, (decode4byte(KSdata[6], KSdata[7], KSdata[8], KSdata[9]) / 1000.0));
+        wheelctl_set_data(WHEELCTL_CURRENT,  (decode2byte(KSdata[10], KSdata[11]) / 100.0));
+        wheelctl_set_data(WHEELCTL_TEMP, (decode2byte(KSdata[12], KSdata[13]) / 100.0));
+        wheelctl_set_data(WHEELCTL_RMODE, KSdata[14]); // check this!!
+
         int rBattvolt = decode2byte(KSdata[2], KSdata[3]);
         int rSpeed = decode2byte(KSdata[4], KSdata[5]);
         int rOdo = decode4byte(KSdata[6], KSdata[7], KSdata[8], KSdata[9]);
@@ -190,7 +211,7 @@ void decodeKS(byte KSdata[])
         wheeldata[7] = wheeldata[0] * wheeldata[3]; //current power usage
     }
     else if (KSdata[16] == 0xb9)
-    {                                                                            // Data package type 3 distance/time/top speed/fan
+    {   // Data package type 2 distance/time/top speed/fan
         int rDistance = decode4byte(KSdata[2], KSdata[3], KSdata[4], KSdata[5]); // trip counter resets when wheel off
         int rWheeltime = decode2byte(KSdata[6], KSdata[7]);                      //time since turned on
         int rTopspeed = decode2byte(KSdata[8], KSdata[9]);                       //Max speed since last power on
@@ -200,13 +221,24 @@ void decodeKS(byte KSdata[])
         wheeldata[9] = rWheeltime;
         wheeldata[10] = rTopspeed / 100.0;
         wheeldata[11] = rFanstate;
+
+        wheelctl_set_data(WHEELCTL_TRIP, (decode4byte(KSdata[2], KSdata[3], KSdata[4], KSdata[5]) / 1000.0)); // trip counter resets when wheel off
+        wheelctl_set_data(WHEELCTL_UPTIME, (decode2byte(KSdata[6], KSdata[7]) / 100.0)); //time since turned on
+        wheelctl_set_data(WHEELCTL_TOPSPEED, (decode2byte(KSdata[8], KSdata[9]) / 100.0)); //Max speed since last power on
+        wheelctl_set_data(WHEELCTL_FANSTATE,  KSdata[12]); //1 if fan is running
+
     }
     else if (KSdata[16] == 0xb5)
-    {
+    {   //Data package type 3 speed alarms and tiltback speed
         wheeldata[12] = KSdata[4];  //Alarmspeed 1
         wheeldata[13] = KSdata[6];  //Alarmspeed 2
         wheeldata[14] = KSdata[8];  //Alarmspeed 3
         wheeldata[15] = KSdata[10]; //Max speed (tiltback)
+
+        wheelctl_set_data(WHEELCTL_ALARM1,  KSdata[4]);
+        wheelctl_set_data(WHEELCTL_ALARM2,  KSdata[6]);
+        wheelctl_set_data(WHEELCTL_ALARM3,  KSdata[8]);
+        wheelctl_set_data(WHEELCTL_TILTBACK,  KSdata[10]);
     }
 
     //set values for max/min arc bars
@@ -243,7 +275,8 @@ void decodeKS(byte KSdata[])
         max_temp = wheeldata[4];
     }
 
-    wheeldata[16] = add_ride_millis ();
+    wheeldata[16] = add_ride_millis();
+    wheelctl_set_data(WHEELCTL_RIDETIME,  (add_ride_millis() / 1000));
     //Debug -- testing, print all data to serial
     //Serial.print(wheeldata[0]); Serial.println(" V");
     //Serial.print(wheeldata[1]); Serial.println(" kmh");
@@ -267,9 +300,6 @@ void decodeKS(byte KSdata[])
     //Serial.print(min_batt); Serial.println(" min_batt");
     //Serial.print(max_current); Serial.println(" max_current");
     //Serial.print(max_temp); Serial.println(" max_temp");
-    update_speed_shake();
-    update_current_shake();
-    update_temp_shake();
 } // End decodeKS
 
 void ks_ble_request(byte reqtype)
@@ -303,104 +333,13 @@ int add_ride_millis () {
     return ride_millis;
 }
 
-//Haptic feedback
-void update_speed_shake(void)
-{
-    if (wheeldata[1] >= wheeldata[14] && shakeoff[0])
-    {
-        speed_shake = lv_task_create(lv_speed_shake, 750, LV_TASK_PRIO_LOWEST, NULL);
-        lv_task_ready(speed_shake);
-        shakeoff[0] = false;
-    }
-    else if (!shakeoff[0])
-    {
-        stop_speed_shake();
-    }
-}
-
-void update_current_shake(void)
-{
-    if (wheeldata[3] > (wheelconst.maxcurrent * 0.75) && shakeoff[1])
-    {
-        current_shake = lv_task_create(lv_current_shake, 200, LV_TASK_PRIO_LOWEST, NULL);
-        lv_task_ready(current_shake);
-        shakeoff[1] = false;
-    }
-    else if (!shakeoff[1])
-    {
-        stop_current_shake();
-    }
-}
-
-void update_temp_shake(void)
-{
-    if (wheeldata[4] > wheelconst.crittemp && shakeoff[2])
-    {
-        temp_shake = lv_task_create(lv_temp_shake, 1000, LV_TASK_PRIO_LOWEST, NULL);
-        lv_task_ready(temp_shake);
-        shakeoff[2] = false;
-    }
-    else if (!shakeoff[2])
-    {
-        stop_temp_shake();
-    }
-}
-
-static void lv_current_shake(lv_task_t *current_shake)
-{
-    TTGOClass *ttgo = TTGOClass::getWatch();
-    ttgo->shake();
-}
-
-static void lv_temp_shake(lv_task_t *temp_shake)
-{
-    TTGOClass *ttgo = TTGOClass::getWatch();
-    ttgo->shake();
-    delay(250);
-    ttgo->shake();
-}
-
-static void lv_speed_shake(lv_task_t *speed_shake)
-{
-    TTGOClass *ttgo = TTGOClass::getWatch();
-    ttgo->shake();
-}
-
-void stop_speed_shake()
-{
-    if (speed_shake != nullptr)
-    {
-        lv_task_del(speed_shake);
-        shakeoff[0] = true;
-    }
-}
-
-void stop_current_shake()
-{
-    if (current_shake != nullptr)
-    {
-        lv_task_del(current_shake);
-        shakeoff[1] = true;
-    }
-}
-
-void stop_temp_shake()
-{
-    if (temp_shake != nullptr)
-    {
-        lv_task_del(temp_shake);
-        shakeoff[2] = true;
-    }
-}
-
 void initks()
 {
     //temporary model strings, Todo: implement automated id
-    wheelmodel = "KS14M";
     //wheelmodel = "KS16S";
     //Setting of some model specific parametes,
     //Todo: automatic model identification
-    setKSconstants();
+    setKSconstants(wheelmodel);
     /*****************************************
        Request Kingsong Model Name, serial number and speed settings
        This must be done before any BLE notifications will be pused by the KS wheel

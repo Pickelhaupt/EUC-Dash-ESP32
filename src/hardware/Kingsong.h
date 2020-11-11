@@ -25,6 +25,12 @@
 /*define constants for specific KS wheel models 
 * add here when adding support for a new model
 */
+#define KS_DEFAULT_MAXCURRENT   35
+#define KS_DEFAULT_CRITTEMP     65
+#define KS_DEFAULT_WARNTEMP     50
+#define KS_DEFAULT_BATTVOLT     67
+#define KS_DEFAULT_BATTWARN     40
+
 #define KS_14D_MAXCURRENT   35
 #define KS_14D_CRITTEMP     65
 #define KS_14D_WARNTEMP     50
@@ -61,7 +67,9 @@ struct Wheel_constants
     byte battvolt;
     byte battwarn;
 };
+
 extern struct Wheel_constants wheelconst;
+
 void decodeKS(byte KSData[]);
 void initks();
 
