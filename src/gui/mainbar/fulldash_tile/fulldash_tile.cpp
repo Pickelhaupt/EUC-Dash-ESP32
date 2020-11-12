@@ -26,6 +26,7 @@
 #include "hardware/Kingsong.h"
 #include "hardware/dashboard.h"
 #include "hardware/wheelctl.h"
+#include "hardware/motor.h"
 
 //task declarations
 lv_task_t *dash_task = nullptr;
@@ -490,6 +491,7 @@ void lv_overlay(void)
 static void overlay_event_cb(lv_obj_t * obj, lv_event_t event) {
     switch( event ) {
         case( LV_EVENT_LONG_PRESSED ):  Serial.println("long press on overlay");
+        motor_vibe(5, true);
     }
 }
 

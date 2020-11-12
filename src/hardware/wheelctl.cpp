@@ -57,6 +57,7 @@ void wheelctl_setup( void ){
     wheelctl_data[WHEELCTL_CURRENT].max_value = 0;
     wheelctl_data[WHEELCTL_CURRENT].min_value = 0;
     wheelctl_data[WHEELCTL_TEMP].min_value = 0;
+    motor_vibe(5, true);
 }
 
 float wheelctl_get_data(int entry)
@@ -270,17 +271,17 @@ void update_temp_shake(void)
 
 static void lv_current_shake(lv_task_t *current_shake)
 {
-    motor_vibe(30, true);
+    motor_vibe(10, true);
 }
 
 static void lv_temp_shake(lv_task_t *temp_shake)
 {
-    motor_vibe(30, true);
-    delay(250);
-    motor_vibe(30, true);
+    motor_vibe(10, true);
+    delay(150);
+    motor_vibe(10, true);
 }
 
 static void lv_speed_shake(lv_task_t *speed_shake)
 {
-    motor_vibe(30, true);
+    motor_vibe(10, true);
 } //End haptic feedback
