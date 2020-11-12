@@ -26,6 +26,7 @@
 #include "callback.h"
 #include "json_psram_allocator.h"
 #include "alloc.h"
+#include "powermgm.h"
 
 lv_task_t *speed_shake = nullptr;
 lv_task_t *current_shake = nullptr;
@@ -34,15 +35,15 @@ lv_task_t *temp_shake = nullptr;
 static void lv_speed_shake(lv_task_t *speed_shake);
 static void lv_current_shake(lv_task_t *current_shake);
 static void lv_temp_shake(lv_task_t *temp_shake);
-void update_speed_shake(void);
-void update_current_shake(void);
-void update_temp_shake(void);
+void update_speed_shake(float value);
+void update_current_shake(float value);
+void update_temp_shake(float value);
 
 void wheelctl_update_max_min(int entry, float value, bool update_min);
 void wheelctl_update_regen_current(int entry, float value);
 void wheelctl_update_battpct_max_min(int entry, float value);
 void update_calc_battery(float value);
-void wheelctl_calc_power(void);
+void wheelctl_calc_power(float value);
 
 bool shakeoff[3] = {true, true, true};
 
@@ -87,17 +88,17 @@ void wheelctl_set_data(int entry, float value)
             update_calc_battery(value);
             break;
         case WHEELCTL_SPEED:
-            update_current_shake();
+            update_speed_shake(value);
             wheelctl_update_max_min(entry, value, false);
             break;
         case WHEELCTL_CURRENT:
-            update_current_shake();
+            update_current_shake(value);
             wheelctl_update_max_min(entry, value, false);
             wheelctl_update_regen_current(entry, value);
-            wheelctl_calc_power();
+            wheelctl_calc_power(value);
             break;
         case WHEELCTL_TEMP:
-            update_temp_shake();
+            update_temp_shake(value);
             wheelctl_update_max_min(entry, value, true);
             break;
         case WHEELCTL_BATTPCT:
@@ -139,8 +140,8 @@ void wheelctl_update_regen_current(int entry, float value) {
     }
 }
 
-void wheelctl_calc_power(void) {
-    wheelctl_set_data(WHEELCTL_POWER, wheelctl_data[WHEELCTL_CURRENT].value * wheelctl_data[WHEELCTL_VOLTAGE].value);
+void wheelctl_calc_power(float value) {
+    wheelctl_set_data(WHEELCTL_POWER, wheelctl_data[WHEELCTL_CURRENT].value * value);
 }
 
 void update_calc_battery(float value)
@@ -224,45 +225,50 @@ void wheelctl_set_constant(int entry, byte value)
 }
 
 //Haptic feedback
-void update_speed_shake(void)
+void update_speed_shake(float value)
 {
-    if (wheelctl_data[WHEELCTL_SPEED].value >= wheelctl_data[WHEELCTL_ALARM3].value && shakeoff[0])
+    if (value >= wheelctl_data[WHEELCTL_ALARM3].value && shakeoff[0])
     {
-        speed_shake = lv_task_create(lv_speed_shake, 750, LV_TASK_PRIO_LOWEST, NULL);
+        powermgm_set_event( POWERMGM_BMA_DOUBLECLICK );
+        speed_shake = lv_task_create(lv_speed_shake, 250, LV_TASK_PRIO_LOWEST, NULL);
         lv_task_ready(speed_shake);
         shakeoff[0] = false;
+        Serial.println("speedshake on");
     }
-    else if (wheelctl_data[WHEELCTL_SPEED].value < wheelctl_data[WHEELCTL_ALARM3].value && !shakeoff[0] && speed_shake != nullptr)
+    else if (value < wheelctl_data[WHEELCTL_ALARM3].value && !shakeoff[0] && speed_shake != nullptr)
     {
         lv_task_del(speed_shake);
         shakeoff[0] = true;
+        Serial.println("speedshake off");
     }
 }
 
-void update_current_shake(void)
+void update_current_shake(float value)
 {
-    if (wheelctl_data[WHEELCTL_CURRENT].value >= (wheelctl_constants[WHEELCTL_CONST_MAXCURRENT].value * 0.75) && shakeoff[1] && current_shake != nullptr)
+    if (value >= (wheelctl_constants[WHEELCTL_CONST_MAXCURRENT].value * 0.75) && shakeoff[1] && current_shake != nullptr)
     {
-        current_shake = lv_task_create(lv_current_shake, 200, LV_TASK_PRIO_LOWEST, NULL);
+        powermgm_set_event( POWERMGM_BMA_DOUBLECLICK );
+        current_shake = lv_task_create(lv_current_shake, 500, LV_TASK_PRIO_LOWEST, NULL);
         lv_task_ready(current_shake);
         shakeoff[1] = false;
     }
-    else if (wheelctl_data[WHEELCTL_CURRENT].value < (wheelctl_constants[WHEELCTL_CONST_MAXCURRENT].value * 0.75) && !shakeoff[1])
+    else if (value < (wheelctl_constants[WHEELCTL_CONST_MAXCURRENT].value * 0.75) && !shakeoff[1])
     {
         lv_task_del(current_shake);
         shakeoff[1] = true;
     }
 }
 
-void update_temp_shake(void)
+void update_temp_shake(float value)
 {
-    if (wheelctl_data[WHEELCTL_TEMP].value > wheelctl_constants[WHEELCTL_CONST_CRITTEMP].value && shakeoff[2])
+    if (value > wheelctl_constants[WHEELCTL_CONST_CRITTEMP].value && shakeoff[2])
     {
+        powermgm_set_event( POWERMGM_BMA_DOUBLECLICK );
         temp_shake = lv_task_create(lv_temp_shake, 1000, LV_TASK_PRIO_LOWEST, NULL);
         lv_task_ready(temp_shake);
         shakeoff[2] = false;
     }
-    else if (wheelctl_data[WHEELCTL_TEMP].value <= wheelctl_constants[WHEELCTL_CONST_CRITTEMP].value && !shakeoff[2] && temp_shake != nullptr)
+    else if (value <= wheelctl_constants[WHEELCTL_CONST_CRITTEMP].value && !shakeoff[2] && temp_shake != nullptr)
     {
         lv_task_del(temp_shake);
         shakeoff[2] = true;
@@ -271,7 +277,7 @@ void update_temp_shake(void)
 
 static void lv_current_shake(lv_task_t *current_shake)
 {
-    motor_vibe(10, true);
+    motor_vibe(50, true);
 }
 
 static void lv_temp_shake(lv_task_t *temp_shake)

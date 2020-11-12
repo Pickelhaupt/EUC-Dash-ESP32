@@ -42,7 +42,8 @@
 #include "mainbar/setup_tile/wlan_settings/wlan_settings.h"
 #include "mainbar/setup_tile/bluetooth_settings/bluetooth_settings.h"
 #include "mainbar/setup_tile/dashboard_settings/dashboard_settings.h"
-
+#include "mainbar/tripinfo_tile/tripinfo_tile.h"
+#include "mainbar/wheelinfo_tile/wheelinfo_tile.h"
 #include "mainbar/setup_tile/utilities/utilities.h"
 
 #include "hardware/powermgm.h"
@@ -66,6 +67,8 @@ void gui_setup( void )
     fulldash_tile_setup();
     simpledash_tile_setup();
     setup_tile_setup();
+    tripinfo_tile_setup();
+    wheelinfo_tile_setup();
 
     /* add setup */
     battery_settings_tile_setup();
