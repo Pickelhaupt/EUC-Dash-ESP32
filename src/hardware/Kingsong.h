@@ -59,20 +59,7 @@
 #include <TTGO.h>
 #include "callback.h"
 
-struct Wheel_constants
-{
-    byte maxcurrent;
-    byte crittemp;
-    byte warntemp;
-    byte battvolt;
-    byte battwarn;
-};
-
-extern struct Wheel_constants wheelconst;
-
 void decodeKS(byte KSData[]);
 void initks();
-
-extern float wheeldata[];
 
 #endif /* __KINGSONG */

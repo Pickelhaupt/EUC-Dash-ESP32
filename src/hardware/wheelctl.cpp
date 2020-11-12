@@ -39,7 +39,9 @@ void update_current_shake(void);
 void update_temp_shake(void);
 
 void wheelctl_update_max_min(int entry, float value, bool update_min);
+void wheelctl_update_regen_current(int entry, float value);
 void update_calc_battery(float value);
+void wheelctl_calc_power(void);
 
 bool shakeoff[3] = {true, true, true};
 
@@ -77,6 +79,8 @@ void wheelctl_set_data(int entry, float value)
         case WHEELCTL_CURRENT:
             update_current_shake();
             wheelctl_update_max_min(entry, value, false);
+            wheelctl_update_regen_current(entry, value);
+            wheelctl_calc_power();
             break;
         case WHEELCTL_TEMP:
             update_temp_shake();
@@ -101,6 +105,21 @@ void wheelctl_update_max_min(int entry, float value, bool update_min)
     }
 }
 
+void wheelctl_update_regen_current(int entry, float value) {
+        if (value < 0)
+    {
+        float negamp = (value * -1);
+        if (negamp > wheelctl_data[entry].min_value)
+        {
+            wheelctl_data[entry].min_value = negamp;
+        }
+    }
+}
+
+void wheelctl_calc_power(void) {
+    wheelctl_set_data(WHEELCTL_POWER, wheelctl_data[WHEELCTL_CURRENT].value * wheelctl_data[WHEELCTL_VOLTAGE].value);
+}
+
 void update_calc_battery(float value)
 {
     int centivolt = value * 100;
@@ -116,7 +135,15 @@ void update_calc_battery(float value)
     {
         if (centivolt > 8350) wheelctl_set_data(WHEELCTL_BATTPCT, 100.0);
         else if (centivolt > 6810) wheelctl_set_data(WHEELCTL_BATTPCT, (centivolt - 6650) / 13.6);
-        else if (centivolt > 5120) wheelctl_set_data(WHEELCTL_BATTPCT, (centivolt - 6400) / 36.0);
+        else if (centivolt > 6420) wheelctl_set_data(WHEELCTL_BATTPCT, (centivolt - 6400) / 36.0);
+        else wheelctl_set_data(WHEELCTL_BATTPCT, 0.0);
+        return;
+    }
+    else if (wheelctl_constants[WHEELCTL_CONST_BATTVOLT].value < 105) 
+    {
+        if (centivolt > 9986) wheelctl_set_data(WHEELCTL_BATTPCT, 100.0);
+        else if (centivolt > 8132) wheelctl_set_data(WHEELCTL_BATTPCT, (centivolt - 8040) / 13.6);
+        else if (centivolt > 7660) wheelctl_set_data(WHEELCTL_BATTPCT, (centivolt - 7660) / 36.0);
         else wheelctl_set_data(WHEELCTL_BATTPCT, 0.0);
         return;
     }

@@ -82,13 +82,5 @@ uint32_t simpledash_get_tile (void);
 void simpledash_tile_reload ( void );
 
 //variable declarations
-extern struct Wheel_constants wheelconst;
-extern float max_speed;
-extern float avg_speed;
-extern float max_batt;
-extern float min_batt;
-extern float max_current;
-extern float regen_current;
-extern float max_temp;
 
 #endif // _SIMPLEDASH_TILE_H
