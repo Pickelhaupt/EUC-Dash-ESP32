@@ -97,6 +97,4 @@ uint32_t fulldash_get_tile (void);
 //variable declarations
 // extern struct Wheel_constants wheelconst;
 
-extern float avg_speed; // to be removed
-
 #endif // _FULLDASH_TILE_H

@@ -40,6 +40,7 @@ void update_temp_shake(void);
 
 void wheelctl_update_max_min(int entry, float value, bool update_min);
 void wheelctl_update_regen_current(int entry, float value);
+void wheelctl_update_battpct_max_min(int entry, float value);
 void update_calc_battery(float value);
 void wheelctl_calc_power(void);
 
@@ -47,6 +48,16 @@ bool shakeoff[3] = {true, true, true};
 
 wheelctl_data_t wheelctl_data[WHEELCTL_DATA_NUM];
 wheelctl_constants_t wheelctl_constants[WHEELCTL_CONST_NUM];
+
+void wheelctl_setup( void ){
+    wheelctl_data[WHEELCTL_SPEED].max_value = 0;
+    wheelctl_data[WHEELCTL_SPEED].min_value = 0;
+    wheelctl_data[WHEELCTL_BATTPCT].max_value = 0;
+    wheelctl_data[WHEELCTL_BATTPCT].min_value = 100;
+    wheelctl_data[WHEELCTL_CURRENT].max_value = 0;
+    wheelctl_data[WHEELCTL_CURRENT].min_value = 0;
+    wheelctl_data[WHEELCTL_TEMP].min_value = 0;
+}
 
 float wheelctl_get_data(int entry)
 {
@@ -62,10 +73,12 @@ void wheelctl_set_data(int entry, float value)
     if (entry < WHEELCTL_DATA_NUM)
     {
         wheelctl_data[entry].value = value;
+        /* debug
         Serial.print("Wheeldata entry: ");
         Serial.print(entry);
         Serial.print(" value: ");
         Serial.println(value);
+        */
         switch (entry)
         {
         case WHEELCTL_VOLTAGE:
@@ -87,7 +100,7 @@ void wheelctl_set_data(int entry, float value)
             wheelctl_update_max_min(entry, value, true);
             break;
         case WHEELCTL_BATTPCT:
-            wheelctl_update_max_min(entry, value, true);
+            wheelctl_update_battpct_max_min(entry, value);
             break;
         }
     }
@@ -102,6 +115,15 @@ void wheelctl_update_max_min(int entry, float value, bool update_min)
     if (wheelctl_data[entry].value < wheelctl_data[entry].min_value && update_min)
     {
         wheelctl_data[entry].min_value = wheelctl_data[entry].value;
+    }
+}
+
+void wheelctl_update_battpct_max_min(int entry, float value){
+    if (wheelctl_data[WHEELCTL_CURRENT].value >= 0) {
+        wheelctl_update_max_min(entry, value, true);
+    }
+    else {
+        wheelctl_update_max_min(entry, value, false);
     }
 }
 

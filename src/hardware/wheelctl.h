@@ -84,8 +84,10 @@
         WHEELCTL_RIDETIME,  //Total time in motion since power on
         WHEELCTL_DATA_NUM   //number of data entries
     };
-
-
+    /**
+     * @brief initial setup of wheelctl
+     */
+    void wheelctl_setup( void );
     /**
      * @brief get the value for a specific wheel data entry
      * 

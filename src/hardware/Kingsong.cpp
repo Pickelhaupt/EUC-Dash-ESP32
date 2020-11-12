@@ -116,10 +116,13 @@ void decodeKS(byte KSdata[])
     //Parse incoming BLE Notifications
     if (KSdata[16] == 0xa9)
     { // Data package type 1 voltage/speed/odo/current/temperature
+        float rCurr = decode2byte(KSdata[10], KSdata[11]) / 100.0;
+        if (rCurr > 32767) rCurr = rCurr - 65536; // Ugly hack to display negative currents, must be a better way
+      
         wheelctl_set_data(WHEELCTL_VOLTAGE, (decode2byte(KSdata[2], KSdata[3]) / 100.0));
         wheelctl_set_data(WHEELCTL_SPEED, (decode2byte(KSdata[4], KSdata[5]) / 100.0));
         wheelctl_set_data(WHEELCTL_ODO, (decode4byte(KSdata[6], KSdata[7], KSdata[8], KSdata[9]) / 1000.0));
-        wheelctl_set_data(WHEELCTL_CURRENT, (decode2byte(KSdata[10], KSdata[11]) / 100.0));
+        wheelctl_set_data(WHEELCTL_CURRENT, rCurr);
         wheelctl_set_data(WHEELCTL_TEMP, (decode2byte(KSdata[12], KSdata[13]) / 100.0));
         wheelctl_set_data(WHEELCTL_RMODE, KSdata[14]); // check this!!
     }

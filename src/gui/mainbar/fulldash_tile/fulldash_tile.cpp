@@ -100,6 +100,12 @@ static lv_obj_t *wbatt = NULL;
 static lv_obj_t *trip = NULL;
 static lv_style_t trip_label_style;
 static lv_style_t dashtime_style;
+//alert objects and styles
+static lv_obj_t *batt_alert = NULL;
+static lv_obj_t *current_alert = NULL;
+static lv_obj_t *temp_alert = NULL;
+static lv_style_t alert_style;
+
 //Overlay objects and styles
 static lv_obj_t *overlay_bar = NULL;
 static lv_obj_t *overlay_line = NULL;
@@ -205,6 +211,10 @@ void lv_define_styles_1(void)
     lv_style_init(&trip_label_style);
     lv_style_set_text_color(&trip_label_style, LV_STATE_DEFAULT, current_fg_clr);
     lv_style_set_text_font(&trip_label_style, LV_STATE_DEFAULT, &DIN1451_m_cond_44);
+
+    //alerts
+    lv_style_copy(&alert_style, style);
+    lv_style_set_bg_opa(&alert_style, LV_STATE_DEFAULT, LV_OPA_TRANSP);
 
     //overlay
     lv_style_copy(&overlay_style, style);
@@ -428,6 +438,33 @@ void lv_dashtime(void)
     lv_obj_align(trip, NULL, LV_ALIGN_IN_TOP_MID, 0, 25);
 }
 
+void lv_alerts(void) 
+{
+    batt_alert = lv_img_create(fulldash_cont, NULL);
+    lv_obj_reset_style_list(batt_alert, LV_OBJ_PART_MAIN);
+    lv_obj_set_size(batt_alert, 128, 128);
+    lv_obj_add_style(batt_alert, LV_OBJ_PART_MAIN, &alert_style);
+    //lv_img_set_src(batt_alert, &batt_alert_128px);
+    lv_obj_set_hidden(batt_alert, true);
+    lv_obj_align(batt_alert, NULL, LV_ALIGN_IN_BOTTOM_LEFT, 0, 0);
+
+    current_alert = lv_img_create(fulldash_cont, NULL);
+    lv_obj_reset_style_list(current_alert, LV_OBJ_PART_MAIN);
+    lv_obj_set_size(current_alert, 128, 128);
+    lv_obj_add_style(current_alert, LV_OBJ_PART_MAIN, &alert_style);
+    //lv_img_set_src(current_alert, &current_alert_128px);
+    lv_obj_set_hidden(current_alert, true);
+    lv_obj_align(current_alert, NULL, LV_ALIGN_IN_TOP_LEFT, 0, 0);
+
+    temp_alert = lv_img_create(fulldash_cont, NULL);
+    lv_obj_reset_style_list(temp_alert, LV_OBJ_PART_MAIN);
+    lv_obj_set_size(temp_alert, 128, 128);
+    lv_obj_add_style(temp_alert, LV_OBJ_PART_MAIN, &alert_style);
+    //lv_img_set_src(temp_alert, &temp_alert_128px);
+    lv_obj_set_hidden(temp_alert, true);
+    lv_obj_align(temp_alert, NULL, LV_ALIGN_IN_TOP_RIGHT, 0, 0);
+}
+
 void lv_overlay(void)
 {
     static lv_point_t line_points[] = {{0, lv_disp_get_ver_res(NULL)}, {lv_disp_get_hor_res(NULL), 0}};
@@ -528,7 +565,7 @@ static void lv_speed_update(void)
     }
     lv_arc_set_angles(speed_max_bar, ang_max, ang_max2);
 
-    int ang_avg = value2angle(speed_arc_start, speed_arc_end, 0, (tiltback_speed + 5), avg_speed, false);
+    int ang_avg = value2angle(speed_arc_start, speed_arc_end, 0, (tiltback_speed + 5), wheelctl_get_min_data(WHEELCTL_SPEED), false);
     int ang_avg2 = ang_avg + 3;
     if (ang_avg2 >= 360)
     {
@@ -639,19 +676,10 @@ void lv_current_update(void)
     {
         lv_style_set_line_color(&current_indic_style, LV_STATE_DEFAULT, current_fg_clr);
         lv_style_set_text_color(&current_label_style, LV_STATE_DEFAULT, current_fg_clr);
-        //stop_current_shake();
     }
     lv_obj_add_style(current_arc, LV_ARC_PART_INDIC, &current_indic_style);
 
-    if (rev_current_arc)
-    {
-        lv_arc_set_value(current_arc, (maxcurrent - amps));
-        //lv_arc_set_value(current_arc, 10);
-    }
-    else
-    {
-        lv_arc_set_value(current_arc, amps);
-    }
+    lv_arc_set_value(current_arc, amps);
 
     int ang_max = value2angle(current_arc_start, current_arc_end, 0, maxcurrent, wheelctl_get_max_data(WHEELCTL_CURRENT), rev_current_arc);
     int ang_max2 = ang_max + 3;
@@ -752,6 +780,7 @@ void updateTime()
     //int watchbatt = ttgo->power->getBattPercentage();
 
     int32_t watchbatt = pmu_get_battery_percent();
+    if (watchbatt > 99) watchbatt = 99;
 
     if (dashtime != nullptr)
     {

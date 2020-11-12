@@ -38,6 +38,7 @@
 #include "hardware/callback.h"
 #include "hardware/Kingsong.h"
 #include "hardware/dashboard.h"
+#include "hardware/wheelctl.h"
 
 TTGOClass *ttgo = TTGOClass::getWatch();
 
@@ -57,6 +58,7 @@ void setup()
 
     // force to store all new heap allocations in psram to get more internal ram
     heap_caps_malloc_extmem_enable( 1 );
+    
     display_setup();
 
     splash_screen_stage_one();
@@ -86,6 +88,9 @@ void setup()
     // enable to store data in normal heap
     splash_screen_stage_update( "alloc heap", 70 );
     heap_caps_malloc_extmem_enable( 16*1024 );
+
+    wheelctl_setup();
+
     //blectl_setup();
     splash_screen_stage_update( "init BLE", 80 );
     blectl_scan_setup();
