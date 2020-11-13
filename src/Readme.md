@@ -25,9 +25,8 @@ Completely rewritten using the My-TTGO-Watch as template, still only works with 
 - Adding wheel settings 
 - Adding wheel model autodetection
 ## Next steps
-- 
+- Add support for more wheel types Gotway will be implemented next
 ## Still todo
-- Add support for more wheel models
 - Add wheel selection setting
 - Add missing dash elements (ride mode and alert indicators)
 
