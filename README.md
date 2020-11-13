@@ -1,7 +1,9 @@
 # EUC-Dash-ESP32
 
 
-**2020-11-09 All features that was available in the old version now works plus a number of newly added features **
+**2020-11-09 All features that was available in the old version now works plus a number of newly added features**
+
+
 **2020-11-09 fixed a couple bugs causing issues with current and temperature arcs**
 
 
@@ -80,9 +82,11 @@ Reads BLE notifications from the electric unicycle and display data on the ESP32
 Only supports Kingsong wheels at the moment. Might work with Gotway as well since the protocols are very similar.
 ## Screenshot
 No screenshots for the new version yet, will add when I get the time. Screenshots are from Version 0.4
-<div>
-  <img src="https://github.com/Pickelhaupt/EUC-Dash-ESP32/raw/master/Images/fulldash-0.4-small.jpg" width="30%" align="left"/>
-  <img src="https://github.com/Pickelhaupt/EUC-Dash-ESP32/raw/master/Images/clock-0.4-small.jpg" width="30%" align="center"/>
+<div> 
+  <img src="https://github.com/Pickelhaupt/EUC-Dash-ESP32/raw/master/Images/20201114_005122-fix_proc.jpg" width="30%" align="left"/>
+  <img src="https://github.com/Pickelhaupt/EUC-Dash-ESP32/raw/master/Images/20201114_005212-fix_proc.jpg" width="30%" align="center"/>
+  <img src="https://github.com/Pickelhaupt/EUC-Dash-ESP32/raw/master/Images/20201114_005143-fix_proc.jpg" width="30%" align="left"/>
+  <img src="https://github.com/Pickelhaupt/EUC-Dash-ESP32/raw/master/Images/20201114_005231-fix_proc.jpg" width="30%" align="center"/>
 </div>
 
 ## Dependencies
