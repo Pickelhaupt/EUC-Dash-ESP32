@@ -34,6 +34,7 @@ Reads BLE notifications from the electric unicycle and display data on the ESP32
   - Around 6 hours when continuously connected
   - Around 1 day of standby and 4-5 hours of continuous riding
 - Wake up from accelerometer, button and double tap
+- long press on dashboard to toggle lights
 - Settings screen:
   - clock
   - dashboard
@@ -91,9 +92,12 @@ Some new screenshots, colours are a bit off though
 
 ## Dependencies
 ### Required libraries:
-- ESP32-BLE-Arduino
-- TTGO T-Watch Library
-- LVGL (The lvgl library that comes with the TTGO T-Watch Library needs to be updated to ver 7.5+)
+- TTGO T-Watch Library; modified version with LVGL 7.6
+- AsyncTCP@>=1.1.1
+- ArduinoJson@>=6.15.2
+- PubSubClient@>=2.8
+Required libraries will be downloaded automatically on first compile with PIO
+
 ## Bugs and issues
 - time zone settings only work if the wifi enable on wakeup setting is on when booting
 - wheel settings are not implemented yet, only the icons and a settings screen containing unrelated settings are present.
