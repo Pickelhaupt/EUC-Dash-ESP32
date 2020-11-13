@@ -26,6 +26,7 @@
 #include "callback.h"
 #include "json_psram_allocator.h"
 #include "alloc.h"
+#include "Kingsong.h"
 #include "powermgm.h"
 
 lv_task_t *speed_shake = nullptr;
@@ -46,11 +47,14 @@ void update_calc_battery(float value);
 void wheelctl_calc_power(float value);
 
 bool shakeoff[3] = {true, true, true};
+bool lightsoff;
 
 wheelctl_data_t wheelctl_data[WHEELCTL_DATA_NUM];
 wheelctl_constants_t wheelctl_constants[WHEELCTL_CONST_NUM];
+wheelctl_info_t wheelctl_info[WHEELCTL_INFO_NUM];
 
-void wheelctl_setup( void ){
+void wheelctl_setup(void)
+{
     wheelctl_data[WHEELCTL_SPEED].max_value = 0;
     wheelctl_data[WHEELCTL_SPEED].min_value = 0;
     wheelctl_data[WHEELCTL_BATTPCT].max_value = 0;
@@ -58,6 +62,8 @@ void wheelctl_setup( void ){
     wheelctl_data[WHEELCTL_CURRENT].max_value = 0;
     wheelctl_data[WHEELCTL_CURRENT].min_value = 0;
     wheelctl_data[WHEELCTL_TEMP].min_value = 0;
+    wheelctl_constants[WHEELCTL_CONST_LIGHTS].value = 0x01;
+    lightsoff = true;
     motor_vibe(5, true);
 }
 
@@ -120,17 +126,21 @@ void wheelctl_update_max_min(int entry, float value, bool update_min)
     }
 }
 
-void wheelctl_update_battpct_max_min(int entry, float value){
-    if (wheelctl_data[WHEELCTL_CURRENT].value >= 0) {
+void wheelctl_update_battpct_max_min(int entry, float value)
+{
+    if (wheelctl_data[WHEELCTL_CURRENT].value >= 0)
+    {
         wheelctl_update_max_min(entry, value, true);
     }
-    else {
+    else
+    {
         wheelctl_update_max_min(entry, value, false);
     }
 }
 
-void wheelctl_update_regen_current(int entry, float value) {
-        if (value < 0)
+void wheelctl_update_regen_current(int entry, float value)
+{
+    if (value < 0)
     {
         float negamp = (value * -1);
         if (negamp > wheelctl_data[entry].min_value)
@@ -140,7 +150,8 @@ void wheelctl_update_regen_current(int entry, float value) {
     }
 }
 
-void wheelctl_calc_power(float value) {
+void wheelctl_calc_power(float value)
+{
     wheelctl_set_data(WHEELCTL_POWER, wheelctl_data[WHEELCTL_CURRENT].value * value);
 }
 
@@ -149,26 +160,38 @@ void update_calc_battery(float value)
     int centivolt = value * 100;
     if (wheelctl_constants[WHEELCTL_CONST_BATTVOLT].value < 70)
     {
-        if (centivolt > 6680) wheelctl_set_data(WHEELCTL_BATTPCT, 100.0);
-        else if (centivolt > 5440) wheelctl_set_data(WHEELCTL_BATTPCT, (centivolt - 5320) / 13.6);
-        else if (centivolt > 5120) wheelctl_set_data(WHEELCTL_BATTPCT, (centivolt - 5120) / 36.0);
-        else wheelctl_set_data(WHEELCTL_BATTPCT, 0.0);
+        if (centivolt > 6680)
+            wheelctl_set_data(WHEELCTL_BATTPCT, 100.0);
+        else if (centivolt > 5440)
+            wheelctl_set_data(WHEELCTL_BATTPCT, (centivolt - 5320) / 13.6);
+        else if (centivolt > 5120)
+            wheelctl_set_data(WHEELCTL_BATTPCT, (centivolt - 5120) / 36.0);
+        else
+            wheelctl_set_data(WHEELCTL_BATTPCT, 0.0);
         return;
     }
-    else if (wheelctl_constants[WHEELCTL_CONST_BATTVOLT].value < 86) 
+    else if (wheelctl_constants[WHEELCTL_CONST_BATTVOLT].value < 86)
     {
-        if (centivolt > 8350) wheelctl_set_data(WHEELCTL_BATTPCT, 100.0);
-        else if (centivolt > 6810) wheelctl_set_data(WHEELCTL_BATTPCT, (centivolt - 6650) / 13.6);
-        else if (centivolt > 6420) wheelctl_set_data(WHEELCTL_BATTPCT, (centivolt - 6400) / 36.0);
-        else wheelctl_set_data(WHEELCTL_BATTPCT, 0.0);
+        if (centivolt > 8350)
+            wheelctl_set_data(WHEELCTL_BATTPCT, 100.0);
+        else if (centivolt > 6810)
+            wheelctl_set_data(WHEELCTL_BATTPCT, (centivolt - 6650) / 13.6);
+        else if (centivolt > 6420)
+            wheelctl_set_data(WHEELCTL_BATTPCT, (centivolt - 6400) / 36.0);
+        else
+            wheelctl_set_data(WHEELCTL_BATTPCT, 0.0);
         return;
     }
-    else if (wheelctl_constants[WHEELCTL_CONST_BATTVOLT].value < 105) 
+    else if (wheelctl_constants[WHEELCTL_CONST_BATTVOLT].value < 105)
     {
-        if (centivolt > 9986) wheelctl_set_data(WHEELCTL_BATTPCT, 100.0);
-        else if (centivolt > 8132) wheelctl_set_data(WHEELCTL_BATTPCT, (centivolt - 8040) / 13.6);
-        else if (centivolt > 7660) wheelctl_set_data(WHEELCTL_BATTPCT, (centivolt - 7660) / 36.0);
-        else wheelctl_set_data(WHEELCTL_BATTPCT, 0.0);
+        if (centivolt > 9986)
+            wheelctl_set_data(WHEELCTL_BATTPCT, 100.0);
+        else if (centivolt > 8132)
+            wheelctl_set_data(WHEELCTL_BATTPCT, (centivolt - 8040) / 13.6);
+        else if (centivolt > 7660)
+            wheelctl_set_data(WHEELCTL_BATTPCT, (centivolt - 7660) / 36.0);
+        else
+            wheelctl_set_data(WHEELCTL_BATTPCT, 0.0);
         return;
     }
 }
@@ -224,12 +247,29 @@ void wheelctl_set_constant(int entry, byte value)
     }
 }
 
+String wheelctl_get_info(int entry)
+{
+    if (entry < WHEELCTL_INFO_NUM)
+    {
+        return (wheelctl_info[entry].value);
+    }
+    return "undefined";
+}
+
+void wheelctl_set_info(int entry, String value)
+{
+    if (entry < WHEELCTL_INFO_NUM)
+    {
+        wheelctl_info[entry].value = value;
+    }
+}
+
 //Haptic feedback
 void update_speed_shake(float value)
 {
     if (value >= wheelctl_data[WHEELCTL_ALARM3].value && shakeoff[0])
     {
-        powermgm_set_event( POWERMGM_BMA_DOUBLECLICK );
+        powermgm_set_event(POWERMGM_BMA_TILT);
         speed_shake = lv_task_create(lv_speed_shake, 250, LV_TASK_PRIO_LOWEST, NULL);
         lv_task_ready(speed_shake);
         shakeoff[0] = false;
@@ -247,7 +287,7 @@ void update_current_shake(float value)
 {
     if (value >= (wheelctl_constants[WHEELCTL_CONST_MAXCURRENT].value * 0.75) && shakeoff[1] && current_shake != nullptr)
     {
-        powermgm_set_event( POWERMGM_BMA_DOUBLECLICK );
+        powermgm_set_event(POWERMGM_BMA_TILT);
         current_shake = lv_task_create(lv_current_shake, 500, LV_TASK_PRIO_LOWEST, NULL);
         lv_task_ready(current_shake);
         shakeoff[1] = false;
@@ -263,7 +303,7 @@ void update_temp_shake(float value)
 {
     if (value > wheelctl_constants[WHEELCTL_CONST_CRITTEMP].value && shakeoff[2])
     {
-        powermgm_set_event( POWERMGM_BMA_DOUBLECLICK );
+        powermgm_set_event(POWERMGM_BMA_TILT);
         temp_shake = lv_task_create(lv_temp_shake, 1000, LV_TASK_PRIO_LOWEST, NULL);
         lv_task_ready(temp_shake);
         shakeoff[2] = false;
@@ -291,3 +331,29 @@ static void lv_speed_shake(lv_task_t *speed_shake)
 {
     motor_vibe(10, true);
 } //End haptic feedback
+
+void wheelctl_toggle_lights(void)
+{
+    String wheeltype = wheelctl_info[WHEELCTL_INFO_MANUFACTURER].value;
+    if (wheeltype == "KS")
+    {
+        if (blectl_cli_getconnected()) ks_lights(lightsoff);
+        if (lightsoff) lightsoff = false; else lightsoff = true;
+    }
+    else if (wheeltype =="GW") {
+        //if (blectl_cli_getconnected()) gw_lights(lightsoff);
+        //if (lightsoff) lightsoff = false; else lightsoff = true;
+    }
+    else if (wheeltype =="IM") {
+        //if (blectl_cli_getconnected()) im_lights(lightsoff);
+        //if (lightsoff) lightsoff = false; else lightsoff = true;
+    }
+    else if (wheeltype =="NBZ") {
+        //if (blectl_cli_getconnected()) nbz_lights(lightsoff);
+        //if (lightsoff) lightsoff = false; else lightsoff = true;
+    }
+    else if (wheeltype =="NB") {
+        //if (blectl_cli_getconnected()) nb_lights(lightsoff);
+        //if (lightsoff) lightsoff = false; else lightsoff = true;
+    }
+}

@@ -492,6 +492,7 @@ static void overlay_event_cb(lv_obj_t * obj, lv_event_t event) {
     switch( event ) {
         case( LV_EVENT_LONG_PRESSED ):  Serial.println("long press on overlay");
         motor_vibe(5, true);
+        wheelctl_toggle_lights();
     }
 }
 

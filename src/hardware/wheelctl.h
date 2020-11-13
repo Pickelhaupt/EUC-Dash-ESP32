@@ -46,12 +46,25 @@
     } wheelctl_constants_t;
 
     enum { 
-        WHEELCTL_CONST_MAXCURRENT,  //Maximum current draw for wheel model
-        WHEELCTL_CONST_CRITTEMP,    //Critical internal temperature
-        WHEELCTL_CONST_WARNTEMP,    //internal temperature to trigger warning
-        WHEELCTL_CONST_BATTVOLT,    //Voltage of the battery pack for the wheel model
-        WHEELCTL_CONST_BATTWARN,    //Percentage of battery remaining when warning should be triggered for the specific wheel model        
+        WHEELCTL_CONST_MAXCURRENT,  //Maximum current draw for wheel model -required
+        WHEELCTL_CONST_CRITTEMP,    //Critical internal temperature -required, might e made optional
+        WHEELCTL_CONST_WARNTEMP,    //internal temperature to trigger warning -required, might e made optional
+        WHEELCTL_CONST_BATTVOLT,    //Voltage of the battery pack for the wheel model -required
+        WHEELCTL_CONST_BATTWARN,    //Percentage of battery remaining when warning should be triggered for the specific wheel model -required     
+        WHEELCTL_CONST_LIGHTS,      //lights toggle
         WHEELCTL_CONST_NUM          //number of wheel constants
+    };
+
+    typedef struct {
+        String value;
+    } wheelctl_info_t;
+
+    enum { 
+        WHEELCTL_INFO_SERIAL,       //Serial Numer
+        WHEELCTL_INFO_MANUFACTURER, //Wheel manufacturer value should be KS, GW, IM or NB -- make sure this is set when implementing a new wheel model
+        WHEELCTL_INFO_MODEL,        //Wheel model -- make sure the wheel ctl constants are set up for the specific model 
+        HEELCTL_INFO_VERSION,       //in case there are multiple versions for a specific model
+        WHEELCTL_INFO_NUM           //number of info entries
     };
 
     /** This wastes 80 bytes due to storing unused max and min floats for entries that doesn't need them
@@ -65,11 +78,11 @@
     } wheelctl_data_t;
 
     enum { 
-        WHEELCTL_VOLTAGE,   //Current battery voltage
-        WHEELCTL_SPEED,     //Current speed in kmh
+        WHEELCTL_VOLTAGE,   //Current battery voltage -required
+        WHEELCTL_SPEED,     //Current speed in kmh -required
         WHEELCTL_ODO,       //Total ride distance since new
-        WHEELCTL_CURRENT,   //Current current consumption
-        WHEELCTL_TEMP,      //Internal wheel temperature
+        WHEELCTL_CURRENT,   //Current current consumption -required
+        WHEELCTL_TEMP,      //Internal wheel temperature -required, might change to optional
         WHEELCTL_RMODE,     //Wheel ride mode
         WHEELCTL_BATTPCT,   //Calculated percentage of remaining battery
         WHEELCTL_POWER,     //Wheel power output
@@ -80,7 +93,7 @@
         WHEELCTL_ALARM1,    //Speed when first alarm is triggered
         WHEELCTL_ALARM2,    //Speed when second alarm is triggered
         WHEELCTL_ALARM3,    //Speed when third alarm is triggered
-        WHEELCTL_TILTBACK,  //Speed when tiltback is triggered
+        WHEELCTL_TILTBACK,  //Speed when tiltback is triggered  -required
         WHEELCTL_RIDETIME,  //Total time in motion since power on
         WHEELCTL_DATA_NUM   //number of data entries
     };
@@ -152,19 +165,43 @@
     /**
      * @brief get the  value of the wheel constant
      * 
-     * @param   entry     configitem: WHEELCTL_CONST_MAXCURRENT,  WHEELCTL_CONST_CRITTEMP, WHEELCTL_CONST_WARNTEMP,   WHEELCTL_CONST_BATTVOLT, WHEELCTL_CONST_BATTWARN
+     * @param   entry     configitem: WHEELCTL_CONST_MAXCURRENT,  WHEELCTL_CONST_CRITTEMP, 
+     * WHEELCTL_CONST_WARNTEMP,   WHEELCTL_CONST_BATTVOLT, WHEELCTL_CONST_BATTWARN
      * 
      * @return  uint8_t
      */
     byte wheelctl_get_constant( int entry );
 
     /**
-     * @brief set the min value for a specific wheel data entry
+     * @brief set the value of the wheel constant
      * 
-     * @param   entry     configitem: WHEELCTL_CONST_MAXCURRENT,  WHEELCTL_CONST_CRITTEMP, WHEELCTL_CONST_WARNTEMP,   WHEELCTL_CONST_BATTVOLT, WHEELCTL_CONST_BATTWARN
+     * @param   entry     configitem: WHEELCTL_CONST_MAXCURRENT, WHEELCTL_CONST_CRITTEMP, 
+     * WHEELCTL_CONST_WARNTEMP, WHEELCTL_CONST_BATTVOLT, WHEELCTL_CONST_BATTWARN
      * @param   value     the value of the constant
      */
     void wheelctl_set_constant( int entry, uint8_t value );
+
+    /**
+     * @brief get the value of the wheel info entry
+     * 
+     * @param   entry     configitem: WHEELCTL_INFO_SERIAL, WHEELCTL_INFO_MANUFACTURER, 
+     * WHEELCTL_INFO_MODEL, WHEELCTL_INFO_VERSION
+     * 
+     * @return  String
+     */
+    String wheelctl_get_info( int entry );
+
+    /**
+     * @brief set the value of the wheel info entry
+     * 
+     * @param   entry     configitem: WHEELCTL_INFO_SERIAL, WHEELCTL_INFO_MANUFACTURER, 
+     * WHEELCTL_INFO_MODEL, WHEELCTL_INFO_VERSION
+     * 
+     * @param   value     the value of the info entry
+     */
+    void wheelctl_set_info( int entry, String value );
+
+    void wheelctl_toggle_lights( void );
 
 
     #endif

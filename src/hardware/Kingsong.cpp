@@ -36,6 +36,9 @@ int add_ride_millis (void);
 byte KS_BLEreq[20];
 String wheelmodel = "KS14D";
 
+void ks_ble_set(byte parameter, byte value, byte value2);
+
+
 /**************************************************
    Decode big endian multi byte data from KS wheels
  **************************************************/
@@ -165,6 +168,35 @@ void ks_ble_request(byte reqtype)
     writeBLE(KS_BLEreq, 20);
 }
 
+void ks_lights(byte mode) {
+    byte byte2 = 0x12 + mode;
+    //ks_ble_set(0x73, 0x12 + mode, 0x01);
+    Serial.print("light setting = ");
+    Serial.println(byte2);
+    ks_ble_set(0x73, byte2, 0x01);
+}
+
+void ks_ble_set(byte parameter, byte value, byte value2)
+{
+    /****************************************************************
+      parameter is the byte representing the parameter to be set
+      0x73 -- Lights (0x00 or 0x01) value 2 required 0x01
+      0x87 -- pedals mode (0x00, 0x01, 0x02) value 2 required 0xE0
+      0x53 -- strobemode (0x00 or 0x01) value2 0x00
+      0x6C -- side led mode value2 0x00
+   *****************************************************************/
+    byte KS_BLEreq[20] = {0x00}; //set array to zero
+    KS_BLEreq[0] = 0xAA;         //Header byte 1
+    KS_BLEreq[1] = 0x55;         //Header byte 2
+    KS_BLEreq[2] = value;
+    KS_BLEreq[3] = value2;      //only required for certain settingd
+    KS_BLEreq[16] = parameter;     // This is the byte that specifies what data is requested
+    KS_BLEreq[17] = 0x14;        //Last 3 bytes also needed
+    KS_BLEreq[18] = 0x5A;
+    KS_BLEreq[19] = 0x5A;
+    writeBLE(KS_BLEreq, 20);
+}
+
 int add_ride_millis () {
     static unsigned long ride_millis;
     static unsigned long old_millis = 0;
@@ -181,6 +213,7 @@ void initks()
     //Setting of some model specific parametes,
     //Todo: automatic model identification
     setKSconstants(wheelmodel);
+    //setKSconstants(wheelctl_get_info(WHEELCTL_INFO_MODEL));
     /*****************************************
        Request Kingsong Model Name, serial number and speed settings
        This must be done before any BLE notifications will be pused by the KS wheel

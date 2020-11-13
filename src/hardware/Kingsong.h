@@ -59,6 +59,7 @@
 #include <TTGO.h>
 #include "callback.h"
 
+void ks_lights(byte mode);
 void decodeKS(byte KSData[]);
 void initks();
 

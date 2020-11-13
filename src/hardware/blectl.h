@@ -53,14 +53,32 @@
     /*
     * Default BLE UUIDs for various EUC mfgs
     */
+
+    #define DESCRIPTOR_UUID                                 BLEUUID("00002902-0000-1000-8000-00805f9b34fb")
+
     //Default UUIDs for KS wheels
     #define KS_SERVICE_UUID_1                               BLEUUID("0000fff0-0000-1000-8000-00805f9b34fb")
     #define KS_SERVICE_UUID_2                               BLEUUID("0000ffe0-0000-1000-8000-00805f9b34fb")
-    #define KS_CHAR_UUID                                    BLEUUID("0000ffe1-0000-1000-8000-00805f9b34fb") 
+    #define KS_CHAR_UUID                                    BLEUUID("0000ffe1-0000-1000-8000-00805f9b34fb")
+    #define KS_WRITE_CHAR_UUID                              BLEUUID("0000ffe1-0000-1000-8000-00805f9b34fb") 
     //Default UUIDs for GW wheels -- Not verified
     #define GW_SERVICE_UUID_1                               BLEUUID("0000fff0-0000-1000-8000-00805f9b34fb")
     #define GW_SERVICE_UUID_2                               BLEUUID("0000ffe0-0000-1000-8000-00805f9b34fb")
     #define GW_CHAR_UUID                                    BLEUUID("0000ffe1-0000-1000-8000-00805f9b34fb")
+    #define GW_WRITE_CHAR_UUID                              BLEUUID("0000ffe1-0000-1000-8000-00805f9b34fb")
+    //Default UUIDs for IM wheels -- Not verified
+    #define IM_SERVICE_UUID                                 BLEUUID("0000fff0-0000-1000-8000-00805f9b34fb")
+    #define IM_WRITE_SERVICE_UUID                           BLEUUID("0000ffe5-0000-1000-8000-00805f9b34fb")
+    #define IM_READ_CHAR_UUID                               BLEUUID("0000ffe4-0000-1000-8000-00805f9b34fb")
+    #define IM_WRITE_CHAR_UUID                              BLEUUID("0000ffe9-0000-1000-8000-00805f9b34fb")
+    //Default UUIDs for NB_Z wheels -- Not verified
+    #define NBZ_SERVICE_UUID                                 BLEUUID("6e400001-b5a3-f393-e0a9-e50e24dcca9e")
+    #define NBZ_READ_CHAR_UUID                               BLEUUID("6e400003-b5a3-f393-e0a9-e50e24dcca9e")
+    #define NBZ_WRITE_CHAR_UUID                              BLEUUID("6e400002-b5a3-f393-e0a9-e50e24dcca9e")
+    //Default UUIDs for older NB wheels -- Not verified
+    #define NB_SERVICE_UUID                                 BLEUUID("0000ffe0-0000-1000-8000-00805f9b34fb")
+    #define NB_READ_CHAR_UUID                               BLEUUID("0000ffe1-0000-1000-8000-00805f9b34fb")
+    #define NB_WRITE_CHAR_UUID                              BLEUUID("0000ffe1-0000-1000-8000-00805f9b34fb")
     //End Wheel config
 
     #define DEVICE_INFORMATION_SERVICE_UUID                 BLEUUID((uint16_t)0x180A)                           /** @brief Device Information server UUID */

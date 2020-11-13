@@ -25,6 +25,7 @@
 #include "hardware/Kingsong.h"
 #include "hardware/dashboard.h"
 #include "hardware/blectl.h"
+#include "hardware/motor.h"
 #include "hardware/wheelctl.h"
 
 //task declarations
@@ -318,6 +319,8 @@ void lv_sd_overlay(void)
 static void sd_overlay_event_cb(lv_obj_t * obj, lv_event_t event) {
     switch( event ) {
         case( LV_EVENT_LONG_PRESSED ):  Serial.println("long press on overlay");
+        motor_vibe(5, true);
+        wheelctl_toggle_lights();
     }
 }
 

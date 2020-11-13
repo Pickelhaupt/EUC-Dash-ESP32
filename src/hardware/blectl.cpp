@@ -38,6 +38,7 @@
 #include "json_psram_allocator.h"
 #include "alloc.h"
 #include "alloc.h"
+#include "wheelctl.h"
 #include "gui/mainbar/fulldash_tile/fulldash_tile.h"
 #include "gui/mainbar/simpledash_tile/simpledash_tile.h"
 #include "gui/mainbar/mainbar.h"
@@ -349,6 +350,9 @@ static void scanCompleteCB(BLEScanResults scanResults) {
 void blectl_cli_loop(void)
 {
     int scandelay = 15000;
+    String euctype = "KS"; //autodetect this
+    wheelctl_set_info(WHEELCTL_INFO_MANUFACTURER, euctype);
+
     if (clidoConnect)
     {
         if (connectToServer())
