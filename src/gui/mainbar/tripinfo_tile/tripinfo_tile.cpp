@@ -44,6 +44,9 @@ lv_style_t tripinfo_data_style;
 lv_obj_t *odometer_data;
 lv_obj_t *trip_data;
 lv_obj_t *max_speed_data;
+lv_obj_t *max_current_data;
+lv_obj_t *max_power_data;
+lv_obj_t *ride_time_data;
 
 void tripinfo_tile_setup(void)
 {
@@ -86,12 +89,48 @@ void tripinfo_setup_obj( void ) {
 
     lv_obj_t *trip_label = lv_label_create( tripinfo_cont, NULL);
     lv_obj_add_style( trip_label, LV_OBJ_PART_MAIN, &tripinfo_style );
-    lv_label_set_text( trip_label, "trip");
+    lv_label_set_text( trip_label, "trip meter");
     lv_obj_align( trip_label, odometer_label, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0 );
     trip_data = lv_label_create( tripinfo_cont, NULL);
     lv_obj_add_style( trip_data, LV_OBJ_PART_MAIN, &tripinfo_data_style  );
     lv_label_set_text( trip_data, "300 km");
-    lv_obj_align( trip_data, odometer_label, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
+    lv_obj_align( trip_data, odometer_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
+
+    lv_obj_t *max_speed_label = lv_label_create( tripinfo_cont, NULL);
+    lv_obj_add_style( max_speed_label, LV_OBJ_PART_MAIN, &tripinfo_style );
+    lv_label_set_text( max_speed_label, "max speed");
+    lv_obj_align( max_speed_label, trip_label, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0 );
+    max_speed_data = lv_label_create( tripinfo_cont, NULL);
+    lv_obj_add_style( max_speed_data, LV_OBJ_PART_MAIN, &tripinfo_data_style  );
+    lv_label_set_text( max_speed_data, "30 kmh");
+    lv_obj_align( max_speed_data, trip_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
+
+    lv_obj_t *max_current_label = lv_label_create( tripinfo_cont, NULL);
+    lv_obj_add_style( max_current_label, LV_OBJ_PART_MAIN, &tripinfo_style );
+    lv_label_set_text( max_current_label, "max current");
+    lv_obj_align( max_current_label, max_speed_label, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0 );
+    max_current_data = lv_label_create( tripinfo_cont, NULL);
+    lv_obj_add_style( max_current_data, LV_OBJ_PART_MAIN, &tripinfo_data_style  );
+    lv_label_set_text( max_current_data, "24 A");
+    lv_obj_align( max_current_data, max_speed_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
+
+    lv_obj_t *max_power_label = lv_label_create( tripinfo_cont, NULL);
+    lv_obj_add_style( max_power_label, LV_OBJ_PART_MAIN, &tripinfo_style );
+    lv_label_set_text( max_power_label, "max power");
+    lv_obj_align( max_power_label, max_current_label, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0 );
+    max_power_data = lv_label_create( tripinfo_cont, NULL);
+    lv_obj_add_style( max_power_data, LV_OBJ_PART_MAIN, &tripinfo_data_style  );
+    lv_label_set_text( max_power_data, "1300 W");
+    lv_obj_align( max_power_data, max_current_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
+
+    lv_obj_t *ride_time_label = lv_label_create( tripinfo_cont, NULL);
+    lv_obj_add_style( ride_time_label, LV_OBJ_PART_MAIN, &tripinfo_style );
+    lv_label_set_text( ride_time_label, "riding time");
+    lv_obj_align( ride_time_label, max_power_label, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0 );
+    ride_time_data = lv_label_create( tripinfo_cont, NULL);
+    lv_obj_add_style( ride_time_data, LV_OBJ_PART_MAIN, &tripinfo_data_style  );
+    lv_label_set_text( ride_time_data, "35 min");
+    lv_obj_align( ride_time_data, max_power_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
 }
 
 void tripinfo_activate_cb(void)
@@ -141,4 +180,25 @@ void tripinfo_update( void ) {
     }
     lv_label_set_text( trip_data, temp);
     lv_obj_align( trip_data, odometer_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
+
+    if (dashboard_get_config(DASHBOARD_IMPDIST)) {
+        float imptrip = wheelctl_get_max_data(WHEELCTL_SPEED) / 1.6;
+        snprintf( temp, sizeof( temp ), "%0.2f mph", imptrip );
+    } else {
+        snprintf( temp, sizeof( temp ), "%0.2f kmh", wheelctl_get_max_data(WHEELCTL_SPEED) );
+    }
+    lv_label_set_text( max_speed_data, temp);
+    lv_obj_align( max_speed_data, trip_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
+
+    snprintf( temp, sizeof( temp ), "%0.2f A", wheelctl_get_max_data(WHEELCTL_CURRENT) );
+    lv_label_set_text( max_current_data, temp);
+    lv_obj_align( max_current_data, max_speed_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
+
+    snprintf( temp, sizeof( temp ), "%0.1f W", wheelctl_get_max_data(WHEELCTL_POWER) );
+    lv_label_set_text( max_power_data, temp);
+    lv_obj_align( max_power_data, max_current_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
+
+    snprintf( temp, sizeof( temp ), "%0f s", wheelctl_get_data(WHEELCTL_RIDETIME) );
+    lv_label_set_text( ride_time_data, temp);
+    lv_obj_align( ride_time_data, max_power_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
 }

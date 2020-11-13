@@ -125,7 +125,7 @@ void lv_wheelinfo_task ( lv_task_t *wheelinfo_task )
 void wheelinfo_update( void ) {
     char temp[16]="";
     
-    snprintf( temp, sizeof( temp ), "%0.1f V", wheelctl_get_data(WHEELCTL_VOLTAGE) );
+    snprintf( temp, sizeof( temp ), "%0.2f V", wheelctl_get_data(WHEELCTL_VOLTAGE) );
     lv_label_set_text( voltage_data, temp);
     lv_obj_align( voltage_data, wheelinfo_cont, LV_ALIGN_IN_TOP_RIGHT, -5, 5 );
 
