@@ -9,6 +9,9 @@ Completely rewritten using the My-TTGO-Watch as template, still only works with 
 - Kingsong EUC support
 - OTA updates on wifi (no binary available yet)
 - Settings storage on flash
+- haptic feedback for speed, current and temperature
+- long press on dashboard to toggle lights
+- Store settings to flash
 - settings for:
   - clock
   - dashboard
@@ -20,15 +23,11 @@ Completely rewritten using the My-TTGO-Watch as template, still only works with 
   - wifi
 ## In progress:
 - Adding wheel settings 
-- Fix non working haptic feedback
+- Adding wheel model autodetection
 ## Next steps
-- Add gesture to turn off lights
-- Add info screens with trip data and wheel info
+- 
 ## Still todo
 - Add support for more wheel models
-- Add more advanced settings options
-- Add flash based settings storage
-- Add wheel model auto detection
 - Add wheel selection setting
 - Add missing dash elements (ride mode and alert indicators)
 
