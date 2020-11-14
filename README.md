@@ -1,7 +1,9 @@
 # EUC-Dash-ESP32
 
 
-**2020-11-09 All features that was available in the old version now works plus a number of newly added features **
+**2020-11-09 All features that was available in the old version now works plus a number of newly added features**
+
+
 **2020-11-09 fixed a couple bugs causing issues with current and temperature arcs**
 
 
@@ -32,6 +34,7 @@ Reads BLE notifications from the electric unicycle and display data on the ESP32
   - Around 6 hours when continuously connected
   - Around 1 day of standby and 4-5 hours of continuous riding
 - Wake up from accelerometer, button and double tap
+- long press on dashboard to toggle lights
 - Settings screen:
   - clock
   - dashboard
@@ -79,17 +82,22 @@ Reads BLE notifications from the electric unicycle and display data on the ESP32
 ### Supported Models
 Only supports Kingsong wheels at the moment. Might work with Gotway as well since the protocols are very similar.
 ## Screenshot
-No screenshots for the new version yet, will add when I get the time. Screenshots are from Version 0.4
-<div>
-  <img src="https://github.com/Pickelhaupt/EUC-Dash-ESP32/raw/master/Images/fulldash-0.4-small.jpg" width="30%" align="left"/>
-  <img src="https://github.com/Pickelhaupt/EUC-Dash-ESP32/raw/master/Images/clock-0.4-small.jpg" width="30%" align="center"/>
+Some new screenshots, colours are a bit off though
+<div> 
+  <img src="https://github.com/Pickelhaupt/EUC-Dash-ESP32/raw/master/Images/20201114_005122-fix_proc.jpg" width="20%" align="left"/>
+  <img src="https://github.com/Pickelhaupt/EUC-Dash-ESP32/raw/master/Images/20201114_005212-fix_proc.jpg" width="20%" align="center"/>
+  <img src="https://github.com/Pickelhaupt/EUC-Dash-ESP32/raw/master/Images/20201114_005143-fix_proc.jpg" width="20%" align="left"/>
+  <img src="https://github.com/Pickelhaupt/EUC-Dash-ESP32/raw/master/Images/20201114_005231-fix_proc.jpg" width="20%" align="center"/>
 </div>
 
 ## Dependencies
 ### Required libraries:
-- ESP32-BLE-Arduino
-- TTGO T-Watch Library
-- LVGL (The lvgl library that comes with the TTGO T-Watch Library needs to be updated to ver 7.5+)
+- TTGO T-Watch Library; modified version with LVGL 7.6
+- AsyncTCP@>=1.1.1
+- ArduinoJson@>=6.15.2
+- PubSubClient@>=2.8
+Required libraries will be downloaded automatically on first compile with PIO
+
 ## Bugs and issues
 - time zone settings only work if the wifi enable on wakeup setting is on when booting
 - wheel settings are not implemented yet, only the icons and a settings screen containing unrelated settings are present.
