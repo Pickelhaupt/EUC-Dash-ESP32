@@ -77,15 +77,19 @@ void tripinfo_setup_styles( void ) {
 }
 
 void tripinfo_setup_obj( void ) {
+    lv_obj_t *heading_label = lv_label_create( tripinfo_cont, NULL);
+    lv_obj_add_style( heading_label, LV_OBJ_PART_MAIN, &tripinfo_heading_style );
+    lv_label_set_text( heading_label, "trip information");
+    lv_obj_align( heading_label, tripinfo_cont, LV_ALIGN_IN_TOP_MID, 0, 5 );
 
     lv_obj_t *odometer_label = lv_label_create( tripinfo_cont, NULL);
     lv_obj_add_style( odometer_label, LV_OBJ_PART_MAIN, &tripinfo_style );
     lv_label_set_text( odometer_label, "odometer");
-    lv_obj_align( odometer_label, tripinfo_cont, LV_ALIGN_IN_TOP_LEFT, 5, 5 );
+    lv_obj_align( odometer_label, tripinfo_cont, LV_ALIGN_IN_TOP_LEFT, 5, 30 );
     odometer_data = lv_label_create( tripinfo_cont, NULL);
     lv_obj_add_style( odometer_data, LV_OBJ_PART_MAIN, &tripinfo_data_style  );
     lv_label_set_text( odometer_data, "300 km");
-    lv_obj_align( odometer_data, tripinfo_cont, LV_ALIGN_IN_TOP_RIGHT, -5, 5 );
+    lv_obj_align( odometer_data, tripinfo_cont, LV_ALIGN_IN_TOP_RIGHT, -5, 30 );
 
     lv_obj_t *trip_label = lv_label_create( tripinfo_cont, NULL);
     lv_obj_add_style( trip_label, LV_OBJ_PART_MAIN, &tripinfo_style );
@@ -170,7 +174,7 @@ void tripinfo_update( void ) {
         snprintf( temp, sizeof( temp ), "%0.1f km", wheelctl_get_data(WHEELCTL_ODO) );
     }
     lv_label_set_text( odometer_data, temp);
-    lv_obj_align( odometer_data, tripinfo_cont, LV_ALIGN_IN_TOP_RIGHT, -5, 5 );
+    lv_obj_align( odometer_data, tripinfo_cont, LV_ALIGN_IN_TOP_RIGHT, -5, 30 );
 
     if (dashboard_get_config(DASHBOARD_IMPDIST)) {
         float imptrip = wheelctl_get_data(WHEELCTL_TRIP) / 1.6;
@@ -198,7 +202,7 @@ void tripinfo_update( void ) {
     lv_label_set_text( max_power_data, temp);
     lv_obj_align( max_power_data, max_current_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
 
-    snprintf( temp, sizeof( temp ), "%0f s", wheelctl_get_data(WHEELCTL_RIDETIME) );
+    snprintf( temp, sizeof( temp ), "%0.0f s", wheelctl_get_data(WHEELCTL_RIDETIME) );
     lv_label_set_text( ride_time_data, temp);
     lv_obj_align( ride_time_data, max_power_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
 }

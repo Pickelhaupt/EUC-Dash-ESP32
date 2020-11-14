@@ -45,9 +45,12 @@ void wheelctl_update_regen_current(int entry, float value);
 void wheelctl_update_battpct_max_min(int entry, float value);
 void update_calc_battery(float value);
 void wheelctl_calc_power(float value);
+void wheelctl_update_ridetime(float uptime);
+
 
 bool shakeoff[3] = {true, true, true};
 bool lightsoff;
+float old_uptime = 0;
 
 wheelctl_data_t wheelctl_data[WHEELCTL_DATA_NUM];
 wheelctl_constants_t wheelctl_constants[WHEELCTL_CONST_NUM];
@@ -110,8 +113,21 @@ void wheelctl_set_data(int entry, float value)
         case WHEELCTL_BATTPCT:
             wheelctl_update_battpct_max_min(entry, value);
             break;
+        case WHEELCTL_POWER:
+            wheelctl_update_max_min(entry, value, false);
+            break;
+        case WHEELCTL_UPTIME:
+            wheelctl_update_ridetime(value);
+            break;
         }
     }
+}
+
+void wheelctl_update_ridetime( float uptime ) {
+    if (wheelctl_data[WHEELCTL_SPEED].value >= MIN_RIDE_SPEED) {
+        wheelctl_data[WHEELCTL_RIDETIME].value =+ (uptime - old_uptime);
+    }
+    old_uptime = uptime;
 }
 
 void wheelctl_update_max_min(int entry, float value, bool update_min)
@@ -152,7 +168,7 @@ void wheelctl_update_regen_current(int entry, float value)
 
 void wheelctl_calc_power(float value)
 {
-    wheelctl_set_data(WHEELCTL_POWER, wheelctl_data[WHEELCTL_CURRENT].value * value);
+    wheelctl_set_data(WHEELCTL_POWER, wheelctl_data[WHEELCTL_VOLTAGE].value * value);
 }
 
 void update_calc_battery(float value)

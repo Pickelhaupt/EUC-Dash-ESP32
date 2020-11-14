@@ -143,7 +143,7 @@ void decodeKS(byte KSdata[])
         wheelctl_set_data(WHEELCTL_ALARM3, KSdata[8]);
         wheelctl_set_data(WHEELCTL_TILTBACK, KSdata[10]);
     }
-    wheelctl_set_data(WHEELCTL_RIDETIME,  (add_ride_millis() / 1000));
+    //wheelctl_set_data(WHEELCTL_RIDETIME, (add_ride_millis() / 1000));
 } // End decodeKS
 
 void ks_ble_request(byte reqtype)

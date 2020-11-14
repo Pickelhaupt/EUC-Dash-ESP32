@@ -76,14 +76,19 @@ void wheelinfo_setup_styles( void ) {
 
 void wheelinfo_setup_obj( void ) {
 
+    lv_obj_t *heading_label = lv_label_create( wheelinfo_cont, NULL);
+    lv_obj_add_style( heading_label, LV_OBJ_PART_MAIN, &wheelinfo_heading_style );
+    lv_label_set_text( heading_label, "wheel information");
+    lv_obj_align( heading_label, wheelinfo_cont, LV_ALIGN_IN_TOP_MID, 0, 5 );
+
     lv_obj_t *voltage_label = lv_label_create( wheelinfo_cont, NULL);
     lv_obj_add_style( voltage_label, LV_OBJ_PART_MAIN, &wheelinfo_style );
     lv_label_set_text( voltage_label, "battery voltage");
-    lv_obj_align( voltage_label, wheelinfo_cont, LV_ALIGN_IN_TOP_LEFT, 5, 5 );
+    lv_obj_align( voltage_label, wheelinfo_cont, LV_ALIGN_IN_TOP_LEFT, 5, 30 );
     voltage_data = lv_label_create( wheelinfo_cont, NULL);
     lv_obj_add_style( voltage_data, LV_OBJ_PART_MAIN, &wheelinfo_data_style  );
     lv_label_set_text( voltage_data, "67 V");
-    lv_obj_align( voltage_data, wheelinfo_cont, LV_ALIGN_IN_TOP_RIGHT, -5, 5 );
+    lv_obj_align( voltage_data, wheelinfo_cont, LV_ALIGN_IN_TOP_RIGHT, -5, 30 );
 
     lv_obj_t *current_label = lv_label_create( wheelinfo_cont, NULL);
     lv_obj_add_style( current_label, LV_OBJ_PART_MAIN, &wheelinfo_style );
@@ -127,7 +132,7 @@ void wheelinfo_update( void ) {
     
     snprintf( temp, sizeof( temp ), "%0.2f V", wheelctl_get_data(WHEELCTL_VOLTAGE) );
     lv_label_set_text( voltage_data, temp);
-    lv_obj_align( voltage_data, wheelinfo_cont, LV_ALIGN_IN_TOP_RIGHT, -5, 5 );
+    lv_obj_align( voltage_data, wheelinfo_cont, LV_ALIGN_IN_TOP_RIGHT, -5, 30 );
 
     snprintf( temp, sizeof( temp ), "%0.2f A", wheelctl_get_data(WHEELCTL_CURRENT) );
     lv_label_set_text( current_data, temp);
