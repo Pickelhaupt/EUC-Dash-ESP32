@@ -78,23 +78,45 @@ LV_FONT_DECLARE(DIN1451_m_cond_180);
 // Bitmaps
 
 //Functions
-    /**
-     * @brief setup the full dashboard tile
-     */
+/**
+* @brief setup the full dashboard tile
+*/
 void fulldash_tile_setup(void);
 //Functions
-    /**
-     * @brief reload the full dashboard tile
-     */
+/**
+* @brief reload the full dashboard tile
+*/
 void fulldash_tile_reload ( void );
 /**
-     * @brief get the tile number for the full dashboard tile
-     * 
-     * @return  tile number
-     */
+* @brief get the tile number for the full dashboard tile
+* 
+* @return  tile number
+*/
 uint32_t fulldash_get_tile (void);
+/**
+* @brief update speed arc and label
+*/
+void fulldash_speed_update(void);
+/**
+* @brief update battery arc and label
+*/
+void fulldash_batt_update(void);
+/**
+* @brief update current arc and label
+*/
+void fulldash_current_update(void);
+/**
+* @brief update temperature arc and label
+*/
+void fulldash_temp_update(void);
+/**
+* @brief update overlay
+*/
+void fulldash_overlay_update();
+
 
 //variable declarations
 // extern struct Wheel_constants wheelconst;
+extern bool fulldash_active;
 
 #endif // _FULLDASH_TILE_H

@@ -28,6 +28,9 @@
 #include "alloc.h"
 #include "Kingsong.h"
 #include "powermgm.h"
+#include "gui/mainbar/fulldash_tile/fulldash_tile.h"
+#include "gui/mainbar/simpledash_tile/simpledash_tile.h"
+#include "gui/mainbar/mainbar.h"
 
 lv_task_t *speed_shake = nullptr;
 lv_task_t *current_shake = nullptr;
@@ -79,39 +82,53 @@ float wheelctl_get_data(int entry)
     return 0;
 }
 
+void dash_speed_update(){
+    if (fulldash_active) fulldash_speed_update();
+    if (simpledash_active) simpledash_speed_update();
+}
+void dash_batt_update(){
+    if (fulldash_active) fulldash_batt_update();
+    if (simpledash_active) simpledash_batt_update();
+}
+void dash_current_update(){
+    if (fulldash_active) fulldash_current_update();
+    if (simpledash_active) simpledash_current_update();
+}
+void dash_temp_update(){
+    if (fulldash_active) fulldash_temp_update();
+}
+
 void wheelctl_set_data(int entry, float value)
 {
     if (entry < WHEELCTL_DATA_NUM)
     {
         wheelctl_data[entry].value = value;
-        /* debug
-        Serial.print("Wheeldata entry: ");
-        Serial.print(entry);
-        Serial.print(" value: ");
-        Serial.println(value);
-        */
         switch (entry)
         {
-        case WHEELCTL_VOLTAGE:
-            wheelctl_update_max_min(entry, value, true);
-            update_calc_battery(value);
-            break;
         case WHEELCTL_SPEED:
             update_speed_shake(value);
             wheelctl_update_max_min(entry, value, false);
+            dash_speed_update();
             break;
         case WHEELCTL_CURRENT:
             update_current_shake(value);
             wheelctl_update_max_min(entry, value, false);
             wheelctl_update_regen_current(entry, value);
             wheelctl_calc_power(value);
+            dash_current_update();
+            break;
+        case WHEELCTL_VOLTAGE:
+            wheelctl_update_max_min(entry, value, true);
+            update_calc_battery(value);
             break;
         case WHEELCTL_TEMP:
             update_temp_shake(value);
             wheelctl_update_max_min(entry, value, true);
+            dash_temp_update(); 
             break;
         case WHEELCTL_BATTPCT:
             wheelctl_update_battpct_max_min(entry, value);
+            dash_batt_update();
             break;
         case WHEELCTL_POWER:
             wheelctl_update_max_min(entry, value, false);

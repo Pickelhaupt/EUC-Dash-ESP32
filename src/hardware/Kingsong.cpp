@@ -38,7 +38,6 @@ String wheelmodel = "KS14D";
 
 void ks_ble_set(byte parameter, byte value, byte value2);
 
-
 /**************************************************
    Decode big endian multi byte data from KS wheels
  **************************************************/
@@ -168,9 +167,8 @@ void ks_ble_request(byte reqtype)
     writeBLE(KS_BLEreq, 20);
 }
 
-void ks_lights(byte mode) {
+void ks_lights(byte mode) { //0=on, 1=off
     byte byte2 = 0x12 + mode;
-    //ks_ble_set(0x73, 0x12 + mode, 0x01);
     Serial.print("light setting = ");
     Serial.println(byte2);
     ks_ble_set(0x73, byte2, 0x01);

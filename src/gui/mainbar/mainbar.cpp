@@ -175,6 +175,11 @@ lv_style_t *mainbar_get_knob_style( void ) {
      return( &mainbar_knob_style );
 }
 
+uint32_t mainbar_get_active_tile( void ){
+    uint32_t active_tile = *((uint32_t *)lv_event_get_data ());
+    return active_tile;
+}
+
 void mainbar_event_cb(lv_obj_t * obj, lv_event_t event) {
     if(event == LV_EVENT_VALUE_CHANGED)
     { 

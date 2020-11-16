@@ -159,6 +159,12 @@
     void mainbar_tilevent_action();
 
     void mainbar_event_cb(lv_obj_t * obj, lv_event_t event);
+    /**
+     * @brief get active tile number
+     * 
+     * @return  active tile number
+     */
+    uint32_t mainbar_get_active_tile( void );
 
 
 #endif // _MAINBAR_H

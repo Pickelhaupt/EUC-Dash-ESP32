@@ -38,8 +38,6 @@ static void lv_time_task(lv_task_t *time_task);
 static void overlay_event_cb(lv_obj_t * obj, lv_event_t event);
 
 void updateTime();
-void stop_time_task();
-void stop_dash_task();
 
 /*
    Declare LVGL Dashboard objects and styles
@@ -54,24 +52,24 @@ static lv_style_t arc_warn_style;
 static lv_style_t arc_crit_style;
 //Speed
 static lv_obj_t *speed_arc = NULL;
-static lv_obj_t *speed_warn_arc = NULL;
-static lv_obj_t *speed_crit_arc = NULL;
+//static lv_obj_t *speed_warn_arc = NULL;
+//static lv_obj_t *speed_crit_arc = NULL;
 static lv_obj_t *speed_label = NULL;
 static lv_style_t speed_indic_style;
 static lv_style_t speed_main_style;
 static lv_style_t speed_label_style;
 //Battery
 static lv_obj_t *batt_arc = NULL;
-static lv_obj_t *batt_warn_arc = NULL;
-static lv_obj_t *batt_crit_arc = NULL;
+//static lv_obj_t *batt_warn_arc = NULL;
+//static lv_obj_t *batt_crit_arc = NULL;
 static lv_obj_t *batt_label = NULL;
 static lv_style_t batt_indic_style;
 static lv_style_t batt_main_style;
 static lv_style_t batt_label_style;
 //Current
 static lv_obj_t *current_arc = NULL;
-static lv_obj_t *current_warn_arc = NULL;
-static lv_obj_t *current_crit_arc = NULL;
+//static lv_obj_t *current_warn_arc = NULL;
+//static lv_obj_t *current_crit_arc = NULL;
 static lv_obj_t *current_label = NULL;
 static lv_style_t current_indic_style;
 static lv_style_t current_main_style;
@@ -126,6 +124,7 @@ int arclinew = 15; // line width of arc gauges
 int arc_spacing = 7;
 bool rev_batt_arc = true;
 bool rev_current_arc = false;
+bool fulldash_active = false;
 
 //int display_xres = lv_disp_get_hor_res( NULL );
 //int display_yres = lv_disp_get_ver_res( NULL );
@@ -532,7 +531,7 @@ int value2angle(int arcstart, int arcstop, float minvalue, float maxvalue, float
    runs every 250ms
  ***************************************************************/
 
-static void lv_speed_update(void)
+void fulldash_speed_update(void)
 {
     float tiltback_speed = wheelctl_get_data(WHEELCTL_TILTBACK);
     float current_speed = wheelctl_get_data(WHEELCTL_SPEED);
@@ -596,7 +595,7 @@ static void lv_speed_update(void)
     lv_obj_align(speed_label, fulldash_cont, LV_ALIGN_CENTER, 0, -3);
 }
 
-void lv_batt_update(void)
+void fulldash_batt_update(void)
 {
     float current_battpct = wheelctl_get_data(WHEELCTL_BATTPCT);
 
@@ -652,7 +651,7 @@ void lv_batt_update(void)
     lv_obj_align(batt_label, fulldash_cont, LV_ALIGN_CENTER, 0, 75);
 }
 
-void lv_current_update(void)
+void fulldash_current_update(void)
 {
     // Set warning and alert colour
     byte maxcurrent = wheelctl_get_constant(WHEELCTL_CONST_MAXCURRENT);
@@ -708,7 +707,7 @@ void lv_current_update(void)
     lv_obj_align(current_label, fulldash_cont, LV_ALIGN_CENTER, -64, 0);
 }
 
-void lv_temp_update(void)
+void fulldash_temp_update(void)
 {
     byte crit_temp = wheelctl_get_constant(WHEELCTL_CONST_CRITTEMP);
     float current_temp = wheelctl_get_data(WHEELCTL_TEMP);
@@ -752,7 +751,7 @@ void lv_temp_update(void)
     lv_obj_align(temp_label, fulldash_cont, LV_ALIGN_CENTER, 64, 0);
 } // update
 
-void lv_overlay_update()
+void fulldash_overlay_update()
 {
     if (blectl_cli_getconnected())
     {
@@ -820,32 +819,18 @@ static void lv_dash_task(lv_task_t *dash_task)
 {
     if (blectl_cli_getconnected())
     {
-        lv_speed_update();
-        lv_batt_update();
-        lv_current_update();
-        lv_temp_update();
+        fulldash_speed_update();
+        fulldash_batt_update();
+        fulldash_current_update();
+        fulldash_temp_update();
     }
-    lv_overlay_update();
+    fulldash_overlay_update();
 }
 
 static void lv_time_task(lv_task_t *time_task)
 {
     updateTime();
-}
-
-void stop_dash_task()
-{
-    Serial.println("check if dash is running");
-    if (dash_task != nullptr)
-    {
-        Serial.println("shutting down dash");
-        lv_task_del(dash_task);
-    }
-    if (time_task != nullptr)
-    {
-        Serial.println("shutting down dashclock");
-        lv_task_del(time_task);
-    }
+    fulldash_overlay_update();
 }
 
 uint32_t fulldash_get_tile(void)
@@ -857,14 +842,16 @@ void fulldash_activate_cb(void)
 {
     time_task = lv_task_create(lv_time_task, 2000, LV_TASK_PRIO_LOWEST, NULL);
     lv_task_ready(time_task);
-    dash_task = lv_task_create(lv_dash_task, 250, LV_TASK_PRIO_LOWEST, NULL);
-    lv_task_ready(dash_task);
+    fulldash_active = true;
+    //dash_task = lv_task_create(lv_dash_task, 250, LV_TASK_PRIO_LOWEST, NULL);
+    //lv_task_ready(dash_task);
 }
 
 void fulldash_hibernate_cb(void)
 {
-    lv_task_del(time_task);
-    lv_task_del(dash_task);
+    if (time_task != nullptr) lv_task_del(time_task);
+    fulldash_active = false;
+    //if (dash_task != nullptr) lv_task_del(dash_task);
 }
 
 void fulldash_tile_reload(void)

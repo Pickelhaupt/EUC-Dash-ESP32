@@ -30,12 +30,12 @@
 
 //task declarations
 lv_task_t *sd_dash_task = nullptr;
+lv_task_t *overlay_task = nullptr;
 
 // Function declarations
 static void lv_sd_dash_task(lv_task_t *sd_dash_task);
-static void sd_overlay_event_cb(lv_obj_t * obj, lv_event_t event);
-
-void sd_stop_dash_task();
+static void simpledash_overlay_task(lv_task_t *overlay_task);
+static void sd_overlay_event_cb(lv_obj_t *obj, lv_event_t event);
 
 /*
    Declare LVGL Dashboard objects and styles
@@ -47,36 +47,36 @@ static lv_style_t sd_arc_style;
 
 // Arc gauges and labels
 //arc background styles
-static lv_style_t sd_arc_warn_style;
-static lv_style_t sd_arc_crit_style;
+//static lv_style_t sd_arc_warn_style;
+//static lv_style_t sd_arc_crit_style;
 //Speed
 static lv_obj_t *sd_speed_arc = nullptr;
-static lv_obj_t *sd_speed_warn_arc = nullptr;
-static lv_obj_t *sd_speed_crit_arc = nullptr;
+//static lv_obj_t *sd_speed_warn_arc = nullptr;
+//static lv_obj_t *sd_speed_crit_arc = nullptr;
 static lv_obj_t *sd_speed_label = nullptr;
-static lv_style_t sd_speed_indic_style;
-static lv_style_t sd_speed_main_style;
+//static lv_style_t sd_speed_indic_style;
+//static lv_style_t sd_speed_main_style;
 static lv_style_t sd_speed_label_style;
 //Battery
 static lv_obj_t *sd_batt_arc = nullptr;
-static lv_obj_t *sd_batt_warn_arc = nullptr;
-static lv_obj_t *sd_batt_crit_arc = nullptr;
-static lv_obj_t *sd_batt_label = nullptr;
+//static lv_obj_t *sd_batt_warn_arc = nullptr;
+//static lv_obj_t *sd_batt_crit_arc = nullptr;
+//static lv_obj_t *sd_batt_label = nullptr;
 static lv_style_t sd_batt_indic_style;
 static lv_style_t sd_batt_main_style;
-static lv_style_t sd_batt_label_style;
+//static lv_style_t sd_batt_label_style;
 //Current
 static lv_obj_t *sd_current_arc = nullptr;
-static lv_obj_t *sd_current_warn_arc = nullptr;
-static lv_obj_t *sd_current_crit_arc = nullptr;
-static lv_obj_t *sd_current_label = nullptr;
+//static lv_obj_t *sd_current_warn_arc = nullptr;
+//static lv_obj_t *sd_current_crit_arc = nullptr;
+//static lv_obj_t *sd_current_label = nullptr;
 static lv_style_t sd_current_indic_style;
 static lv_style_t sd_current_main_style;
-static lv_style_t sd_current_label_style;
+//static lv_style_t sd_current_label_style;
 
 //Max min avg bars
-static lv_obj_t *sd_speed_avg_bar = nullptr;
-static lv_obj_t *sd_speed_max_bar = nullptr;
+//static lv_obj_t *sd_speed_avg_bar = nullptr;
+//static lv_obj_t *sd_speed_max_bar = nullptr;
 static lv_obj_t *sd_batt_max_bar = nullptr;
 static lv_obj_t *sd_batt_min_bar = nullptr;
 static lv_obj_t *sd_current_max_bar = nullptr;
@@ -105,6 +105,7 @@ int sd_current_arc_end = 70;
 bool sd_rev_current_arc = true;
 int sd_arclinew = 25; // line width of arc gauges
 bool sd_display_bars = true;
+bool simpledash_active = false;
 
 int sd_out_arc_x = 240;
 int sd_out_arc_y = 240;
@@ -127,8 +128,6 @@ void lv_sd_define_styles_1(void)
     lv_style_set_border_opa(&sd_arc_style, LV_STATE_DEFAULT, LV_OPA_TRANSP);
 
     //General styles
-    lv_style_copy(&sd_arc_warn_style, &sd_arc_style);
-    lv_style_set_line_opa(&sd_arc_warn_style, LV_STATE_DEFAULT, LV_OPA_TRANSP);
 
     //Speed label
     lv_style_init(&sd_speed_label_style);
@@ -177,7 +176,6 @@ void lv_sd_define_styles_1(void)
 
 void lv_sd_speed_arc_1(void)
 {
-    float tiltback_speed = wheelctl_get_data(WHEELCTL_TILTBACK);
     float current_speed = wheelctl_get_data(WHEELCTL_SPEED);
     //Label
     sd_speed_label = lv_label_create(simpledash_cont, NULL);
@@ -255,7 +253,6 @@ void lv_sd_current_arc_1(void)
 {
     //Create current gauge arc
     byte maxcurrent = wheelctl_get_constant(WHEELCTL_CONST_MAXCURRENT);
-    float current_current = wheelctl_get_data(WHEELCTL_CURRENT);
     //Arc
     sd_current_arc = lv_arc_create(simpledash_cont, NULL);
     lv_obj_reset_style_list(sd_current_arc, LV_OBJ_PART_MAIN);
@@ -304,7 +301,7 @@ void lv_sd_overlay(void)
     lv_obj_add_style(sd_overlay_bar, LV_OBJ_PART_MAIN, &sd_overlay_style);
     lv_obj_align(sd_overlay_bar, NULL, LV_ALIGN_CENTER, 0, 0);
     mainbar_add_slide_element(sd_overlay_bar);
-    lv_obj_set_event_cb( sd_overlay_bar, sd_overlay_event_cb );
+    lv_obj_set_event_cb(sd_overlay_bar, sd_overlay_event_cb);
 
     sd_overlay_line = lv_line_create(sd_overlay_bar, NULL);
     lv_line_set_points(sd_overlay_line, line_points, 2);
@@ -312,13 +309,16 @@ void lv_sd_overlay(void)
     lv_obj_add_style(sd_overlay_line, LV_OBJ_PART_MAIN, &sd_overlay_style);
     lv_obj_align(sd_overlay_line, NULL, LV_ALIGN_CENTER, 0, 0);
     mainbar_add_slide_element(sd_overlay_line);
-    lv_obj_set_event_cb( sd_overlay_line, sd_overlay_event_cb );
+    lv_obj_set_event_cb(sd_overlay_line, sd_overlay_event_cb);
 
 } //End Create Dashboard objects
 
-static void sd_overlay_event_cb(lv_obj_t * obj, lv_event_t event) {
-    switch( event ) {
-        case( LV_EVENT_LONG_PRESSED ):  Serial.println("long press on overlay");
+static void sd_overlay_event_cb(lv_obj_t *obj, lv_event_t event)
+{
+    switch (event)
+    {
+    case (LV_EVENT_LONG_PRESSED):
+        Serial.println("long press on overlay");
         motor_vibe(5, true);
         wheelctl_toggle_lights();
     }
@@ -360,7 +360,7 @@ int sd_value2angle(int arcstart, int arcstop, float minvalue, float maxvalue, fl
    runs every 250ms
  ***************************************************************/
 
-static void lv_sd_speed_update(void)
+void simpledash_speed_update(void)
 {
     float tiltback_speed = wheelctl_get_data(WHEELCTL_TILTBACK);
     float current_speed = wheelctl_get_data(WHEELCTL_SPEED);
@@ -382,7 +382,8 @@ static void lv_sd_speed_update(void)
     lv_obj_add_style(sd_speed_label, LV_LABEL_PART_MAIN, &sd_speed_label_style);
     char speedstring[4];
     float converted_speed = current_speed;
-    if (dashboard_get_config(DASHBOARD_IMPDIST)) {
+    if (dashboard_get_config(DASHBOARD_IMPDIST))
+    {
         converted_speed = current_speed / 1.6;
     }
     if (converted_speed > 10)
@@ -398,7 +399,7 @@ static void lv_sd_speed_update(void)
     lv_obj_align(sd_speed_label, sd_speed_arc, LV_ALIGN_CENTER, 0, 8);
 }
 
-void lv_sd_batt_update(void)
+void simpledash_batt_update(void)
 {
     float current_battpct = wheelctl_get_data(WHEELCTL_BATTPCT);
     if (current_battpct < 10)
@@ -439,61 +440,64 @@ void lv_sd_batt_update(void)
     }
 }
 
-void lv_sd_current_update(void)
+void simpledash_current_update(void)
 {
-    // Set warning and alert colour
-    byte maxcurrent = wheelctl_get_constant(WHEELCTL_CONST_MAXCURRENT);
-    float current_current = wheelctl_get_data(WHEELCTL_CURRENT);
-    float amps = current_current;
+    if (dashboard_get_config(DASHBOARD_CURRENT))
+    {
+        // Set warning and alert colour
+        byte maxcurrent = wheelctl_get_constant(WHEELCTL_CONST_MAXCURRENT);
+        float current_current = wheelctl_get_data(WHEELCTL_CURRENT);
+        float amps = current_current;
 
-    if (current_current > (maxcurrent * 0.75))
-    {
-        lv_style_set_line_color(&sd_current_indic_style, LV_STATE_DEFAULT, LV_COLOR_RED);
-    }
-    else if (current_current > (maxcurrent * 0.5))
-    {
-        lv_style_set_line_color(&sd_current_indic_style, LV_STATE_DEFAULT, LV_COLOR_YELLOW);
-    }
-    else if (current_current < 0)
-    {
-        lv_style_set_line_color(&sd_current_indic_style, LV_STATE_DEFAULT, sd_speed_fg_clr);
-        amps = (current_current * -1);
-    }
-    else
-    {
-        lv_style_set_line_color(&sd_current_indic_style, LV_STATE_DEFAULT, sd_current_fg_clr);
-    }
-    lv_obj_add_style(sd_current_arc, LV_ARC_PART_INDIC, &sd_current_indic_style);
-
-    if (sd_rev_current_arc)
-    {
-        lv_arc_set_value(sd_current_arc, (maxcurrent - amps));
-    }
-    else
-    {
-        lv_arc_set_value(sd_current_arc, amps);
-    }
-    if (dashboard_get_config(DASHBOARD_BARS))
-    {
-        int ang_max = sd_value2angle(sd_current_arc_start, sd_current_arc_end, 0, maxcurrent, wheelctl_get_max_data(WHEELCTL_CURRENT), sd_rev_current_arc);
-        int ang_max2 = ang_max + 3;
-        if (ang_max2 >= 360)
+        if (current_current > (maxcurrent * 0.75))
         {
-            ang_max2 = ang_max2 - 360;
+            lv_style_set_line_color(&sd_current_indic_style, LV_STATE_DEFAULT, LV_COLOR_RED);
         }
-        lv_arc_set_angles(sd_current_max_bar, ang_max, ang_max2);
-
-        int ang_regen = sd_value2angle(sd_current_arc_start, sd_current_arc_end, 0, maxcurrent, wheelctl_get_min_data(WHEELCTL_CURRENT), sd_rev_current_arc);
-        int ang_regen2 = ang_regen + 3;
-        if (ang_regen2 >= 360)
+        else if (current_current > (maxcurrent * 0.5))
         {
-            ang_regen2 = ang_regen2 - 360;
+            lv_style_set_line_color(&sd_current_indic_style, LV_STATE_DEFAULT, LV_COLOR_YELLOW);
         }
-        lv_arc_set_angles(sd_current_regen_bar, ang_regen, ang_regen2);
+        else if (current_current < 0)
+        {
+            lv_style_set_line_color(&sd_current_indic_style, LV_STATE_DEFAULT, sd_speed_fg_clr);
+            amps = (current_current * -1);
+        }
+        else
+        {
+            lv_style_set_line_color(&sd_current_indic_style, LV_STATE_DEFAULT, sd_current_fg_clr);
+        }
+        lv_obj_add_style(sd_current_arc, LV_ARC_PART_INDIC, &sd_current_indic_style);
+
+        if (sd_rev_current_arc)
+        {
+            lv_arc_set_value(sd_current_arc, (maxcurrent - amps));
+        }
+        else
+        {
+            lv_arc_set_value(sd_current_arc, amps);
+        }
+        if (dashboard_get_config(DASHBOARD_BARS))
+        {
+            int ang_max = sd_value2angle(sd_current_arc_start, sd_current_arc_end, 0, maxcurrent, wheelctl_get_max_data(WHEELCTL_CURRENT), sd_rev_current_arc);
+            int ang_max2 = ang_max + 3;
+            if (ang_max2 >= 360)
+            {
+                ang_max2 = ang_max2 - 360;
+            }
+            lv_arc_set_angles(sd_current_max_bar, ang_max, ang_max2);
+
+            int ang_regen = sd_value2angle(sd_current_arc_start, sd_current_arc_end, 0, maxcurrent, wheelctl_get_min_data(WHEELCTL_CURRENT), sd_rev_current_arc);
+            int ang_regen2 = ang_regen + 3;
+            if (ang_regen2 >= 360)
+            {
+                ang_regen2 = ang_regen2 - 360;
+            }
+            lv_arc_set_angles(sd_current_regen_bar, ang_regen, ang_regen2);
+        }
     }
 }
 
-void lv_sd_overlay_update()
+void simpledash_overlay_update()
 {
     if (blectl_cli_getconnected())
     {
@@ -515,25 +519,23 @@ void lv_sd_overlay_update()
    Task update functions
  ***********************/
 
-static void lv_sd_dash_task(lv_task_t *sd_dash_task)
+static void simpledash_overlay_task(lv_task_t *overlay_task)
 {
-    lv_sd_speed_update();
-    lv_sd_batt_update();
-    if (dashboard_get_config(DASHBOARD_CURRENT))
-    {
-        lv_sd_current_update();
-    }
-    lv_sd_overlay_update();
+    simpledash_overlay_update();
 }
 
-void sd_stop_dash_task()
+static void lv_sd_dash_task(lv_task_t *sd_dash_task)
 {
-    Serial.println("check if dash is running");
-    if (sd_dash_task != nullptr)
+    if (blectl_cli_getconnected())
     {
-        Serial.println("shutting down dash");
-        lv_task_del(sd_dash_task);
+        simpledash_speed_update();
+        simpledash_batt_update();
+        if (dashboard_get_config(DASHBOARD_CURRENT))
+        {
+            simpledash_current_update();
+        }
     }
+    simpledash_overlay_update();
 }
 
 uint32_t simpledash_get_tile(void)
@@ -541,17 +543,25 @@ uint32_t simpledash_get_tile(void)
     return simpledash_tile_num;
 }
 
-void simpledash_activate_cb( void ) {
+void simpledash_activate_cb(void)
+{
     //Create task -- update freq 4/s
-    sd_dash_task = lv_task_create(lv_sd_dash_task, 250, LV_TASK_PRIO_LOWEST, NULL);
-    lv_task_ready(sd_dash_task);
+    //sd_dash_task = lv_task_create(lv_sd_dash_task, 250, LV_TASK_PRIO_LOWEST, NULL);
+    //lv_task_ready(sd_dash_task);
+    overlay_task = lv_task_create(simpledash_overlay_task, 2000, LV_TASK_PRIO_LOWEST, NULL);
+    lv_task_ready(overlay_task);
+    simpledash_active = true;
 }
 
-void simpledash_hibernate_cb( void ) {
-    lv_task_del( sd_dash_task );
+void simpledash_hibernate_cb(void)
+{
+    //lv_task_del( sd_dash_task );
+    lv_task_del(overlay_task);
+    simpledash_active = false;
 }
 
-void simpledash_tile_reload ( void ) {
+void simpledash_tile_reload(void)
+{
     lv_obj_del(simpledash_cont);
     simpledash_tile_setup();
 }
@@ -562,9 +572,7 @@ void simpledash_tile_setup(void)
     simpledash_cont = mainbar_get_tile_obj(simpledash_tile_num);
     //simpledash_cont = mainbar_get_tile_obj(mainbar_add_tile(2, 0, "simpledash tile"));
     style = mainbar_get_style();
-
     Serial.println("setting up dashboard");
-
     lv_sd_define_styles_1();
     lv_sd_speed_arc_1();
     lv_sd_batt_arc_1();
@@ -574,6 +582,6 @@ void simpledash_tile_setup(void)
     }
     lv_sd_overlay();
 
-    mainbar_add_tile_activate_cb( simpledash_tile_num, simpledash_activate_cb );
-    mainbar_add_tile_hibernate_cb( simpledash_tile_num, simpledash_hibernate_cb );
+    mainbar_add_tile_activate_cb(simpledash_tile_num, simpledash_activate_cb);
+    mainbar_add_tile_hibernate_cb(simpledash_tile_num, simpledash_hibernate_cb);
 }

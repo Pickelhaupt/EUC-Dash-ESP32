@@ -81,6 +81,20 @@ void simpledash_tile_setup(void);
 uint32_t simpledash_get_tile (void);
 void simpledash_tile_reload ( void );
 
+/**
+* @brief update speed arc and label
+*/
+void simpledash_speed_update(void);
+/**
+* @brief update battery arc and label
+*/
+void simpledash_batt_update(void);
+/**
+* @brief update current arc and label
+*/
+void simpledash_current_update(void);
+
 //variable declarations
+extern bool simpledash_active;
 
 #endif // _SIMPLEDASH_TILE_H
