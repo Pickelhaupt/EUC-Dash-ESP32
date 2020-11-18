@@ -31,6 +31,8 @@
 #include "gui/mainbar/fulldash_tile/fulldash_tile.h"
 #include "gui/mainbar/simpledash_tile/simpledash_tile.h"
 
+#define BATT_AVG_ENTRIES  10
+
 lv_task_t *speed_shake = nullptr;
 lv_task_t *current_shake = nullptr;
 lv_task_t *temp_shake = nullptr;
@@ -174,8 +176,22 @@ void wheelctl_calc_power(float value)
 
 void update_calc_battery(float value)
 {
+    static int centivolt_array[BATT_AVG_ENTRIES] = {0};
+    static int i = 0;
+    int sum = 0; 
+    int num = 0;
+    if (i < BATT_AVG_ENTRIES) i++; else i = 0;
+     
     float voltagesag = wheelctl_constants[WHEELCTL_CONST_BATT_IR].value * wheelctl_data[WHEELCTL_CURRENT].value;
-    int centivolt = (value * 100) + voltagesag; //compensate for battery pack interna resitance
+    centivolt_array[i] = (value * 100) + voltagesag; //compensate for battery pack internal resitance
+    for (int j = 0; j < BATT_AVG_ENTRIES; j++) {
+        if (centivolt_array[j] > 0) {
+            sum += centivolt_array[j];
+            num++;
+        }
+    }
+    int centivolt = sum / num;
+
     if (wheelctl_constants[WHEELCTL_CONST_BATTVOLT].value < 70)
     {
         if (centivolt > 6680)
