@@ -52,7 +52,7 @@
         WHEELCTL_CONST_WARNTEMP,    //internal temperature to trigger warning -required, might e made optional
         WHEELCTL_CONST_BATTVOLT,    //Voltage of the battery pack for the wheel model -required
         WHEELCTL_CONST_BATTWARN,    //Percentage of battery remaining when warning should be triggered for the specific wheel model -required     
-        WHEELCTL_CONST_LIGHTS,      //lights toggle
+        WHEELCTL_CONST_BATT_IR,     //battery pack internal resistance
         WHEELCTL_CONST_NUM          //number of wheel constants
     };
 
@@ -64,7 +64,12 @@
         WHEELCTL_INFO_SERIAL,       //Serial Numer
         WHEELCTL_INFO_MANUFACTURER, //Wheel manufacturer value should be KS, GW, IM or NB -- make sure this is set when implementing a new wheel model
         WHEELCTL_INFO_MODEL,        //Wheel model -- make sure the wheel ctl constants are set up for the specific model 
-        HEELCTL_INFO_VERSION,       //in case there are multiple versions for a specific model
+        WHEELCTL_INFO_VERSION,      //in case there are multiple versions for a specific model
+        WHEELCTL_INFO_BLESUUID,       
+        WHEELCTL_INFO_BLESDUUID,
+        WHEELCTL_INFO_BLENAME,
+        WHEELCTL_INFO_BLEDATA,
+        WHEELCTL_INFO_BLEMFG,
         WHEELCTL_INFO_NUM           //number of info entries
     };
 

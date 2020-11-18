@@ -76,11 +76,13 @@ void display_loop( void ) {
 
   if ( dest_brightness != brightness ) {
     if ( brightness < dest_brightness ) {
-      brightness++;
+      //brightness++;
+      brightness = dest_brightness;
       ttgo->bl->adjust( brightness );
     }
     else {
-      brightness--;
+      //brightness--;
+      brightness = dest_brightness;
       ttgo->bl->adjust( brightness );
     }
   }

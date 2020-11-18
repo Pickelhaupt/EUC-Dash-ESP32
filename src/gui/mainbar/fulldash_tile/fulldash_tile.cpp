@@ -531,12 +531,12 @@ int value2angle(int arcstart, int arcstop, float minvalue, float maxvalue, float
    runs every 250ms
  ***************************************************************/
 
-void fulldash_speed_update(void)
+void fulldash_speed_update(float current_speed, float warn_speed, float tiltback_speed, float top_speed)
 {
-    float tiltback_speed = wheelctl_get_data(WHEELCTL_TILTBACK);
-    float current_speed = wheelctl_get_data(WHEELCTL_SPEED);
-    float warn_speed = wheelctl_get_data(WHEELCTL_ALARM3);
-    float top_speed = wheelctl_get_data(WHEELCTL_TOPSPEED);
+    //float tiltback_speed = wheelctl_get_data(WHEELCTL_TILTBACK);
+    //float current_speed = wheelctl_get_data(WHEELCTL_SPEED);
+    //float warn_speed = wheelctl_get_data(WHEELCTL_ALARM3);
+    //float top_speed = wheelctl_get_data(WHEELCTL_TOPSPEED);
     if (top_speed < tiltback_speed + 5) top_speed = tiltback_speed + 5;
 
     if (current_speed >= tiltback_speed)
@@ -595,9 +595,9 @@ void fulldash_speed_update(void)
     lv_obj_align(speed_label, fulldash_cont, LV_ALIGN_CENTER, 0, -3);
 }
 
-void fulldash_batt_update(void)
+void fulldash_batt_update(float current_battpct, float min_battpct, float max_battpct)
 {
-    float current_battpct = wheelctl_get_data(WHEELCTL_BATTPCT);
+    //float current_battpct = wheelctl_get_data(WHEELCTL_BATTPCT);
 
     if (current_battpct < 10)
     {
@@ -620,7 +620,7 @@ void fulldash_batt_update(void)
 
     lv_arc_set_value(batt_arc, (100 - current_battpct));
 
-    int ang_max = value2angle(batt_arc_start, batt_arc_end, 0, 100, wheelctl_get_max_data(WHEELCTL_BATTPCT), rev_batt_arc);
+    int ang_max = value2angle(batt_arc_start, batt_arc_end, 0, 100, max_battpct, rev_batt_arc);
     int ang_max2 = ang_max + 3;
     if (ang_max2 >= 360)
     {
@@ -628,7 +628,7 @@ void fulldash_batt_update(void)
     }
     lv_arc_set_angles(batt_max_bar, ang_max, ang_max2);
 
-    int ang_min = value2angle(batt_arc_start, batt_arc_end, 0, 100, wheelctl_get_min_data(WHEELCTL_BATTPCT), rev_batt_arc);
+    int ang_min = value2angle(batt_arc_start, batt_arc_end, 0, 100, min_battpct, rev_batt_arc);
     int ang_min2 = ang_min + 3;
     if (ang_min2 >= 360)
     {
@@ -651,11 +651,11 @@ void fulldash_batt_update(void)
     lv_obj_align(batt_label, fulldash_cont, LV_ALIGN_CENTER, 0, 75);
 }
 
-void fulldash_current_update(void)
+void fulldash_current_update(float current_current, byte maxcurrent, float min_current, float max_current)
 {
     // Set warning and alert colour
-    byte maxcurrent = wheelctl_get_constant(WHEELCTL_CONST_MAXCURRENT);
-    float current_current = wheelctl_get_data(WHEELCTL_CURRENT);
+    //byte maxcurrent = wheelctl_get_constant(WHEELCTL_CONST_MAXCURRENT);
+    //float current_current = wheelctl_get_data(WHEELCTL_CURRENT);
     float amps = current_current;
     
     if (current_current > (maxcurrent * 0.75))
@@ -683,7 +683,7 @@ void fulldash_current_update(void)
 
     lv_arc_set_value(current_arc, amps);
 
-    int ang_max = value2angle(current_arc_start, current_arc_end, 0, maxcurrent, wheelctl_get_max_data(WHEELCTL_CURRENT), rev_current_arc);
+    int ang_max = value2angle(current_arc_start, current_arc_end, 0, maxcurrent, max_current, rev_current_arc);
     int ang_max2 = ang_max + 3;
     if (ang_max2 >= 360)
     {
@@ -691,7 +691,7 @@ void fulldash_current_update(void)
     }
     lv_arc_set_angles(current_max_bar, ang_max, ang_max2);
 
-    int ang_regen = value2angle(current_arc_start, current_arc_end, 0, maxcurrent, wheelctl_get_min_data(WHEELCTL_CURRENT), rev_current_arc);
+    int ang_regen = value2angle(current_arc_start, current_arc_end, 0, maxcurrent, min_current, rev_current_arc);
     int ang_regen2 = ang_regen + 3;
     if (ang_regen2 >= 360)
     {
@@ -707,17 +707,17 @@ void fulldash_current_update(void)
     lv_obj_align(current_label, fulldash_cont, LV_ALIGN_CENTER, -64, 0);
 }
 
-void fulldash_temp_update(void)
+void fulldash_temp_update(float current_temp, byte warn_temp, byte crit_temp, float max_temp)
 {
-    byte crit_temp = wheelctl_get_constant(WHEELCTL_CONST_CRITTEMP);
-    float current_temp = wheelctl_get_data(WHEELCTL_TEMP);
+    //byte crit_temp = wheelctl_get_constant(WHEELCTL_CONST_CRITTEMP);
+    //float current_temp = wheelctl_get_data(WHEELCTL_TEMP);
     // Set warning and alert colour
     if (current_temp > crit_temp)
     {
         lv_style_set_line_color(&temp_indic_style, LV_STATE_DEFAULT, LV_COLOR_RED);
         lv_style_set_text_color(&temp_label_style, LV_STATE_DEFAULT, LV_COLOR_RED);
     }
-    else if (current_temp > wheelctl_get_constant(WHEELCTL_CONST_WARNTEMP))
+    else if (current_temp > warn_temp)
     {
         lv_style_set_line_color(&temp_indic_style, LV_STATE_DEFAULT, LV_COLOR_YELLOW);
         lv_style_set_text_color(&temp_label_style, LV_STATE_DEFAULT, LV_COLOR_YELLOW);
@@ -730,7 +730,7 @@ void fulldash_temp_update(void)
     lv_obj_add_style(temp_arc, LV_ARC_PART_INDIC, &temp_indic_style);
     lv_arc_set_value(temp_arc, ((crit_temp + 10) - current_temp));
 
-    int ang_max = value2angle(temp_arc_start, temp_arc_end, 0, (crit_temp + 10), wheelctl_get_max_data(WHEELCTL_TEMP), true);
+    int ang_max = value2angle(temp_arc_start, temp_arc_end, 0, (crit_temp + 10), max_temp, true);
     int ang_max2 = ang_max + 3;
     if (ang_max2 >= 360)
     {
@@ -814,7 +814,7 @@ void updateTime()
 /************************
    Task update functions
  ***********************/
-
+/*
 static void lv_dash_task(lv_task_t *dash_task)
 {
     if (blectl_cli_getconnected())
@@ -826,6 +826,7 @@ static void lv_dash_task(lv_task_t *dash_task)
     }
     fulldash_overlay_update();
 }
+*/
 
 static void lv_time_task(lv_task_t *time_task)
 {

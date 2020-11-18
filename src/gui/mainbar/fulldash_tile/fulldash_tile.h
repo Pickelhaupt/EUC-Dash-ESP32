@@ -96,19 +96,19 @@ uint32_t fulldash_get_tile (void);
 /**
 * @brief update speed arc and label
 */
-void fulldash_speed_update(void);
+void fulldash_speed_update(float current_speed, float warn_speed, float tiltback_speed, float top_speed);
 /**
 * @brief update battery arc and label
 */
-void fulldash_batt_update(void);
+void fulldash_batt_update(float current_battpct, float min_battpct, float max_battpct);
 /**
 * @brief update current arc and label
 */
-void fulldash_current_update(void);
+void fulldash_current_update(float current_current, byte maxcurrent, float min_current, float max_current);
 /**
 * @brief update temperature arc and label
 */
-void fulldash_temp_update(void);
+void fulldash_temp_update(float current_temp, byte warn_temp, byte crit_temp, float max_temp);
 /**
 * @brief update overlay
 */

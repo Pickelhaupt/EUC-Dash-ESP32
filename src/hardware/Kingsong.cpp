@@ -64,6 +64,7 @@ void setKSconstants(String model)
         wheelctl_set_constant(WHEELCTL_CONST_WARNTEMP, KS_14D_WARNTEMP);
         wheelctl_set_constant(WHEELCTL_CONST_BATTVOLT, KS_14D_BATTVOLT);
         wheelctl_set_constant(WHEELCTL_CONST_BATTWARN, KS_14D_BATTWARN);
+        wheelctl_set_constant(WHEELCTL_CONST_BATT_IR, KS_14D_BATT_IR);
     }
     else if (model = "KS14S")
     {
@@ -72,6 +73,7 @@ void setKSconstants(String model)
         wheelctl_set_constant(WHEELCTL_CONST_WARNTEMP, KS_14S_WARNTEMP);
         wheelctl_set_constant(WHEELCTL_CONST_BATTVOLT, KS_14S_BATTVOLT);
         wheelctl_set_constant(WHEELCTL_CONST_BATTWARN, KS_14S_BATTWARN);
+        wheelctl_set_constant(WHEELCTL_CONST_BATT_IR, KS_14S_BATT_IR);
     }
     else if (model = "KS16S")
     {
@@ -80,6 +82,7 @@ void setKSconstants(String model)
         wheelctl_set_constant(WHEELCTL_CONST_WARNTEMP, KS_16S_WARNTEMP);
         wheelctl_set_constant(WHEELCTL_CONST_BATTVOLT, KS_16S_BATTVOLT);
         wheelctl_set_constant(WHEELCTL_CONST_BATTWARN, KS_16S_BATTWARN);
+        wheelctl_set_constant(WHEELCTL_CONST_BATT_IR, KS_16S_BATT_IR);
     }
     else if (model = "KS16X")
     {
@@ -88,6 +91,7 @@ void setKSconstants(String model)
         wheelctl_set_constant(WHEELCTL_CONST_WARNTEMP, KS_16X_WARNTEMP);
         wheelctl_set_constant(WHEELCTL_CONST_BATTVOLT, KS_16X_BATTVOLT);
         wheelctl_set_constant(WHEELCTL_CONST_BATTWARN, KS_16X_BATTWARN);
+        wheelctl_set_constant(WHEELCTL_CONST_BATT_IR, KS_16X_BATT_IR);
     }
     else
     {
@@ -96,6 +100,7 @@ void setKSconstants(String model)
         wheelctl_set_constant(WHEELCTL_CONST_WARNTEMP, KS_DEFAULT_WARNTEMP);
         wheelctl_set_constant(WHEELCTL_CONST_BATTVOLT, KS_DEFAULT_BATTVOLT);
         wheelctl_set_constant(WHEELCTL_CONST_BATTWARN, KS_DEFAULT_BATTWARN);
+        wheelctl_set_constant(WHEELCTL_CONST_BATT_IR, KS_DEFAULT_BATT_IR);
     }
 }
 

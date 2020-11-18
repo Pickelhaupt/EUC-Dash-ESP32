@@ -75,6 +75,8 @@ BLECharacteristic *pTxCharacteristic;
 BLECharacteristic *pRxCharacteristic;
 uint8_t txValue = 0;
 String EUC_Brand = "KingSong";
+String blename;
+String blemfg;
 
 static BLERemoteCharacteristic *pRemoteCharacteristic;
 static BLEAdvertisedDevice *myDevice;
@@ -358,6 +360,8 @@ void blectl_cli_loop(void)
         if (connectToServer())
         {
             Serial.println("We are now connected to the BLE Server.");
+            if (wheelctl_get_info(WHEELCTL_INFO_BLENAME) == "KS-14SMD4735") Serial.println("Found KS Wheel");
+
             if (EUC_Brand = "Kingsong")
             {
                 Serial.println("initialising KingSong");
@@ -411,6 +415,17 @@ bool connectToServer()
     Serial.print("Forming a connection to ");
 
     Serial.println(myDevice->getAddress().toString().c_str());
+    Serial.println(myDevice->getName().c_str());
+    Serial.println(myDevice->getManufacturerData().c_str());
+    Serial.println(myDevice->getServiceUUID().toString().c_str());
+
+    blename = myDevice->getName().c_str();
+    blemfg = myDevice->getManufacturerData().c_str();
+
+    wheelctl_set_info(WHEELCTL_INFO_BLENAME, blename);
+    wheelctl_set_info(WHEELCTL_INFO_BLEMFG, blemfg);
+ 
+    //wheelctl_set_info(WHEELCTL_INFO_BLENAME, "kalle");
 
     BLEClient *pClient = BLEDevice::createClient();
     Serial.println(" - Created client");

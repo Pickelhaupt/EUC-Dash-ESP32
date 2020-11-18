@@ -89,14 +89,14 @@ void setup()
     splash_screen_stage_update( "alloc heap", 70 );
     heap_caps_malloc_extmem_enable( 16*1024 );
 
+    splash_screen_stage_update( "init wheel data", 80 );
     wheelctl_setup();
-
-    //blectl_setup();
-    splash_screen_stage_update( "init BLE", 80 );
-    blectl_scan_setup();
 
     splash_screen_stage_update( "init gui", 90 );
     gui_setup();
+    
+    //blectl_setup();
+    blectl_scan_setup();
 
     splash_screen_stage_finish();
 
