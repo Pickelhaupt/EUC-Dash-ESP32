@@ -49,12 +49,18 @@ void setup()
     Serial.printf("Configure watchdog to 30s: %d\r\n", esp_task_wdt_init( 30, true ) );
 
     ttgo->begin();
+
+    SPI.begin();
+    SPI.setFrequency(80000000);
+    ttgo->tft->initDMA();
     ttgo->lvgl_begin();
 
     SPIFFS.begin();
     motor_setup();
 
     dashboard_setup();
+
+
 
     // force to store all new heap allocations in psram to get more internal ram
     heap_caps_malloc_extmem_enable( 1 );
