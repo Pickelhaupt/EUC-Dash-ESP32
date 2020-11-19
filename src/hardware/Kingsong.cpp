@@ -36,7 +36,7 @@ int add_ride_millis (void);
 byte KS_BLEreq[20];
 String wheelmodel = "KS14D";
 
-void ks_ble_set(byte parameter, byte value, byte value2);
+void ks_ble_set(byte parameter, byte value);
 
 /**************************************************
    Decode big endian multi byte data from KS wheels
@@ -104,32 +104,18 @@ void setKSconstants(String model)
     }
 }
 
-/*************************************************************
-    Kingsong wheel data decoder adds current values to
-    the wheeldata array. Prootocol decoding from Wheellog by
-    Kevin Cooper,
-    would have been a lot of work without that code
-    to reference.
-    Should be fairly easy to adapt this to Gotway as well.
-    Function is called on by the notifyCallback function in blectl
-    decoded data is added to the data struct in wheelctl
-    Todo:
-    - Add Serial and model number
-    - Add periodical polling of speed settings? Verify by
-      testing with low battery
- ************************************************************/
+
 void decodeKS(byte KSdata[])
 {
     //Parse incoming BLE Notifications
     if (KSdata[16] == 0xa9)
     { // Data package type 1 voltage/speed/odo/current/temperature
-        int rCurr = decode2byte(KSdata[10], KSdata[11]);
-        if (rCurr > 32767) rCurr = rCurr - 65536; // Ugly hack to display negative currents, must be a better way
-      
+        int ks_current = decode2byte(KSdata[10], KSdata[11]);
+        if (ks_current > 32767) ks_current = ks_current - 65536; // Ugly hack to display negative currents, must be a better way
+        wheelctl_set_data(WHEELCTL_CURRENT, ks_current / 100.0); // Current must come before voltages for the battery calc to be correct
         wheelctl_set_data(WHEELCTL_VOLTAGE, (decode2byte(KSdata[2], KSdata[3]) / 100.0));
         wheelctl_set_data(WHEELCTL_SPEED, (decode2byte(KSdata[4], KSdata[5]) / 100.0));
         wheelctl_set_data(WHEELCTL_ODO, (decode4byte(KSdata[6], KSdata[7], KSdata[8], KSdata[9]) / 1000.0));
-        wheelctl_set_data(WHEELCTL_CURRENT, rCurr / 100.0);
         wheelctl_set_data(WHEELCTL_TEMP, (decode2byte(KSdata[12], KSdata[13]) / 100.0));
         wheelctl_set_data(WHEELCTL_RMODE, KSdata[14]); // check this!!
     }
@@ -174,27 +160,39 @@ void ks_ble_request(byte reqtype)
 
 void ks_lights(byte mode) { //0=on, 1=off
     byte byte2 = 0x12 + mode;
-    Serial.print("light setting = ");
-    Serial.println(byte2);
-    ks_ble_set(0x73, byte2, 0x01);
+    ks_ble_set(0x73, byte2);
 }
 
-void ks_ble_set(byte parameter, byte value, byte value2)
+void ks_led(byte mode) { //check actual values
+    byte byte2 = mode;
+    ks_ble_set(0x6C, byte2);
+}
+
+void ks_pedals(byte mode) { //0=hard, 1=med, 2=soft
+    byte byte2 = mode; //check this before use
+    ks_ble_set(0x87, byte2);
+}
+
+void ks_ble_set(byte parameter, byte value)
 {
     /****************************************************************
       parameter is the byte representing the parameter to be set
-      0x73 -- Lights (0x00 or 0x01) value 2 required 0x01
-      0x87 -- pedals mode (0x00, 0x01, 0x02) value 2 required 0xE0
-      0x53 -- strobemode (0x00 or 0x01) value2 0x00
-      0x6C -- side led mode value2 0x00
+      0x73 -- Lights (0x12, 0x13, 0x14, 0x15) value 2 = 0x01
+      0x87 -- pedals mode (0x00, 0x01, 0x02) value = 0xE0
+      0x53 -- strobemode (0x00 or 0x01) value2 = 0x00
+      0x6C -- side led mode value2 = 0x00
    *****************************************************************/
+    byte value2{0x00};
+    if (value == 0x73) value2 = 0x01;
+    if (value == 0x87) value2 = 0xE0;
+
     byte KS_BLEreq[20] = {0x00}; //set array to zero
     KS_BLEreq[0] = 0xAA;         //Header byte 1
     KS_BLEreq[1] = 0x55;         //Header byte 2
     KS_BLEreq[2] = value;
     KS_BLEreq[3] = value2;      //only required for certain settingd
-    KS_BLEreq[16] = parameter;     // This is the byte that specifies what data is requested
-    KS_BLEreq[17] = 0x14;        //Last 3 bytes also needed
+    KS_BLEreq[16] = parameter;  // This is the byte that specifies what data is requested
+    KS_BLEreq[17] = 0x14;       //Last 3 bytes also needed
     KS_BLEreq[18] = 0x5A;
     KS_BLEreq[19] = 0x5A;
     writeBLE(KS_BLEreq, 20);
@@ -212,16 +210,10 @@ int add_ride_millis () {
 
 void initks()
 {
-    //temporary model strings, Todo: implement automated id;
     //Setting of some model specific parametes,
-    //Todo: automatic model identification
     setKSconstants(wheelmodel);
     //setKSconstants(wheelctl_get_info(WHEELCTL_INFO_MODEL));
-    /*****************************************
-       Request Kingsong Model Name, serial number and speed settings
-       This must be done before any BLE notifications will be pused by the KS wheel
-  ******************************************/
-    //TTGOClass *ttgo = TTGOClass::getWatch();
+
     Serial.println("requesting model..");
     ks_ble_request(0x9B);
     delay(200);

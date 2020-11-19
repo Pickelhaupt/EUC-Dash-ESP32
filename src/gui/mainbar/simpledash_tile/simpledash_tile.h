@@ -84,15 +84,15 @@ void simpledash_tile_reload ( void );
 /**
 * @brief update speed arc and label
 */
-void simpledash_speed_update(void);
+void simpledash_speed_update(float current_speed, float warn_speed, float tiltback_speed, float top_speed);
 /**
 * @brief update battery arc and label
 */
-void simpledash_batt_update(void);
+void simpledash_batt_update(float current_battpct, float min_battpct, float max_battpct);
 /**
 * @brief update current arc and label
 */
-void simpledash_current_update(void);
+void simpledash_current_update(float current_current, byte maxcurrent, float min_current, float max_current);
 
 //variable declarations
 extern bool simpledash_active;

@@ -31,7 +31,7 @@
 #include "gui/mainbar/fulldash_tile/fulldash_tile.h"
 #include "gui/mainbar/simpledash_tile/simpledash_tile.h"
 
-#define BATT_AVG_ENTRIES  10
+#define BATT_AVG_ENTRIES 10
 
 lv_task_t *speed_shake = nullptr;
 lv_task_t *current_shake = nullptr;
@@ -52,7 +52,8 @@ void wheelctl_calc_power(float value);
 void wheelctl_update_ridetime(float uptime);
 
 bool shakeoff[3] = {true, true, true};
-bool lightsoff;
+bool lightsoff = true;
+bool firstrun[WHEELCTL_DATA_NUM];
 float old_uptime = 0;
 
 wheelctl_data_t wheelctl_data[WHEELCTL_DATA_NUM];
@@ -68,8 +69,16 @@ void wheelctl_setup(void)
     wheelctl_data[WHEELCTL_CURRENT].max_value = 0;
     wheelctl_data[WHEELCTL_CURRENT].min_value = 0;
     wheelctl_data[WHEELCTL_TEMP].min_value = 0;
-    lightsoff = true;
+    wheelctl_update_values();
     motor_vibe(5, true);
+}
+
+void wheelctl_update_values(void)
+{
+    for (int i = 0; i < WHEELCTL_DATA_NUM; i++)
+    {
+        firstrun[i] = {true};
+    }
 }
 
 float wheelctl_get_data(int entry)
@@ -85,36 +94,56 @@ void wheelctl_set_data(int entry, float value)
 {
     if (entry < WHEELCTL_DATA_NUM)
     {
-        wheelctl_data[entry].value = value;
+        if (firstrun[entry]) wheelctl_data[entry].value = value;
         switch (entry)
         {
         case WHEELCTL_SPEED:
-            update_speed_shake(value);
-            wheelctl_update_max_min(entry, value, false);
-            if (fulldash_active) fulldash_speed_update(value, wheelctl_data[WHEELCTL_ALARM3].value,  wheelctl_data[WHEELCTL_TILTBACK].value, wheelctl_data[WHEELCTL_TOPSPEED].value);
-            if (simpledash_active) simpledash_speed_update();
+            if (wheelctl_data[entry].value != value || firstrun[entry])
+            {
+                update_speed_shake(value);
+                wheelctl_update_max_min(entry, value, false);
+                if (fulldash_active) fulldash_speed_update(value, wheelctl_data[WHEELCTL_ALARM3].value, wheelctl_data[WHEELCTL_TILTBACK].value, wheelctl_data[WHEELCTL_TOPSPEED].value);
+                if (simpledash_active) simpledash_speed_update(value, wheelctl_data[WHEELCTL_ALARM3].value, wheelctl_data[WHEELCTL_TILTBACK].value, wheelctl_data[WHEELCTL_TOPSPEED].value);
+                firstrun[entry] = false;       
+            }
             break;
         case WHEELCTL_CURRENT:
-            update_current_shake(value);
-            wheelctl_update_max_min(entry, value, false);
-            wheelctl_update_regen_current(entry, value);
-            wheelctl_calc_power(value);
-            if (fulldash_active) fulldash_current_update(value, wheelctl_constants[WHEELCTL_CONST_MAXCURRENT].value, wheelctl_data[WHEELCTL_CURRENT].min_value, wheelctl_data[WHEELCTL_CURRENT].max_value);
-            if (simpledash_active) simpledash_current_update();
+            if (wheelctl_data[entry].value != value || firstrun[entry])
+            {
+                update_current_shake(value);
+                wheelctl_update_max_min(entry, value, false);
+                wheelctl_update_regen_current(entry, value);
+                wheelctl_calc_power(value);
+                if (fulldash_active) fulldash_current_update(value, wheelctl_constants[WHEELCTL_CONST_MAXCURRENT].value, wheelctl_data[WHEELCTL_CURRENT].min_value, wheelctl_data[WHEELCTL_CURRENT].max_value);
+                if (simpledash_active) simpledash_current_update(value, wheelctl_constants[WHEELCTL_CONST_MAXCURRENT].value, wheelctl_data[WHEELCTL_CURRENT].min_value, wheelctl_data[WHEELCTL_CURRENT].max_value);
+                firstrun[entry] = false;
+            }
             break;
         case WHEELCTL_VOLTAGE:
-            wheelctl_update_max_min(entry, value, true);
-            update_calc_battery(value);
+            if (wheelctl_data[entry].value != value || firstrun[entry])
+            {
+                wheelctl_update_max_min(entry, value, true);
+                update_calc_battery(value);
+                firstrun[entry] = false;
+            }
             break;
         case WHEELCTL_TEMP:
-            update_temp_shake(value);
-            wheelctl_update_max_min(entry, value, true);
-            if (fulldash_active) fulldash_temp_update(value, wheelctl_constants[WHEELCTL_CONST_WARNTEMP].value, wheelctl_constants[WHEELCTL_CONST_CRITTEMP].value, wheelctl_data[WHEELCTL_TEMP].max_value);
+            if (wheelctl_data[entry].value != value || firstrun[entry])
+            {
+                update_temp_shake(value);
+                wheelctl_update_max_min(entry, value, true);
+                if (fulldash_active) fulldash_temp_update(value, wheelctl_constants[WHEELCTL_CONST_WARNTEMP].value, wheelctl_constants[WHEELCTL_CONST_CRITTEMP].value, wheelctl_data[WHEELCTL_TEMP].max_value);
+                firstrun[entry] = false;
+            }
             break;
         case WHEELCTL_BATTPCT:
-            wheelctl_update_battpct_max_min(entry, value);
-            if (fulldash_active) fulldash_batt_update(value, wheelctl_data[WHEELCTL_BATTPCT].min_value, wheelctl_data[WHEELCTL_BATTPCT].max_value);
-            if (simpledash_active) simpledash_batt_update();
+            if (wheelctl_data[entry].value != value || firstrun[entry])
+            {
+                wheelctl_update_battpct_max_min(entry, value);
+                if (fulldash_active) fulldash_batt_update(value, wheelctl_data[WHEELCTL_BATTPCT].min_value, wheelctl_data[WHEELCTL_BATTPCT].max_value);
+                if (simpledash_active) simpledash_batt_update(value, wheelctl_data[WHEELCTL_BATTPCT].min_value, wheelctl_data[WHEELCTL_BATTPCT].max_value);
+                firstrun[entry] = false;
+            }
             break;
         case WHEELCTL_POWER:
             wheelctl_update_max_min(entry, value, false);
@@ -123,12 +152,16 @@ void wheelctl_set_data(int entry, float value)
             wheelctl_update_ridetime(value);
             break;
         }
+        firstrun[entry] = false;
+        wheelctl_data[entry].value = value;
     }
 }
 
-void wheelctl_update_ridetime( float uptime ) {
-    if (wheelctl_data[WHEELCTL_SPEED].value >= MIN_RIDE_SPEED) {
-        wheelctl_data[WHEELCTL_RIDETIME].value =+ (uptime - old_uptime);
+void wheelctl_update_ridetime(float uptime)
+{
+    if (wheelctl_data[WHEELCTL_SPEED].value >= MIN_RIDE_SPEED)
+    {
+        wheelctl_data[WHEELCTL_RIDETIME].value = +(uptime - old_uptime);
     }
     old_uptime = uptime;
 }
@@ -147,13 +180,9 @@ void wheelctl_update_max_min(int entry, float value, bool update_min)
 
 void wheelctl_update_battpct_max_min(int entry, float value)
 {
-    if (wheelctl_data[WHEELCTL_CURRENT].value >= 0)
+    if (wheelctl_data[WHEELCTL_CURRENT].value > 0)
     {
         wheelctl_update_max_min(entry, value, true);
-    }
-    else
-    {
-        wheelctl_update_max_min(entry, value, false);
     }
 }
 
@@ -176,21 +205,28 @@ void wheelctl_calc_power(float value)
 
 void update_calc_battery(float value)
 {
+    float voltagesag = wheelctl_constants[WHEELCTL_CONST_BATT_IR].value * wheelctl_data[WHEELCTL_CURRENT].value;
+
+    /*
     static int centivolt_array[BATT_AVG_ENTRIES] = {0};
     static int i = 0;
-    int sum = 0; 
+    int sum = 0;
     int num = 0;
     if (i < BATT_AVG_ENTRIES) i++; else i = 0;
-     
-    float voltagesag = wheelctl_constants[WHEELCTL_CONST_BATT_IR].value * wheelctl_data[WHEELCTL_CURRENT].value;
+
     centivolt_array[i] = (value * 100) + voltagesag; //compensate for battery pack internal resitance
-    for (int j = 0; j < BATT_AVG_ENTRIES; j++) {
-        if (centivolt_array[j] > 0) {
+    for (int j = 0; j < BATT_AVG_ENTRIES; j++)
+    {
+        if (centivolt_array[j] > 0)
+        {
             sum += centivolt_array[j];
             num++;
         }
     }
     int centivolt = sum / num;
+    */
+
+    int centivolt = (value * 100) + voltagesag;
 
     if (wheelctl_constants[WHEELCTL_CONST_BATTVOLT].value < 70)
     {
@@ -371,22 +407,30 @@ void wheelctl_toggle_lights(void)
     String wheeltype = wheelctl_info[WHEELCTL_INFO_MANUFACTURER].value;
     if (wheeltype == "KS")
     {
-        if (blectl_cli_getconnected()) ks_lights(lightsoff);
-        if (lightsoff) lightsoff = false; else lightsoff = true;
+        if (blectl_cli_getconnected())
+            ks_lights(lightsoff);
+        if (lightsoff)
+            lightsoff = false;
+        else
+            lightsoff = true;
     }
-    else if (wheeltype =="GW") {
+    else if (wheeltype == "GW")
+    {
         //if (blectl_cli_getconnected()) gw_lights(lightsoff);
         //if (lightsoff) lightsoff = false; else lightsoff = true;
     }
-    else if (wheeltype =="IM") {
+    else if (wheeltype == "IM")
+    {
         //if (blectl_cli_getconnected()) im_lights(lightsoff);
         //if (lightsoff) lightsoff = false; else lightsoff = true;
     }
-    else if (wheeltype =="NBZ") {
+    else if (wheeltype == "NBZ")
+    {
         //if (blectl_cli_getconnected()) nbz_lights(lightsoff);
         //if (lightsoff) lightsoff = false; else lightsoff = true;
     }
-    else if (wheeltype =="NB") {
+    else if (wheeltype == "NB")
+    {
         //if (blectl_cli_getconnected()) nb_lights(lightsoff);
         //if (lightsoff) lightsoff = false; else lightsoff = true;
     }

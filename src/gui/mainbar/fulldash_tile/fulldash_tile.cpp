@@ -844,6 +844,7 @@ void fulldash_activate_cb(void)
     time_task = lv_task_create(lv_time_task, 2000, LV_TASK_PRIO_LOWEST, NULL);
     lv_task_ready(time_task);
     fulldash_active = true;
+    wheelctl_update_values();
     //dash_task = lv_task_create(lv_dash_task, 250, LV_TASK_PRIO_LOWEST, NULL);
     //lv_task_ready(dash_task);
 }

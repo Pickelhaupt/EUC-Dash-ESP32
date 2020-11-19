@@ -33,7 +33,6 @@ lv_task_t *sd_dash_task = nullptr;
 lv_task_t *overlay_task = nullptr;
 
 // Function declarations
-static void lv_sd_dash_task(lv_task_t *sd_dash_task);
 static void simpledash_overlay_task(lv_task_t *overlay_task);
 static void sd_overlay_event_cb(lv_obj_t *obj, lv_event_t event);
 
@@ -360,12 +359,8 @@ int sd_value2angle(int arcstart, int arcstop, float minvalue, float maxvalue, fl
    runs every 250ms
  ***************************************************************/
 
-void simpledash_speed_update(void)
+void simpledash_speed_update(float current_speed, float warn_speed, float tiltback_speed, float top_speed)
 {
-    float tiltback_speed = wheelctl_get_data(WHEELCTL_TILTBACK);
-    float current_speed = wheelctl_get_data(WHEELCTL_SPEED);
-    float warn_speed = wheelctl_get_data(WHEELCTL_ALARM3);
-
     if (current_speed >= tiltback_speed)
     {
         lv_style_set_text_color(&sd_speed_label_style, LV_STATE_DEFAULT, LV_COLOR_RED);
@@ -399,9 +394,8 @@ void simpledash_speed_update(void)
     lv_obj_align(sd_speed_label, sd_speed_arc, LV_ALIGN_CENTER, 0, 8);
 }
 
-void simpledash_batt_update(void)
+void simpledash_batt_update(float current_battpct, float min_battpct, float max_battpct)
 {
-    float current_battpct = wheelctl_get_data(WHEELCTL_BATTPCT);
     if (current_battpct < 10)
     {
         lv_style_set_line_color(&sd_batt_indic_style, LV_STATE_DEFAULT, LV_COLOR_RED);
@@ -422,7 +416,7 @@ void simpledash_batt_update(void)
 
     if (dashboard_get_config(DASHBOARD_BARS))
     {
-        int ang_max = sd_value2angle(sd_batt_arc_start, sd_batt_arc_end, 0, 100, wheelctl_get_max_data(WHEELCTL_BATTPCT), sd_rev_batt_arc);
+        int ang_max = sd_value2angle(sd_batt_arc_start, sd_batt_arc_end, 0, 100, max_battpct, sd_rev_batt_arc);
         int ang_max2 = ang_max + 3;
         if (ang_max2 >= 360)
         {
@@ -430,7 +424,7 @@ void simpledash_batt_update(void)
         }
         lv_arc_set_angles(sd_batt_max_bar, ang_max, ang_max2);
 
-        int ang_min = sd_value2angle(sd_batt_arc_start, sd_batt_arc_end, 0, 100, wheelctl_get_min_data(WHEELCTL_BATTPCT), sd_rev_batt_arc);
+        int ang_min = sd_value2angle(sd_batt_arc_start, sd_batt_arc_end, 0, 100, min_battpct, sd_rev_batt_arc);
         int ang_min2 = ang_min + 3;
         if (ang_min2 >= 360)
         {
@@ -440,13 +434,11 @@ void simpledash_batt_update(void)
     }
 }
 
-void simpledash_current_update(void)
+void simpledash_current_update(float current_current, byte maxcurrent, float min_current, float max_current)
 {
     if (dashboard_get_config(DASHBOARD_CURRENT))
     {
         // Set warning and alert colour
-        byte maxcurrent = wheelctl_get_constant(WHEELCTL_CONST_MAXCURRENT);
-        float current_current = wheelctl_get_data(WHEELCTL_CURRENT);
         float amps = current_current;
 
         if (current_current > (maxcurrent * 0.75))
@@ -478,7 +470,7 @@ void simpledash_current_update(void)
         }
         if (dashboard_get_config(DASHBOARD_BARS))
         {
-            int ang_max = sd_value2angle(sd_current_arc_start, sd_current_arc_end, 0, maxcurrent, wheelctl_get_max_data(WHEELCTL_CURRENT), sd_rev_current_arc);
+            int ang_max = sd_value2angle(sd_current_arc_start, sd_current_arc_end, 0, maxcurrent, max_current, sd_rev_current_arc);
             int ang_max2 = ang_max + 3;
             if (ang_max2 >= 360)
             {
@@ -486,7 +478,7 @@ void simpledash_current_update(void)
             }
             lv_arc_set_angles(sd_current_max_bar, ang_max, ang_max2);
 
-            int ang_regen = sd_value2angle(sd_current_arc_start, sd_current_arc_end, 0, maxcurrent, wheelctl_get_min_data(WHEELCTL_CURRENT), sd_rev_current_arc);
+            int ang_regen = sd_value2angle(sd_current_arc_start, sd_current_arc_end, 0, maxcurrent, min_current, sd_rev_current_arc);
             int ang_regen2 = ang_regen + 3;
             if (ang_regen2 >= 360)
             {
@@ -524,20 +516,6 @@ static void simpledash_overlay_task(lv_task_t *overlay_task)
     simpledash_overlay_update();
 }
 
-static void lv_sd_dash_task(lv_task_t *sd_dash_task)
-{
-    if (blectl_cli_getconnected())
-    {
-        simpledash_speed_update();
-        simpledash_batt_update();
-        if (dashboard_get_config(DASHBOARD_CURRENT))
-        {
-            simpledash_current_update();
-        }
-    }
-    simpledash_overlay_update();
-}
-
 uint32_t simpledash_get_tile(void)
 {
     return simpledash_tile_num;
@@ -551,6 +529,7 @@ void simpledash_activate_cb(void)
     overlay_task = lv_task_create(simpledash_overlay_task, 2000, LV_TASK_PRIO_LOWEST, NULL);
     lv_task_ready(overlay_task);
     simpledash_active = true;
+    wheelctl_update_values();
 }
 
 void simpledash_hibernate_cb(void)
