@@ -39,6 +39,11 @@ static void overlay_event_cb(lv_obj_t * obj, lv_event_t event);
 
 void updateTime();
 
+
+ LV_IMG_DECLARE(currentalarm_128px);
+ LV_IMG_DECLARE(battalarm_128px);
+ LV_IMG_DECLARE(tempalarm_128px);
+ LV_IMG_DECLARE(fan_40px);
 /*
    Declare LVGL Dashboard objects and styles
 */
@@ -103,6 +108,7 @@ static lv_style_t dashtime_style;
 static lv_obj_t *batt_alert = NULL;
 static lv_obj_t *current_alert = NULL;
 static lv_obj_t *temp_alert = NULL;
+static lv_obj_t *fan_indic = NULL;
 static lv_style_t alert_style;
 
 //Overlay objects and styles
@@ -447,11 +453,19 @@ void lv_dashtime(void)
 
 void lv_alerts(void) 
 {
+    fan_indic = lv_img_create(fulldash_cont, NULL);
+    lv_obj_reset_style_list(fan_indic, LV_OBJ_PART_MAIN);
+    lv_obj_set_size(fan_indic, 40, 40);
+    lv_obj_add_style(fan_indic, LV_OBJ_PART_MAIN, &alert_style);
+    lv_img_set_src(fan_indic, &fan_40px);
+    lv_obj_set_hidden(fan_indic, true);
+    lv_obj_align(fan_indic, NULL, LV_ALIGN_IN_TOP_RIGHT, -10, -10);
+
     batt_alert = lv_img_create(fulldash_cont, NULL);
     lv_obj_reset_style_list(batt_alert, LV_OBJ_PART_MAIN);
     lv_obj_set_size(batt_alert, 128, 128);
     lv_obj_add_style(batt_alert, LV_OBJ_PART_MAIN, &alert_style);
-    //lv_img_set_src(batt_alert, &batt_alert_128px);
+    lv_img_set_src(batt_alert, &battalarm_128px);
     lv_obj_set_hidden(batt_alert, true);
     lv_obj_align(batt_alert, NULL, LV_ALIGN_IN_BOTTOM_LEFT, 0, 0);
 
@@ -459,7 +473,7 @@ void lv_alerts(void)
     lv_obj_reset_style_list(current_alert, LV_OBJ_PART_MAIN);
     lv_obj_set_size(current_alert, 128, 128);
     lv_obj_add_style(current_alert, LV_OBJ_PART_MAIN, &alert_style);
-    //lv_img_set_src(current_alert, &current_alert_128px);
+    lv_img_set_src(current_alert, &currentalarm_128px);
     lv_obj_set_hidden(current_alert, true);
     lv_obj_align(current_alert, NULL, LV_ALIGN_IN_TOP_LEFT, 0, 0);
 
@@ -467,7 +481,7 @@ void lv_alerts(void)
     lv_obj_reset_style_list(temp_alert, LV_OBJ_PART_MAIN);
     lv_obj_set_size(temp_alert, 128, 128);
     lv_obj_add_style(temp_alert, LV_OBJ_PART_MAIN, &alert_style);
-    //lv_img_set_src(temp_alert, &temp_alert_128px);
+    lv_img_set_src(temp_alert, &tempalarm_128px);
     lv_obj_set_hidden(temp_alert, true);
     lv_obj_align(temp_alert, NULL, LV_ALIGN_IN_TOP_RIGHT, 0, 0);
 }
@@ -872,6 +886,7 @@ void fulldash_tile_setup(void)
     style = mainbar_get_style();
     Serial.println("setting up dashboard");
     lv_define_styles_1();
+    lv_alerts();
     lv_speed_arc_1();
     lv_batt_arc_1();
     lv_current_arc_1();

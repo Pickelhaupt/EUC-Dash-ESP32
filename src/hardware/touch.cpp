@@ -40,7 +40,7 @@ void touch_setup(void)
 
 bool touch_powermgm_event_cb(EventBits_t event, void *arg)
 {
-    TTGOClass *ttgo = TTGOClass::getWatch();
+    //TTGOClass *ttgo = TTGOClass::getWatch();
     
     switch (event)
     {
