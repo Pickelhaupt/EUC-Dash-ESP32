@@ -50,8 +50,6 @@ void setup()
 
     ttgo->begin();
 
-    SPI.begin();
-    SPI.setFrequency(80000000);
     ttgo->tft->initDMA();
     ttgo->lvgl_begin();
 

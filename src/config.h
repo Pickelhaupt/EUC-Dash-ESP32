@@ -26,10 +26,10 @@
 
     #define LILYGO_WATCH_2020_V1             //To use T-Watch2020, please uncomment this line
     #define LILYGO_WATCH_LVGL                   //To use LVGL, you need to enable the macro LVGL
-    #define TWATCH_USE_PSRAM_ALLOC_LVGL
+    //#define TWATCH_USE_PSRAM_ALLOC_LVGL
     //#define TWATCH_LVGL_DOUBLE_BUFFER
-    #define LVGL_BUFFER_SIZE        (240*240)
-    //#define LVGL_BUFFER_SIZE        (240*80)
+    //#define LVGL_BUFFER_SIZE        (240*240)
+    #define LVGL_BUFFER_SIZE        (240*120)
     //#define LV_DISP_DEF_REFR_PERIOD   5
     #include <LilyGoWatch.h>
 
