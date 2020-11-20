@@ -1,5 +1,6 @@
 # EUC-Dash-ESP32
 
+**2020-11-21 Major performance overhaul, scrolling should be fairly smooth now**
 
 **2020-11-09 All features that was available in the old version now works plus a number of newly added features**
 
