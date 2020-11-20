@@ -89,8 +89,9 @@ static lv_style_t sd_bar_main_style;
 
 //Overlay objects and styles
 static lv_obj_t *sd_overlay_bar = NULL;
-static lv_obj_t *sd_overlay_line = NULL;
+static lv_obj_t *sd_overlay_label = NULL;
 static lv_style_t sd_overlay_style;
+static lv_style_t sd_overlay_label_style;
 
 //End LV objects and styles
 
@@ -162,10 +163,20 @@ void lv_sd_define_styles_1(void)
     //overlay
     lv_style_copy(&sd_overlay_style, style);
     lv_style_set_bg_color(&sd_overlay_style, LV_STATE_DEFAULT, LV_COLOR_BLACK);
-    lv_style_set_line_color(&sd_overlay_style, LV_STATE_DEFAULT, LV_COLOR_RED);
-    lv_style_set_line_width(&sd_overlay_style, LV_STATE_DEFAULT, 20);
-    lv_style_set_line_opa(&sd_overlay_style, LV_STATE_DEFAULT, LV_OPA_20);
-    lv_style_set_bg_opa(&sd_overlay_style, LV_STATE_DEFAULT, LV_OPA_20);
+    lv_style_set_text_color(&sd_overlay_style, LV_STATE_DEFAULT, LV_COLOR_RED);
+    lv_style_set_text_font(&sd_overlay_style, LV_STATE_DEFAULT, &DIN1451_m_cond_36);
+    lv_style_set_text_opa(&sd_overlay_style, LV_STATE_DEFAULT, LV_OPA_70);
+    lv_style_set_bg_opa(&sd_overlay_style, LV_STATE_DEFAULT, LV_OPA_30);
+
+    lv_style_copy(&sd_overlay_style, style);
+    lv_style_set_bg_color(&sd_overlay_style, LV_STATE_DEFAULT, LV_COLOR_BLACK);
+    lv_style_set_bg_opa(&sd_overlay_style, LV_STATE_DEFAULT, LV_OPA_30);
+
+    lv_style_copy(&sd_overlay_label_style, &sd_overlay_style);
+    lv_style_set_text_color(&sd_overlay_label_style, LV_STATE_DEFAULT, LV_COLOR_RED);
+    lv_style_set_text_font(&sd_overlay_label_style, LV_STATE_DEFAULT, &DIN1451_m_cond_36);
+    lv_style_set_text_opa(&sd_overlay_label_style, LV_STATE_DEFAULT, LV_OPA_70);
+    lv_style_set_bg_opa(&sd_overlay_label_style, LV_STATE_DEFAULT, LV_OPA_TRANSP);
 
 } //End Define LVGL default object styles
 
@@ -292,8 +303,7 @@ void lv_sd_current_arc_1(void)
 
 void lv_sd_overlay(void)
 {
-    static lv_point_t line_points[] = {{0, lv_disp_get_ver_res(NULL)}, {lv_disp_get_hor_res(NULL), 0}};
-
+    
     sd_overlay_bar = lv_bar_create(simpledash_cont, NULL);
     lv_obj_reset_style_list(sd_overlay_bar, LV_OBJ_PART_MAIN);
     lv_obj_set_size(sd_overlay_bar, lv_disp_get_hor_res(NULL), lv_disp_get_ver_res(NULL));
@@ -302,13 +312,13 @@ void lv_sd_overlay(void)
     mainbar_add_slide_element(sd_overlay_bar);
     lv_obj_set_event_cb(sd_overlay_bar, sd_overlay_event_cb);
 
-    sd_overlay_line = lv_line_create(sd_overlay_bar, NULL);
-    lv_line_set_points(sd_overlay_line, line_points, 2);
-    lv_obj_reset_style_list(sd_overlay_line, LV_OBJ_PART_MAIN);
-    lv_obj_add_style(sd_overlay_line, LV_OBJ_PART_MAIN, &sd_overlay_style);
-    lv_obj_align(sd_overlay_line, NULL, LV_ALIGN_CENTER, 0, 0);
-    mainbar_add_slide_element(sd_overlay_line);
-    lv_obj_set_event_cb(sd_overlay_line, sd_overlay_event_cb);
+    sd_overlay_label = lv_label_create(sd_overlay_bar, NULL);
+    lv_label_set_text(sd_overlay_label, "disconnected");
+    lv_obj_reset_style_list(sd_overlay_label, LV_OBJ_PART_MAIN);
+    lv_obj_add_style(sd_overlay_label, LV_OBJ_PART_MAIN, &sd_overlay_label_style);
+    lv_obj_align(sd_overlay_label, NULL, LV_ALIGN_CENTER, 0, 0);
+    mainbar_add_slide_element(sd_overlay_label);
+    lv_obj_set_event_cb(sd_overlay_label, sd_overlay_event_cb);
 
 } //End Create Dashboard objects
 
@@ -493,17 +503,15 @@ void simpledash_overlay_update()
 {
     if (blectl_cli_getconnected())
     {
-        lv_style_set_line_opa(&sd_overlay_style, LV_STATE_DEFAULT, LV_OPA_TRANSP);
         lv_style_set_bg_opa(&sd_overlay_style, LV_STATE_DEFAULT, LV_OPA_TRANSP);
         lv_obj_add_style(sd_overlay_bar, LV_OBJ_PART_MAIN, &sd_overlay_style);
-        lv_obj_add_style(sd_overlay_line, LV_OBJ_PART_MAIN, &sd_overlay_style);
+        lv_obj_set_hidden(sd_overlay_label, true);
     }
     else
     {
-        lv_style_set_line_opa(&sd_overlay_style, LV_STATE_DEFAULT, LV_OPA_20);
-        lv_style_set_bg_opa(&sd_overlay_style, LV_STATE_DEFAULT, LV_OPA_20);
+        lv_style_set_bg_opa(&sd_overlay_style, LV_STATE_DEFAULT, LV_OPA_30);
         lv_obj_add_style(sd_overlay_bar, LV_OBJ_PART_MAIN, &sd_overlay_style);
-        lv_obj_add_style(sd_overlay_line, LV_OBJ_PART_MAIN, &sd_overlay_style);
+        lv_obj_set_hidden(sd_overlay_label, false);
     }
 }
 

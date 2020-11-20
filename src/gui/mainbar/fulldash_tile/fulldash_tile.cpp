@@ -33,7 +33,7 @@ lv_task_t *dash_task = nullptr;
 lv_task_t *time_task = nullptr;
 
 // Function declarations
-static void lv_dash_task(lv_task_t *dash_task);
+//static void lv_dash_task(lv_task_t *dash_task);
 static void lv_time_task(lv_task_t *time_task);
 static void overlay_event_cb(lv_obj_t * obj, lv_event_t event);
 
@@ -107,8 +107,10 @@ static lv_style_t alert_style;
 
 //Overlay objects and styles
 static lv_obj_t *overlay_bar = NULL;
-static lv_obj_t *overlay_line = NULL;
+//static lv_obj_t *overlay_line = NULL;
+static lv_obj_t *overlay_label = NULL;
 static lv_style_t overlay_style;
+static lv_style_t overlay_label_style;
 
 //End LV objects and styles
 
@@ -219,10 +221,13 @@ void lv_define_styles_1(void)
     //overlay
     lv_style_copy(&overlay_style, style);
     lv_style_set_bg_color(&overlay_style, LV_STATE_DEFAULT, LV_COLOR_BLACK);
-    lv_style_set_line_color(&overlay_style, LV_STATE_DEFAULT, LV_COLOR_RED);
-    lv_style_set_line_width(&overlay_style, LV_STATE_DEFAULT, 20);
-    lv_style_set_line_opa(&overlay_style, LV_STATE_DEFAULT, LV_OPA_20);
-    lv_style_set_bg_opa(&overlay_style, LV_STATE_DEFAULT, LV_OPA_20);
+    lv_style_set_bg_opa(&overlay_style, LV_STATE_DEFAULT, LV_OPA_30);
+
+    lv_style_copy(&overlay_label_style, &overlay_style);
+    lv_style_set_text_color(&overlay_label_style, LV_STATE_DEFAULT, LV_COLOR_RED);
+    lv_style_set_text_font(&overlay_label_style, LV_STATE_DEFAULT, &DIN1451_m_cond_36);
+    lv_style_set_text_opa(&overlay_label_style, LV_STATE_DEFAULT, LV_OPA_70);
+    lv_style_set_bg_opa(&overlay_label_style, LV_STATE_DEFAULT, LV_OPA_TRANSP);
 
 } //End Define LVGL default object styles
 
@@ -268,15 +273,12 @@ void lv_speed_arc_1(void)
     //Label
     speed_label = lv_label_create(fulldash_cont, NULL);
     lv_obj_reset_style_list(speed_label, LV_OBJ_PART_MAIN);
-
     lv_obj_add_style(speed_label, LV_LABEL_PART_MAIN, &speed_label_style);
     char speedstring[4];
-    if (current_speed > 10)
-    {
+    if (current_speed > 10) {
         dtostrf(current_speed, 2, 0, speedstring);
     }
-    else
-    {
+    else {
         dtostrf(current_speed, 1, 0, speedstring);
     }
     lv_label_set_text(speed_label, speedstring);
@@ -327,7 +329,12 @@ void lv_batt_arc_1(void)
     lv_obj_reset_style_list(batt_label, LV_OBJ_PART_MAIN);
     lv_obj_add_style(batt_label, LV_OBJ_PART_MAIN, &batt_label_style);
     char battstring[4];
-    dtostrf(wheelctl_get_data(WHEELCTL_BATTPCT), 2, 0, battstring);
+    if (wheelctl_get_data(WHEELCTL_BATTPCT) > 10){
+        dtostrf(wheelctl_get_data(WHEELCTL_BATTPCT), 2, 0, battstring);
+    }
+    else {
+        dtostrf(wheelctl_get_data(WHEELCTL_BATTPCT), 1, 0, battstring);
+    }
     lv_label_set_text(batt_label, battstring);
     lv_label_set_align(batt_label, LV_LABEL_ALIGN_CENTER);
     lv_obj_align(batt_label, batt_arc, LV_ALIGN_CENTER, 0, 75);
@@ -467,8 +474,6 @@ void lv_alerts(void)
 
 void lv_overlay(void)
 {
-    static lv_point_t line_points[] = {{0, lv_disp_get_ver_res(NULL)}, {lv_disp_get_hor_res(NULL), 0}};
-
     overlay_bar = lv_bar_create(fulldash_cont, NULL);
     lv_obj_reset_style_list(overlay_bar, LV_OBJ_PART_MAIN);
     lv_obj_set_size(overlay_bar, lv_disp_get_hor_res(NULL), lv_disp_get_ver_res(NULL));
@@ -477,14 +482,13 @@ void lv_overlay(void)
     mainbar_add_slide_element(overlay_bar);
     lv_obj_set_event_cb( overlay_bar, overlay_event_cb );
 
-    overlay_line = lv_line_create(overlay_bar, NULL);
-    lv_line_set_points(overlay_line, line_points, 2);
-    lv_obj_reset_style_list(overlay_line, LV_OBJ_PART_MAIN);
-    lv_obj_add_style(overlay_line, LV_OBJ_PART_MAIN, &overlay_style);
-    lv_obj_align(overlay_line, NULL, LV_ALIGN_CENTER, 0, 0);
-    mainbar_add_slide_element(overlay_line);
-    lv_obj_set_event_cb( overlay_line, overlay_event_cb );
-
+    overlay_label = lv_label_create(overlay_bar, NULL);
+    lv_label_set_text(overlay_label, "disconnected");
+    lv_obj_reset_style_list(overlay_label, LV_OBJ_PART_MAIN);
+    lv_obj_add_style(overlay_label, LV_OBJ_PART_MAIN, &overlay_label_style);
+    lv_obj_align(overlay_label, NULL, LV_ALIGN_CENTER, 0, -40);
+    mainbar_add_slide_element(overlay_label);
+    lv_obj_set_event_cb(overlay_label, overlay_event_cb);
 } //End Create Dashboard objects
 
 static void overlay_event_cb(lv_obj_t * obj, lv_event_t event) {
@@ -755,17 +759,15 @@ void fulldash_overlay_update()
 {
     if (blectl_cli_getconnected())
     {
-        lv_style_set_line_opa(&overlay_style, LV_STATE_DEFAULT, LV_OPA_TRANSP);
         lv_style_set_bg_opa(&overlay_style, LV_STATE_DEFAULT, LV_OPA_TRANSP);
         lv_obj_add_style(overlay_bar, LV_OBJ_PART_MAIN, &overlay_style);
-        lv_obj_add_style(overlay_line, LV_OBJ_PART_MAIN, &overlay_style);
+        lv_obj_set_hidden(overlay_label, true);
     }
     else
     {
-        lv_style_set_line_opa(&overlay_style, LV_STATE_DEFAULT, LV_OPA_20);
-        lv_style_set_bg_opa(&overlay_style, LV_STATE_DEFAULT, LV_OPA_20);
+        lv_style_set_bg_opa(&overlay_style, LV_STATE_DEFAULT, LV_OPA_30);
         lv_obj_add_style(overlay_bar, LV_OBJ_PART_MAIN, &overlay_style);
-        lv_obj_add_style(overlay_line, LV_OBJ_PART_MAIN, &overlay_style);
+        lv_obj_set_hidden(overlay_label, false);
     }
 }
 

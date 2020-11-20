@@ -36,6 +36,6 @@
     /*
     * firmeware version string
     */
-    #define __FIRMWARE__            "2020112001"
+    #define __FIRMWARE__            "2020112002"
 
 #endif // _CONFIG_H
