@@ -93,6 +93,26 @@ void simpledash_batt_update(float current_battpct, float min_battpct, float max_
 * @brief update current arc and label
 */
 void simpledash_current_update(float current_current, byte maxcurrent, float min_current, float max_current);
+/**
+* @brief display current alert icon on the simple dashboard
+* @param enabled set to true to enable
+*/
+void simpledash_current_alert(bool enabled);
+/**
+* @brief display battery alert icon on the simple dashboard
+* @param enabled set to true to enable
+*/
+void simpledash_batt_alert(bool enabled);
+/**
+* @brief display temperature alert icon on the simple dashboard
+* @param enabled set to true to enable
+*/
+void simpledash_temp_alert(bool enabled);
+/**
+* @brief display fan running notification on the simple dashboard
+* @param enabled set to true to enable
+*/
+void simpledash_fan_indic(bool enabled);
 
 //variable declarations
 extern bool simpledash_active;

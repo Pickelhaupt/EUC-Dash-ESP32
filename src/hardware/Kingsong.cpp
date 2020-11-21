@@ -133,6 +133,32 @@ void decodeKS(byte KSdata[])
         wheelctl_set_data(WHEELCTL_ALARM3, KSdata[8]);
         wheelctl_set_data(WHEELCTL_TILTBACK, KSdata[10]);
     }
+    else if (KSdata[16] == 0xb3) { //Serial number
+        byte serial_no[18];
+        for (int i = 2; i < 16; i++) {
+            serial_no[i - 2] = KSdata[i];
+        }
+        serial_no[14] = KSdata[17];
+        serial_no[15] = KSdata[18];
+        serial_no[16] = KSdata[19];
+        serial_no[17] = 0x00;
+        char sstring[sizeof(serial_no) + 1];
+        memcpy(sstring, serial_no, sizeof(serial_no));
+        sstring[sizeof(serial_no)] = 0;
+        wheelctl_set_info(WHEELCTL_INFO_SERIAL, sstring);
+    }
+    else if (KSdata[16] == 0xbb) { //name and model
+        byte model_name[14];
+        for (int i = 2; i < 16; i++) {
+            if (KSdata[i] != 0) {
+                model_name[i - 2] = KSdata[i];
+            }
+        }
+        char mstring[sizeof(model_name) + 1];
+        memcpy(mstring, model_name, sizeof(model_name));
+        mstring[sizeof(model_name)] = 0;
+        wheelctl_set_info(WHEELCTL_INFO_MODEL, mstring);
+    }
     //wheelctl_set_data(WHEELCTL_RIDETIME, (add_ride_millis() / 1000));
 } // End decodeKS
 

@@ -40,52 +40,45 @@ static void sd_overlay_event_cb(lv_obj_t *obj, lv_event_t event);
    Declare LVGL Dashboard objects and styles
 */
 
+ LV_IMG_DECLARE(currentalarm_128px);
+ LV_IMG_DECLARE(battalarm_128px);
+ LV_IMG_DECLARE(tempalarm_128px);
+ LV_IMG_DECLARE(fan_40px);
+
 static lv_obj_t *simpledash_cont = NULL;
 static lv_style_t *style;
 static lv_style_t sd_arc_style;
 
 // Arc gauges and labels
 //arc background styles
-//static lv_style_t sd_arc_warn_style;
-//static lv_style_t sd_arc_crit_style;
 //Speed
 static lv_obj_t *sd_speed_arc = nullptr;
-//static lv_obj_t *sd_speed_warn_arc = nullptr;
-//static lv_obj_t *sd_speed_crit_arc = nullptr;
 static lv_obj_t *sd_speed_label = nullptr;
-//static lv_style_t sd_speed_indic_style;
-//static lv_style_t sd_speed_main_style;
 static lv_style_t sd_speed_label_style;
 //Battery
 static lv_obj_t *sd_batt_arc = nullptr;
-//static lv_obj_t *sd_batt_warn_arc = nullptr;
-//static lv_obj_t *sd_batt_crit_arc = nullptr;
-//static lv_obj_t *sd_batt_label = nullptr;
 static lv_style_t sd_batt_indic_style;
 static lv_style_t sd_batt_main_style;
-//static lv_style_t sd_batt_label_style;
 //Current
 static lv_obj_t *sd_current_arc = nullptr;
-//static lv_obj_t *sd_current_warn_arc = nullptr;
-//static lv_obj_t *sd_current_crit_arc = nullptr;
-//static lv_obj_t *sd_current_label = nullptr;
 static lv_style_t sd_current_indic_style;
 static lv_style_t sd_current_main_style;
-//static lv_style_t sd_current_label_style;
-
 //Max min avg bars
-//static lv_obj_t *sd_speed_avg_bar = nullptr;
-//static lv_obj_t *sd_speed_max_bar = nullptr;
 static lv_obj_t *sd_batt_max_bar = nullptr;
 static lv_obj_t *sd_batt_min_bar = nullptr;
 static lv_obj_t *sd_current_max_bar = nullptr;
 static lv_obj_t *sd_current_regen_bar = nullptr;
-
 //Max avg, regen and min bars
 static lv_style_t sd_max_bar_indic_style;
 static lv_style_t sd_min_bar_indic_style; //also for avg speed
 static lv_style_t sd_regen_bar_indic_style;
 static lv_style_t sd_bar_main_style;
+//alert objects and styles
+static lv_obj_t *sd_batt_alert = NULL;
+static lv_obj_t *sd_current_alert = NULL;
+static lv_obj_t *sd_temp_alert = NULL;
+static lv_obj_t *sd_fan_indic = NULL;
+static lv_style_t sd_alert_style;
 
 //Overlay objects and styles
 static lv_obj_t *sd_overlay_bar = NULL;
@@ -126,7 +119,6 @@ void lv_sd_define_styles_1(void)
     lv_style_set_bg_opa(&sd_arc_style, LV_STATE_DEFAULT, LV_OPA_TRANSP);
     lv_style_set_border_width(&sd_arc_style, LV_STATE_DEFAULT, 0);
     lv_style_set_border_opa(&sd_arc_style, LV_STATE_DEFAULT, LV_OPA_TRANSP);
-
     //General styles
 
     //Speed label
@@ -159,15 +151,10 @@ void lv_sd_define_styles_1(void)
     //regen bar
     lv_style_copy(&sd_regen_bar_indic_style, &sd_arc_style);
     lv_style_set_line_color(&sd_regen_bar_indic_style, LV_STATE_DEFAULT, sd_regen_bar_clr);
-
+    //alerts
+    lv_style_copy(&sd_alert_style, style);
+    lv_style_set_bg_opa(&sd_alert_style, LV_STATE_DEFAULT, LV_OPA_TRANSP);
     //overlay
-    lv_style_copy(&sd_overlay_style, style);
-    lv_style_set_bg_color(&sd_overlay_style, LV_STATE_DEFAULT, LV_COLOR_BLACK);
-    lv_style_set_text_color(&sd_overlay_style, LV_STATE_DEFAULT, LV_COLOR_RED);
-    lv_style_set_text_font(&sd_overlay_style, LV_STATE_DEFAULT, &DIN1451_m_cond_36);
-    lv_style_set_text_opa(&sd_overlay_style, LV_STATE_DEFAULT, LV_OPA_70);
-    lv_style_set_bg_opa(&sd_overlay_style, LV_STATE_DEFAULT, LV_OPA_30);
-
     lv_style_copy(&sd_overlay_style, style);
     lv_style_set_bg_color(&sd_overlay_style, LV_STATE_DEFAULT, LV_COLOR_BLACK);
     lv_style_set_bg_opa(&sd_overlay_style, LV_STATE_DEFAULT, LV_OPA_30);
@@ -300,6 +287,40 @@ void lv_sd_current_arc_1(void)
         mainbar_add_slide_element(sd_current_regen_bar);
     }
 }
+void lv_sd_alerts(void) 
+{
+    sd_fan_indic = lv_img_create(simpledash_cont, NULL);
+    lv_obj_reset_style_list(sd_fan_indic, LV_OBJ_PART_MAIN);
+    lv_obj_set_size(sd_fan_indic, 40, 40);
+    lv_obj_add_style(sd_fan_indic, LV_OBJ_PART_MAIN, &sd_alert_style);
+    lv_img_set_src(sd_fan_indic, &fan_40px);
+    lv_obj_set_hidden(sd_fan_indic, true);
+    lv_obj_align(sd_fan_indic, NULL, LV_ALIGN_IN_TOP_RIGHT, -10, -10);
+
+    sd_batt_alert = lv_img_create(simpledash_cont, NULL);
+    lv_obj_reset_style_list(sd_batt_alert, LV_OBJ_PART_MAIN);
+    lv_obj_set_size(sd_batt_alert, 128, 128);
+    lv_obj_add_style(sd_batt_alert, LV_OBJ_PART_MAIN, &sd_alert_style);
+    lv_img_set_src(sd_batt_alert, &battalarm_128px);
+    lv_obj_set_hidden(sd_batt_alert, true);
+    lv_obj_align(sd_batt_alert, NULL, LV_ALIGN_IN_BOTTOM_LEFT, 0, 0);
+
+    sd_current_alert = lv_img_create(simpledash_cont, NULL);
+    lv_obj_reset_style_list(sd_current_alert, LV_OBJ_PART_MAIN);
+    lv_obj_set_size(sd_current_alert, 128, 128);
+    lv_obj_add_style(sd_current_alert, LV_OBJ_PART_MAIN, &sd_alert_style);
+    lv_img_set_src(sd_current_alert, &currentalarm_128px);
+    lv_obj_set_hidden(sd_current_alert, true);
+    lv_obj_align(sd_current_alert, NULL, LV_ALIGN_IN_TOP_LEFT, 0, 0);
+
+    sd_temp_alert = lv_img_create(simpledash_cont, NULL);
+    lv_obj_reset_style_list(sd_temp_alert, LV_OBJ_PART_MAIN);
+    lv_obj_set_size(sd_temp_alert, 128, 128);
+    lv_obj_add_style(sd_temp_alert, LV_OBJ_PART_MAIN, &sd_alert_style);
+    lv_img_set_src(sd_temp_alert, &tempalarm_128px);
+    lv_obj_set_hidden(sd_temp_alert, true);
+    lv_obj_align(sd_temp_alert, NULL, LV_ALIGN_IN_TOP_RIGHT, 0, 0);
+}
 
 void lv_sd_overlay(void)
 {
@@ -331,6 +352,19 @@ static void sd_overlay_event_cb(lv_obj_t *obj, lv_event_t event)
         motor_vibe(5, true);
         wheelctl_toggle_lights();
     }
+}
+
+void simpledash_current_alert(bool enabled) {
+        lv_obj_set_hidden(sd_current_alert , !enabled);
+}
+void simpledash_batt_alert(bool enabled) {
+        lv_obj_set_hidden(sd_batt_alert , !enabled);
+}
+void simpledash_temp_alert(bool enabled) {
+        lv_obj_set_hidden(sd_temp_alert , !enabled);
+}
+void simpledash_fan_indic(bool enabled) {
+        lv_obj_set_hidden(sd_fan_indic , !enabled);
 }
 
 int sd_value2angle(int arcstart, int arcstop, float minvalue, float maxvalue, float arcvalue, bool reverse)

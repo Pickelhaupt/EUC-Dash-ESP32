@@ -113,7 +113,26 @@ void fulldash_temp_update(float current_temp, byte warn_temp, byte crit_temp, fl
 * @brief update overlay
 */
 void fulldash_overlay_update();
-
+/**
+* @brief display current alert icon on the full dashboard
+* @param enabled set to true to enable
+*/
+void fulldash_current_alert(bool enabled);
+/**
+* @brief display battery alert icon on the full dashboard
+* @param enabled set to true to enable
+*/
+void fulldash_batt_alert(bool enabled);
+/**
+* @brief display temperature alert icon on the full dashboard
+* @param enabled set to true to enable
+*/
+void fulldash_temp_alert(bool enabled);
+/**
+* @brief display fan running notification dashboard
+* @param enabled set to true to enable
+*/
+void fulldash_fan_indic(bool enabled);
 
 //variable declarations
 // extern struct Wheel_constants wheelconst;

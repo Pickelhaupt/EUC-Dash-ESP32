@@ -39,7 +39,6 @@ static void overlay_event_cb(lv_obj_t * obj, lv_event_t event);
 
 void updateTime();
 
-
  LV_IMG_DECLARE(currentalarm_128px);
  LV_IMG_DECLARE(battalarm_128px);
  LV_IMG_DECLARE(tempalarm_128px);
@@ -511,6 +510,19 @@ static void overlay_event_cb(lv_obj_t * obj, lv_event_t event) {
         motor_vibe(5, true);
         wheelctl_toggle_lights();
     }
+}
+
+void fulldash_current_alert(bool enabled) {
+        lv_obj_set_hidden(current_alert , !enabled);
+}
+void fulldash_batt_alert(bool enabled) {
+        lv_obj_set_hidden(batt_alert , !enabled);
+}
+void fulldash_temp_alert(bool enabled) {
+        lv_obj_set_hidden(temp_alert , !enabled);
+}
+void fulldash_fan_indic(bool enabled) {
+        lv_obj_set_hidden(fan_indic , !enabled);
 }
 
 int value2angle(int arcstart, int arcstop, float minvalue, float maxvalue, float arcvalue, bool reverse)

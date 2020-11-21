@@ -124,7 +124,7 @@ void wheelinfo_setup_obj( void ) {
 
     lv_obj_t *blesuuid_label = lv_label_create( wheelinfo_cont, NULL);
     lv_obj_add_style( blesuuid_label, LV_OBJ_PART_MAIN, &wheelinfo_style );
-    lv_label_set_text( blesuuid_label, "blesuuid");
+    lv_label_set_text( blesuuid_label, "serial");
     lv_obj_align( blesuuid_label, blemfg_label, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0 );
     blesuuid_data = lv_label_create( wheelinfo_cont, NULL);
     lv_obj_add_style( blesuuid_data, LV_OBJ_PART_MAIN, &wheelinfo_data_style  );
@@ -133,7 +133,7 @@ void wheelinfo_setup_obj( void ) {
 
     lv_obj_t *blesduuid_label = lv_label_create( wheelinfo_cont, NULL);
     lv_obj_add_style( blesduuid_label, LV_OBJ_PART_MAIN, &wheelinfo_style );
-    lv_label_set_text( blesduuid_label, "blesduuid");
+    lv_label_set_text( blesduuid_label, "model");
     lv_obj_align( blesduuid_label, blesuuid_label, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0 );
     blesduuid_data = lv_label_create( wheelinfo_cont, NULL);
     lv_obj_add_style( blesduuid_data, LV_OBJ_PART_MAIN, &wheelinfo_data_style  );
@@ -188,20 +188,21 @@ void wheelinfo_update( void ) {
     lv_label_set_text( current_data, temp);
     lv_obj_align( current_data, voltage_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
 
-    
-    //snprintf( temp, sizeof( temp ), "%s", wheelctl_get_info(WHEELCTL_INFO_BLENAME) );
-    //strcpy(temp, wheelctl_get_info(WHEELCTL_INFO_BLENAME).c_str());
     lv_label_set_text( blename_data, wheelctl_get_info(WHEELCTL_INFO_BLENAME).c_str());
     lv_obj_align( blename_data, current_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
 
     lv_label_set_text( blemfg_data, wheelctl_get_info(WHEELCTL_INFO_BLEMFG).c_str());
     lv_obj_align( blemfg_data, blename_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
+
+    lv_label_set_text( blesuuid_data, wheelctl_get_info(WHEELCTL_INFO_SERIAL).c_str());
+    lv_obj_align( blesuuid_data, blemfg_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
+
+    lv_label_set_text( blesduuid_data, wheelctl_get_info(WHEELCTL_INFO_MODEL).c_str());
+    lv_obj_align( blesduuid_data, blesuuid_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
 /*
     //snprintf( temp, sizeof( temp ), "%s", wheelctl_get_info(WHEELCTL_INFO_BLESUUID) );
     strcpy(temp, wheelctl_get_info(WHEELCTL_INFO_BLESUUID).c_str());
-    lv_label_set_text( blesuuid_data, temp);
-    lv_obj_align( blesuuid_data, blemfg_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
-
+    
     //snprintf( temp, sizeof( temp ), "%s", wheelctl_get_info(WHEELCTL_INFO_BLESDUUID) );
     strcpy(temp, wheelctl_get_info(WHEELCTL_INFO_BLESDUUID).c_str());
     lv_label_set_text( blesduuid_data, temp);

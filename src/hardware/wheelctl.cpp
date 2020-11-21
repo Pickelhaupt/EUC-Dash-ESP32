@@ -151,6 +151,10 @@ void wheelctl_set_data(int entry, float value)
         case WHEELCTL_UPTIME:
             wheelctl_update_ridetime(value);
             break;
+        case WHEELCTL_FANSTATE:
+            if (fulldash_active) fulldash_fan_indic(value);
+            if (simpledash_active) simpledash_fan_indic(value);
+            break;
         }
         firstrun[entry] = false;
         wheelctl_data[entry].value = value;
@@ -183,6 +187,14 @@ void wheelctl_update_battpct_max_min(int entry, float value)
     if (wheelctl_data[WHEELCTL_CURRENT].value > 0)
     {
         wheelctl_update_max_min(entry, value, true);
+    }
+    if (value < 10) {
+        if (fulldash_active) fulldash_batt_alert(true);
+        if (simpledash_active) simpledash_batt_alert(true);
+    }
+    else {
+        if (fulldash_active) fulldash_batt_alert(false);
+        if (simpledash_active) simpledash_batt_alert(false);
     }
 }
 
@@ -361,11 +373,15 @@ void update_current_shake(float value)
         current_shake = lv_task_create(lv_current_shake, 500, LV_TASK_PRIO_LOWEST, NULL);
         lv_task_ready(current_shake);
         shakeoff[1] = false;
+        if (fulldash_active) fulldash_current_alert(true);
+        if (simpledash_active) simpledash_current_alert(true);
     }
     else if (value < (wheelctl_constants[WHEELCTL_CONST_MAXCURRENT].value * 0.75) && !shakeoff[1])
     {
         lv_task_del(current_shake);
         shakeoff[1] = true;
+        if (fulldash_active) fulldash_current_alert(false);
+        if (simpledash_active) simpledash_current_alert(false);
     }
 }
 
@@ -377,11 +393,15 @@ void update_temp_shake(float value)
         temp_shake = lv_task_create(lv_temp_shake, 1000, LV_TASK_PRIO_LOWEST, NULL);
         lv_task_ready(temp_shake);
         shakeoff[2] = false;
+        if (fulldash_active) fulldash_temp_alert(true);
+        if (simpledash_active) simpledash_temp_alert(true);
     }
     else if (value <= wheelctl_constants[WHEELCTL_CONST_CRITTEMP].value && !shakeoff[2] && temp_shake != nullptr)
     {
         lv_task_del(temp_shake);
         shakeoff[2] = true;
+        if (fulldash_active) fulldash_temp_alert(false);
+        if (simpledash_active) simpledash_temp_alert(false);
     }
 }
 
@@ -407,12 +427,8 @@ void wheelctl_toggle_lights(void)
     String wheeltype = wheelctl_info[WHEELCTL_INFO_MANUFACTURER].value;
     if (wheeltype == "KS")
     {
-        if (blectl_cli_getconnected())
-            ks_lights(lightsoff);
-        if (lightsoff)
-            lightsoff = false;
-        else
-            lightsoff = true;
+        if (blectl_cli_getconnected()) ks_lights(lightsoff);
+        if (lightsoff) lightsoff = false; else lightsoff = true;
     }
     else if (wheeltype == "GW")
     {
