@@ -355,16 +355,20 @@ static void sd_overlay_event_cb(lv_obj_t *obj, lv_event_t event)
 }
 
 void simpledash_current_alert(bool enabled) {
-        lv_obj_set_hidden(sd_current_alert , !enabled);
+    if (enabled) lv_obj_set_hidden(sd_current_alert , false);
+    else lv_obj_set_hidden(sd_current_alert , true);
 }
 void simpledash_batt_alert(bool enabled) {
-        lv_obj_set_hidden(sd_batt_alert , !enabled);
+    if (enabled) lv_obj_set_hidden(sd_batt_alert , false);
+    else lv_obj_set_hidden(sd_batt_alert , true);
 }
 void simpledash_temp_alert(bool enabled) {
-        lv_obj_set_hidden(sd_temp_alert , !enabled);
+    if (enabled) lv_obj_set_hidden(sd_temp_alert , true);
+    else lv_obj_set_hidden(sd_temp_alert , true);
 }
 void simpledash_fan_indic(bool enabled) {
-        lv_obj_set_hidden(sd_fan_indic , !enabled);
+    if (enabled) lv_obj_set_hidden(sd_fan_indic , true);
+    else lv_obj_set_hidden(sd_fan_indic , true);
 }
 
 int sd_value2angle(int arcstart, int arcstop, float minvalue, float maxvalue, float arcvalue, bool reverse)
@@ -595,6 +599,7 @@ void simpledash_tile_setup(void)
     style = mainbar_get_style();
     Serial.println("setting up dashboard");
     lv_sd_define_styles_1();
+    lv_sd_alerts();
     lv_sd_speed_arc_1();
     lv_sd_batt_arc_1();
     if (dashboard_get_config(DASHBOARD_CURRENT))

@@ -43,13 +43,12 @@ lv_style_t wheelinfo_data_style;
 
 lv_obj_t *voltage_data;
 lv_obj_t *current_data;
-lv_obj_t *power_data;
+lv_obj_t *colour_data;
 lv_obj_t *speed_data;
-lv_obj_t *blename_data;
-lv_obj_t *blemfg_data;
-lv_obj_t *blesuuid_data;
-lv_obj_t *blesduuid_data;
-lv_obj_t *blesvcdata_data;
+lv_obj_t *maxvolt_data;
+lv_obj_t *model_data;
+lv_obj_t *serial_data;
+lv_obj_t *capacity_data;
 
 void wheelinfo_tile_setup(void)
 {
@@ -86,68 +85,70 @@ void wheelinfo_setup_obj( void ) {
     lv_label_set_text( heading_label, "wheel information");
     lv_obj_align( heading_label, wheelinfo_cont, LV_ALIGN_IN_TOP_MID, 0, 5 );
 
+    lv_obj_t *serial_label = lv_label_create( wheelinfo_cont, NULL);
+    lv_obj_add_style( serial_label, LV_OBJ_PART_MAIN, &wheelinfo_style );
+    lv_label_set_text( serial_label, "serial");
+    lv_obj_align( serial_label, wheelinfo_cont, LV_ALIGN_IN_TOP_LEFT, 5, 30 );
+    serial_data = lv_label_create( wheelinfo_cont, NULL);
+    lv_obj_add_style( serial_data, LV_OBJ_PART_MAIN, &wheelinfo_data_style  );
+    lv_label_set_text( serial_data, "ABCDEFG");
+    lv_obj_align( serial_data, wheelinfo_cont, LV_ALIGN_IN_TOP_RIGHT, -5, 30 );
+
+    lv_obj_t *model_label = lv_label_create( wheelinfo_cont, NULL);
+    lv_obj_add_style( model_label, LV_OBJ_PART_MAIN, &wheelinfo_style );
+    lv_label_set_text( model_label, "model");
+    lv_obj_align( model_label, serial_label, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0 );
+    model_data = lv_label_create( wheelinfo_cont, NULL);
+    lv_obj_add_style( model_data, LV_OBJ_PART_MAIN, &wheelinfo_data_style  );
+    lv_label_set_text( model_data, "KS99X");
+    lv_obj_align( model_data, serial_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
+
+    lv_obj_t *maxvolt_label = lv_label_create( wheelinfo_cont, NULL);
+    lv_obj_add_style( maxvolt_label, LV_OBJ_PART_MAIN, &wheelinfo_style );
+    lv_label_set_text( maxvolt_label, "max voltage");
+    lv_obj_align( maxvolt_label, model_label, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0 );
+    maxvolt_data = lv_label_create( wheelinfo_cont, NULL);
+    lv_obj_add_style( maxvolt_data, LV_OBJ_PART_MAIN, &wheelinfo_data_style  );
+    lv_label_set_text( maxvolt_data, "67 V");
+    lv_obj_align( maxvolt_data, model_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
+
     lv_obj_t *voltage_label = lv_label_create( wheelinfo_cont, NULL);
     lv_obj_add_style( voltage_label, LV_OBJ_PART_MAIN, &wheelinfo_style );
-    lv_label_set_text( voltage_label, "battery voltage");
-    lv_obj_align( voltage_label, wheelinfo_cont, LV_ALIGN_IN_TOP_LEFT, 5, 30 );
+    lv_label_set_text( voltage_label, "current voltage");
+    lv_obj_align( voltage_label, maxvolt_label, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0 );
     voltage_data = lv_label_create( wheelinfo_cont, NULL);
     lv_obj_add_style( voltage_data, LV_OBJ_PART_MAIN, &wheelinfo_data_style  );
-    lv_label_set_text( voltage_data, "67 V");
-    lv_obj_align( voltage_data, wheelinfo_cont, LV_ALIGN_IN_TOP_RIGHT, -5, 30 );
+    lv_label_set_text( voltage_data, "2.4 A");
+    lv_obj_align( voltage_data, maxvolt_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
 
-    lv_obj_t *current_label = lv_label_create( wheelinfo_cont, NULL);
-    lv_obj_add_style( current_label, LV_OBJ_PART_MAIN, &wheelinfo_style );
-    lv_label_set_text( current_label, "current");
-    lv_obj_align( current_label, voltage_label, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0 );
-    current_data = lv_label_create( wheelinfo_cont, NULL);
-    lv_obj_add_style( current_data, LV_OBJ_PART_MAIN, &wheelinfo_data_style  );
-    lv_label_set_text( current_data, "2.4 A");
-    lv_obj_align( current_data, voltage_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
+    lv_obj_t *capacity_label = lv_label_create( wheelinfo_cont, NULL);
+    lv_obj_add_style( capacity_label, LV_OBJ_PART_MAIN, &wheelinfo_style );
+    lv_label_set_text( capacity_label, "battery capacity");
+    lv_obj_align( capacity_label, voltage_label, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0 );
+    capacity_data = lv_label_create( wheelinfo_cont, NULL);
+    lv_obj_add_style( capacity_data, LV_OBJ_PART_MAIN, &wheelinfo_data_style  );
+    lv_label_set_text( capacity_data, "2.4 A");
+    lv_obj_align( capacity_data, voltage_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
 
-    lv_obj_t *blename_label = lv_label_create( wheelinfo_cont, NULL);
-    lv_obj_add_style( blename_label, LV_OBJ_PART_MAIN, &wheelinfo_style );
-    lv_label_set_text( blename_label, "blename");
-    lv_obj_align( blename_label, current_label, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0 );
-    blename_data = lv_label_create( wheelinfo_cont, NULL);
-    lv_obj_add_style( blename_data, LV_OBJ_PART_MAIN, &wheelinfo_data_style  );
-    lv_label_set_text( blename_data, "2.4 A");
-    lv_obj_align( blename_data, current_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
+    lv_obj_t *colour_label = lv_label_create( wheelinfo_cont, NULL);
+    lv_obj_add_style( colour_label, LV_OBJ_PART_MAIN, &wheelinfo_style );
+    lv_label_set_text( colour_label, "colour");
+    lv_obj_align( colour_label, capacity_label, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0 );
+    colour_data = lv_label_create( wheelinfo_cont, NULL);
+    lv_obj_add_style( colour_data, LV_OBJ_PART_MAIN, &wheelinfo_data_style  );
+    lv_label_set_text( colour_data, "2.4 A");
+    lv_obj_align( colour_data, capacity_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
 
-    lv_obj_t *blemfg_label = lv_label_create( wheelinfo_cont, NULL);
-    lv_obj_add_style( blemfg_label, LV_OBJ_PART_MAIN, &wheelinfo_style );
-    lv_label_set_text( blemfg_label, "blemfg");
-    lv_obj_align( blemfg_label, blename_label, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0 );
-    blemfg_data = lv_label_create( wheelinfo_cont, NULL);
-    lv_obj_add_style( blemfg_data, LV_OBJ_PART_MAIN, &wheelinfo_data_style  );
-    lv_label_set_text( blemfg_data, "2.4 A");
-    lv_obj_align( blemfg_data, blename_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
-
-    lv_obj_t *blesuuid_label = lv_label_create( wheelinfo_cont, NULL);
-    lv_obj_add_style( blesuuid_label, LV_OBJ_PART_MAIN, &wheelinfo_style );
-    lv_label_set_text( blesuuid_label, "serial");
-    lv_obj_align( blesuuid_label, blemfg_label, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0 );
-    blesuuid_data = lv_label_create( wheelinfo_cont, NULL);
-    lv_obj_add_style( blesuuid_data, LV_OBJ_PART_MAIN, &wheelinfo_data_style  );
-    lv_label_set_text( blesuuid_data, "2.4 A");
-    lv_obj_align( blesuuid_data, blemfg_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
-
-    lv_obj_t *blesduuid_label = lv_label_create( wheelinfo_cont, NULL);
-    lv_obj_add_style( blesduuid_label, LV_OBJ_PART_MAIN, &wheelinfo_style );
-    lv_label_set_text( blesduuid_label, "model");
-    lv_obj_align( blesduuid_label, blesuuid_label, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0 );
-    blesduuid_data = lv_label_create( wheelinfo_cont, NULL);
-    lv_obj_add_style( blesduuid_data, LV_OBJ_PART_MAIN, &wheelinfo_data_style  );
-    lv_label_set_text( blesduuid_data, "2.4 A");
-    lv_obj_align( blesduuid_data, blesuuid_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
-
+/*
     lv_obj_t *blesvcdata_label = lv_label_create( wheelinfo_cont, NULL);
     lv_obj_add_style( blesvcdata_label, LV_OBJ_PART_MAIN, &wheelinfo_style );
     lv_label_set_text( blesvcdata_label, "blesvcdata");
-    lv_obj_align( blesvcdata_label, blesduuid_label, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0 );
+    lv_obj_align( blesvcdata_label, colour_label, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0 );
     blesvcdata_data = lv_label_create( wheelinfo_cont, NULL);
     lv_obj_add_style( blesvcdata_data, LV_OBJ_PART_MAIN, &wheelinfo_data_style  );
     lv_label_set_text( blesvcdata_data, "2.4 A");
-    lv_obj_align( blesvcdata_data, blesduuid_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
+    lv_obj_align( blesvcdata_data, colour_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
+    */
 }
 
 void wheelinfo_activate_cb(void)
@@ -179,26 +180,26 @@ void lv_wheelinfo_task ( lv_task_t *wheelinfo_task )
 
 void wheelinfo_update( void ) {
     char temp[26]="no data";
-    
+
+    lv_label_set_text( serial_data, wheelctl_get_info(WHEELCTL_INFO_SERIAL).c_str());
+    lv_obj_align( serial_data, wheelinfo_cont, LV_ALIGN_IN_TOP_RIGHT, -5, 30 );
+
+    lv_label_set_text( model_data, wheelctl_get_info(WHEELCTL_INFO_MODEL).c_str());
+    lv_obj_align( model_data, serial_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
+
+    snprintf( temp, sizeof( temp ), "%d V", wheelctl_get_constant(WHEELCTL_CONST_BATTVOLT) );
+    lv_label_set_text( maxvolt_data, temp);
+    lv_obj_align( maxvolt_data, model_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
+
     snprintf( temp, sizeof( temp ), "%0.2f V", wheelctl_get_data(WHEELCTL_VOLTAGE) );
     lv_label_set_text( voltage_data, temp);
-    lv_obj_align( voltage_data, wheelinfo_cont, LV_ALIGN_IN_TOP_RIGHT, -5, 30 );
+    lv_obj_align( voltage_data, maxvolt_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
 
-    snprintf( temp, sizeof( temp ), "%0.2f A", wheelctl_get_data(WHEELCTL_CURRENT) );
-    lv_label_set_text( current_data, temp);
-    lv_obj_align( current_data, voltage_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
+    lv_label_set_text( capacity_data, wheelctl_get_info(WHEELCTL_INFO_BATTCAP).c_str());
+    lv_obj_align( capacity_data, voltage_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
 
-    lv_label_set_text( blename_data, wheelctl_get_info(WHEELCTL_INFO_BLENAME).c_str());
-    lv_obj_align( blename_data, current_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
-
-    lv_label_set_text( blemfg_data, wheelctl_get_info(WHEELCTL_INFO_BLEMFG).c_str());
-    lv_obj_align( blemfg_data, blename_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
-
-    lv_label_set_text( blesuuid_data, wheelctl_get_info(WHEELCTL_INFO_SERIAL).c_str());
-    lv_obj_align( blesuuid_data, blemfg_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
-
-    lv_label_set_text( blesduuid_data, wheelctl_get_info(WHEELCTL_INFO_MODEL).c_str());
-    lv_obj_align( blesduuid_data, blesuuid_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
+    lv_label_set_text( colour_data, wheelctl_get_info(WHEELCTL_INFO_WHEELCOLOR).c_str());
+    lv_obj_align( colour_data, capacity_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
 /*
     //snprintf( temp, sizeof( temp ), "%s", wheelctl_get_info(WHEELCTL_INFO_BLESUUID) );
     strcpy(temp, wheelctl_get_info(WHEELCTL_INFO_BLESUUID).c_str());
@@ -213,6 +214,6 @@ void wheelinfo_update( void ) {
     lv_label_set_text( blesvcdata_data, temp);
     lv_obj_align( blesvcdata_data, blesduuid_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
 
-    //Serial.println(wheelctl_get_info(WHEELCTL_INFO_BLENAME));
+    //Serial.println(wheelctl_get_info(WHEELCTL_INFO_maxvolt));
     */
 }

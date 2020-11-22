@@ -53,6 +53,7 @@
         WHEELCTL_CONST_BATTVOLT,    //Voltage of the battery pack for the wheel model -required
         WHEELCTL_CONST_BATTWARN,    //Percentage of battery remaining when warning should be triggered for the specific wheel model -required     
         WHEELCTL_CONST_BATT_IR,     //battery pack internal resistance
+        WHEELCTL_CONST_BATT_P,     //number of battery cells in parallel
         WHEELCTL_CONST_NUM          //number of wheel constants
     };
 
@@ -65,6 +66,9 @@
         WHEELCTL_INFO_MANUFACTURER, //Wheel manufacturer value should be KS, GW, IM or NB -- make sure this is set when implementing a new wheel model
         WHEELCTL_INFO_MODEL,        //Wheel model -- make sure the wheel ctl constants are set up for the specific model 
         WHEELCTL_INFO_VERSION,      //in case there are multiple versions for a specific model
+        WHEELCTL_INFO_BATTCAP,
+        WHEELCTL_INFO_WHEELCOLOR,
+        WHEELCTL_INFO_MANUFDATE,
         WHEELCTL_INFO_BLESUUID,       
         WHEELCTL_INFO_BLESDUUID,
         WHEELCTL_INFO_BLENAME,
