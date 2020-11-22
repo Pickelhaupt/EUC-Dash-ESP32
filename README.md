@@ -116,7 +116,7 @@ Required libraries will be downloaded automatically on first compile with PIO
 - Add persistent settings storage --done
 - Add gesture controls of light and horn --lights done
 - Support for more wheel models
-- Autodetection of wheel make and model --80%
+- Autodetection of wheel make and model --done, only detects KS at this time
 
 Removed the old mockups of the planned end state for version 1.0 as this has changed a bit and I will add new images when I find the time.
 
