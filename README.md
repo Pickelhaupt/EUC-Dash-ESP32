@@ -106,17 +106,17 @@ Required libraries will be downloaded automatically on first compile with PIO
 
 ## Todo
 - Add haptic feedback to alarms  --done
-- Add missing dashboard objects  --mostly done, only alert icons remaining
-  - Alert icons and red corners
+- Add missing dashboard objects  --done
+  - Alert icons and red corners --done
 - Add simple dashboard --done
 - Add multiple screens (2 dashboard detail levels) --done
 - Add info screen --done, additional info items to be added
 - Add settings screen and settings --done, only wheel settings remain
 - Make alarms wake up screens --done
 - Add persistent settings storage --done
-- Add gesture controls of light and horn
+- Add gesture controls of light and horn --lights done
 - Support for more wheel models
-- Autodetection of wheel make and model
+- Autodetection of wheel make and model --80%
 
 Removed the old mockups of the planned end state for version 1.0 as this has changed a bit and I will add new images when I find the time.
 
