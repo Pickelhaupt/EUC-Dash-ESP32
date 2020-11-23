@@ -23,12 +23,11 @@ Completely rewritten using the My-TTGO-Watch as template, still only works with 
   - wifi
 ## In progress:
 - Adding wheel settings 
-- Adding wheel model autodetection
+- Adding wheel model autodetection --done for KS wheels, still some models missing though
 ## Next steps
-- Add support for more wheel types Gotway will be implemented next
+- Add support for more wheel types, Gotway will be implemented next
 ## Still todo
 - Add wheel selection setting
-- Add missing dash elements (ride mode and alert indicators)
 
 This version requires the TTGO_TWatch_Library, this will automatically be downloaded when building the project the first time.
 I have forked the Twatch library and upgraded the LVGL version, the forked version is the one that is downloaded when building the project.
