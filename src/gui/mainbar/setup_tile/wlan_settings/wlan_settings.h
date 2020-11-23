@@ -27,5 +27,6 @@
     void wlan_settings_tile_setup( void );
     void wlan_password_tile_setup( uint32_t wifi_password_tile_num );
     void wlan_setup_tile_setup( uint32_t wifi_setup_tile_num );
+    void wlan_setup_display_ssid(String ssid);
 
 #endif // _WLAN_SETTINGS_H

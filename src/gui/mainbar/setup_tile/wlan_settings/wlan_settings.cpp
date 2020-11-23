@@ -40,6 +40,7 @@ LV_IMG_DECLARE(exit_32px);
 lv_obj_t *wifi_settings_tile=NULL;
 lv_style_t wifi_settings_style;
 lv_style_t wifi_settings_heading_style;
+lv_style_t wifi_settings_data_style;
 lv_style_t wifi_list_style;
 uint32_t wifi_settings_tile_num;
 icon_t *wifi_setup_icon = NULL;
@@ -56,6 +57,9 @@ uint32_t wifi_setup_tile_num;
 
 lv_obj_t *wifi_onoff=NULL;
 lv_obj_t *wifiname_list=NULL;
+
+lv_obj_t *wifi_connection_label=NULL;
+lv_obj_t *wifi_connection_ssid=NULL;
 
 static void enter_wifi_settings_event_cb( lv_obj_t * obj, lv_event_t event );
 static void exit_wifi_settings_event_cb( lv_obj_t * obj, lv_event_t event );
@@ -90,6 +94,8 @@ void wlan_settings_tile_setup( void ) {
 
     lv_style_copy( &wifi_settings_heading_style, &wifi_settings_style );
     lv_style_set_text_color( &wifi_settings_heading_style, LV_OBJ_PART_MAIN, LV_COLOR_WHITE );
+    lv_style_copy( &wifi_settings_data_style, &wifi_settings_style );
+    lv_style_set_text_color( &wifi_settings_data_style, LV_OBJ_PART_MAIN, LV_COLOR_LIME );
 
     lv_obj_add_style( wifi_settings_tile, LV_OBJ_PART_MAIN, &wifi_settings_style );
 
@@ -128,6 +134,15 @@ void wlan_settings_tile_setup( void ) {
     lv_obj_align( wifi_onoff, setup_btn, LV_ALIGN_OUT_LEFT_MID, -10, 0 );
     lv_obj_set_event_cb( wifi_onoff, wifi_onoff_event_handler);
 
+    wifi_connection_label = lv_label_create( wifi_settings_tile, NULL );
+    lv_label_set_text( wifi_connection_label, "connected:");
+    lv_obj_align( wifi_connection_label, wifi_settings_tile, LV_ALIGN_IN_TOP_LEFT, 10, 45 );
+    
+    wifi_connection_ssid = lv_label_create( wifi_settings_tile, NULL );
+    lv_obj_add_style( wifi_connection_label, LV_OBJ_PART_MAIN, &wifi_settings_data_style );
+    lv_label_set_text( wifi_connection_ssid, "NULL");
+    lv_obj_align( wifi_connection_ssid, wifi_connection_label, LV_ALIGN_OUT_RIGHT_MID, 10, 0 );
+
     wifiname_list = lv_list_create( wifi_settings_tile, NULL);
     lv_obj_set_size( wifiname_list, lv_disp_get_hor_res( NULL ), 160);
     lv_style_init( &wifi_list_style  );
@@ -139,19 +154,38 @@ void wlan_settings_tile_setup( void ) {
     wlan_password_tile_setup( wifi_password_tile_num );
     wlan_setup_tile_setup( wifi_setup_tile_num );
 
-    wifictl_register_cb( WIFICTL_ON | WIFICTL_OFF | WIFICTL_SCAN , wifi_setup_wifictl_event_cb, "wifi network scan" );
+    wifictl_register_cb( WIFICTL_ON | WIFICTL_OFF | WIFICTL_SCAN | WIFICTL_CONNECT, wifi_setup_wifictl_event_cb, "wifi network scan" );
 }
 
+void wlan_setup_display_ssid(String ssid) {
+    if (wifi_connection_ssid != NULL) {
+        lv_label_set_text( wifi_connection_ssid, ssid.c_str());
+        lv_obj_align( wifi_connection_ssid, wifi_connection_label, LV_ALIGN_OUT_RIGHT_MID, 10, 0 );
+    }
+}
+
+
 bool wifi_setup_wifictl_event_cb( EventBits_t event, void *arg ) {
+    String getssid;
     switch( event ) {
         case    WIFICTL_ON:
             lv_switch_on( wifi_onoff, LV_ANIM_OFF );
+            getssid = WiFi.SSID();
+            wlan_setup_display_ssid(getssid);
             break;
         case    WIFICTL_OFF:
+            getssid = WiFi.SSID();
+            wlan_setup_display_ssid(getssid);
             lv_switch_off( wifi_onoff, LV_ANIM_OFF );
             while ( lv_list_remove( wifiname_list, 0 ) );
             break;
+        case    WIFICTL_CONNECT:
+            getssid = WiFi.SSID();
+            wlan_setup_display_ssid(getssid);
+            break;
         case    WIFICTL_SCAN:
+            getssid = WiFi.SSID();
+            wlan_setup_display_ssid(getssid);
             while ( lv_list_remove( wifiname_list, 0 ) );
 
             int len = WiFi.scanComplete();
@@ -342,7 +376,6 @@ void wlan_setup_tile_setup( uint32_t wifi_setup_tile_num ) {
     lv_obj_add_style( wifi_autoon_label, LV_OBJ_PART_MAIN, &wifi_setup_style  );
     lv_label_set_text( wifi_autoon_label, "enable on wakeup");
     lv_obj_align( wifi_autoon_label, wifi_autoon_onoff_cont, LV_ALIGN_IN_LEFT_MID, 5, 0 );
-
 
      lv_obj_t *wifi_enabled_on_standby_onoff_cont = lv_obj_create( wifi_setup_tile, NULL );
     lv_obj_set_size(wifi_enabled_on_standby_onoff_cont, lv_disp_get_hor_res( NULL ) , 32);
