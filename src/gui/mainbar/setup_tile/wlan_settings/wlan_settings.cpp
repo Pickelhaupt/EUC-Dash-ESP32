@@ -139,7 +139,7 @@ void wlan_settings_tile_setup( void ) {
     lv_obj_align( wifi_connection_label, wifi_settings_tile, LV_ALIGN_IN_TOP_LEFT, 10, 45 );
     
     wifi_connection_ssid = lv_label_create( wifi_settings_tile, NULL );
-    lv_obj_add_style( wifi_connection_label, LV_OBJ_PART_MAIN, &wifi_settings_data_style );
+    lv_obj_add_style( wifi_connection_ssid, LV_OBJ_PART_MAIN, &wifi_settings_data_style );
     lv_label_set_text( wifi_connection_ssid, "NULL");
     lv_obj_align( wifi_connection_ssid, wifi_connection_label, LV_ALIGN_OUT_RIGHT_MID, 10, 0 );
 
@@ -163,7 +163,6 @@ void wlan_setup_display_ssid(String ssid) {
         lv_obj_align( wifi_connection_ssid, wifi_connection_label, LV_ALIGN_OUT_RIGHT_MID, 10, 0 );
     }
 }
-
 
 bool wifi_setup_wifictl_event_cb( EventBits_t event, void *arg ) {
     String getssid;
