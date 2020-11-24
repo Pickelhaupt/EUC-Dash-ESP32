@@ -109,7 +109,8 @@ void main_tile_setup( void ) {
     lv_label_set_text( datelabel, buf );
     lv_obj_align( datelabel, timelabel, LV_ALIGN_CENTER, 0, 47 );
 
-    main_tile_task = lv_task_create( main_tile_update_task, 500, LV_TASK_PRIO_MID, NULL );
+    main_tile_task = lv_task_create( main_tile_update_task, 5000, LV_TASK_PRIO_MID, NULL );
+    lv_task_ready(main_tile_task);
 
     powermgm_register_cb( POWERMGM_WAKEUP , main_tile_powermgm_event_cb, "main tile time update" );
 }

@@ -355,20 +355,16 @@ static void sd_overlay_event_cb(lv_obj_t *obj, lv_event_t event)
 }
 
 void simpledash_current_alert(bool enabled) {
-    if (enabled) lv_obj_set_hidden(sd_current_alert , false);
-    else lv_obj_set_hidden(sd_current_alert , true);
+    lv_obj_set_hidden(sd_current_alert , !enabled);
 }
 void simpledash_batt_alert(bool enabled) {
-    if (enabled) lv_obj_set_hidden(sd_batt_alert , false);
-    else lv_obj_set_hidden(sd_batt_alert , true);
+    lv_obj_set_hidden(sd_batt_alert , !enabled);
 }
 void simpledash_temp_alert(bool enabled) {
-    if (enabled) lv_obj_set_hidden(sd_temp_alert , true);
-    else lv_obj_set_hidden(sd_temp_alert , true);
+    lv_obj_set_hidden(sd_temp_alert , !enabled);
 }
 void simpledash_fan_indic(bool enabled) {
-    if (enabled) lv_obj_set_hidden(sd_fan_indic , true);
-    else lv_obj_set_hidden(sd_fan_indic , true);
+    lv_obj_set_hidden(sd_fan_indic , !enabled);
 }
 
 int sd_value2angle(int arcstart, int arcstop, float minvalue, float maxvalue, float arcvalue, bool reverse)
