@@ -96,11 +96,11 @@ Some new screenshots, colours are a bit off though
 
 ## Dependencies
 ### Required libraries:
+Libraries are downloaded automatically by PlatformIO when compiling for the first time.
 - TTGO T-Watch Library; modified version with LVGL 7.6
 - AsyncTCP@>=1.1.1
 - ArduinoJson@>=6.15.2
 - PubSubClient@>=2.8
-Required libraries will be downloaded automatically on first compile with PIO
 
 ## Bugs and issues
 - time zone settings only work if the wifi enable on wakeup setting is on when booting
