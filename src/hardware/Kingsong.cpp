@@ -351,6 +351,16 @@ void kingsong_decode_serial( void ) {
             wheelctl_set_constant(WHEELCTL_CONST_MAXCURRENT, 55);
         }
     }
+    else if (ks_size == "KSS1"){
+        if (ks_battsize == "81") {
+            wheelctl_set_info(WHEELCTL_INFO_BATTCAP, "1110");
+            wheelctl_set_constant(WHEELCTL_CONST_BATTVOLT, 84);
+            wheelctl_set_constant(WHEELCTL_CONST_BATT_P, 4);
+            wheelctl_set_info(WHEELCTL_INFO_MODEL, "KS-S18");
+            wheelctl_set_constant(WHEELCTL_CONST_BATTWARN, 25);
+            wheelctl_set_constant(WHEELCTL_CONST_MAXCURRENT, 50);
+        }
+    }
     if (wheelctl_get_constant(WHEELCTL_CONST_BATT_P) == 1) wheelctl_set_constant(WHEELCTL_CONST_BATT_IR, 0.3);
     if (wheelctl_get_constant(WHEELCTL_CONST_BATT_P) == 2) wheelctl_set_constant(WHEELCTL_CONST_BATT_IR, 0.23);
     if (wheelctl_get_constant(WHEELCTL_CONST_BATT_P) == 3) wheelctl_set_constant(WHEELCTL_CONST_BATT_IR, 0.20);
