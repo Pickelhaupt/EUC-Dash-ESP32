@@ -31,7 +31,7 @@ lv_obj_t *preload = NULL;
 lv_obj_t *preload_label = NULL;
 lv_style_t style;
 
-LV_FONT_DECLARE(DIN1451_m_cond_24);
+//LV_FONT_DECLARE(DIN1451_m_cond_24);
 LV_FONT_DECLARE(DIN1451_m_cond_28);
 
 LV_IMG_DECLARE(hedgehog);
@@ -41,7 +41,7 @@ void splash_screen_stage_one( void ) {
     TTGOClass *ttgo = TTGOClass::getWatch();
 
     png_decoder_init();
-    lv_img_cache_set_size(100);
+    lv_img_cache_set_size(50);
 
     lv_style_init( &style );
     lv_style_set_radius( &style, LV_OBJ_PART_MAIN, 0 );

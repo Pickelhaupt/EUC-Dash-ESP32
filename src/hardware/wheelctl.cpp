@@ -149,7 +149,9 @@ void wheelctl_set_data(int entry, float value)
             wheelctl_update_max_min(entry, value, false);
             break;
         case WHEELCTL_UPTIME:
-            wheelctl_update_ridetime(value);
+        if (wheelctl_data[entry].value != value) {
+                wheelctl_update_ridetime(value);
+            }
             break;
         case WHEELCTL_FANSTATE:
             if (fulldash_active) fulldash_fan_indic(value);
@@ -165,9 +167,8 @@ void wheelctl_update_ridetime(float uptime)
 {
     if (wheelctl_data[WHEELCTL_SPEED].value >= MIN_RIDE_SPEED)
     {
-        wheelctl_data[WHEELCTL_RIDETIME].value = +(uptime - old_uptime);
+        wheelctl_data[WHEELCTL_RIDETIME].value =+ 1;
     }
-    old_uptime = uptime;
 }
 
 void wheelctl_update_max_min(int entry, float value, bool update_min)

@@ -46,6 +46,7 @@ static void framebuffer_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv
 
 void framebuffer_setup( void ) {
     framebuffer = (lv_color_t*)ps_malloc( lv_disp_get_hor_res( NULL ) * lv_disp_get_ver_res( NULL ) * sizeof( lv_color_t ) );
+    //framebuffer = (lv_color_t*)malloc( lv_disp_get_hor_res( NULL ) * lv_disp_get_ver_res( NULL ) * sizeof( lv_color_t ) );
     if ( framebuffer == NULL ) {
         log_e("framebuffer 1 malloc failed");
         return;
