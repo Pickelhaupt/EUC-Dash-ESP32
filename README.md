@@ -1,4 +1,5 @@
 # EUC-Dash-ESP32
+**2020-11-24 Autodetection of KS wheels has been implemented, at the moment only KS14M/D/S, KS16/KS16S and KS18A/S are detected**
 
 **2020-11-21 Major performance overhaul, scrolling should be fairly smooth now**
 
