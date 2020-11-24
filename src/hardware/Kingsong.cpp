@@ -423,8 +423,8 @@ void ks_ble_set(byte parameter, byte value)
       0x6C -- side led mode value2 = 0x00
    *****************************************************************/
     byte value2{0x00};
-    if (value == 0x73) value2 = 0x01;
-    if (value == 0x87) value2 = 0xE0;
+    if (parameter == 0x73) value2 = 0x01;
+    if (parameter == 0x87) value2 = 0xE0;
 
     byte KS_BLEreq[20] = {0x00}; //set array to zero
     KS_BLEreq[0] = 0xAA;         //Header byte 1
