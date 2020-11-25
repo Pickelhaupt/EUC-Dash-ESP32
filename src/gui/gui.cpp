@@ -84,7 +84,7 @@ void gui_setup( void )
     //statusbar_setup();
     lv_disp_trig_activity( NULL );
 
-    //gui_set_background_image( display_get_background_image() );
+    gui_set_background_image( display_get_background_image() );
 
     keyboard_setup();
 
@@ -115,6 +115,7 @@ bool gui_powermgm_event_cb( EventBits_t event, void *arg ) {
 }
 
 void gui_set_background_image ( uint32_t background_image ) {
+    /*
     switch ( background_image ) {
         case 0:
             LV_IMG_DECLARE( bg );
@@ -159,9 +160,11 @@ void gui_set_background_image ( uint32_t background_image ) {
                 lv_obj_set_hidden( img_bin, true );
             }
             break;
+        
         default:
             lv_obj_set_hidden( img_bin, true ); 
-    }
+    } */
+    lv_obj_set_hidden( img_bin, true ); 
 }
 
 bool gui_powermgm_loop_event_cb( EventBits_t event, void *arg ) {

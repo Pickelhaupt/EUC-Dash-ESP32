@@ -272,8 +272,8 @@ void display_settings_tile_setup( void ) {
     }
     lv_label_set_text( display_timeout_slider_label, temp );
     lv_obj_align( display_timeout_slider_label, display_timeout_slider, LV_ALIGN_OUT_BOTTOM_MID, 0, 15 );
-    lv_dropdown_set_selected( display_rotation_list, display_get_rotation() / 90 );
-    lv_dropdown_set_selected( display_bg_img_list, display_get_background_image() );
+    //lv_dropdown_set_selected( display_rotation_list, display_get_rotation() / 90 );
+    //lv_dropdown_set_selected( display_bg_img_list, display_get_background_image() );
 
     if ( motor_get_vibe_config() )
         lv_switch_on( display_vibe_onoff, LV_ANIM_OFF );

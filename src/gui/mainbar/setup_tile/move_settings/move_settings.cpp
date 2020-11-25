@@ -35,8 +35,8 @@ lv_style_t move_settings_heading_style;
 uint32_t move_tile_num;
 
 lv_obj_t *stepcounter_onoff=NULL;
-lv_obj_t *doubleclick_onoff=NULL;
-lv_obj_t *tilt_onoff=NULL;
+//lv_obj_t *doubleclick_onoff=NULL;
+//lv_obj_t *tilt_onoff=NULL;
 lv_obj_t *daily_stepcounter_onoff=NULL;
 
 LV_IMG_DECLARE(exit_32px);
@@ -45,8 +45,8 @@ LV_IMG_DECLARE(wheel_64px);
 static void enter_move_setup_event_cb( lv_obj_t * obj, lv_event_t event );
 static void exit_move_setup_event_cb( lv_obj_t * obj, lv_event_t event );
 static void stepcounter_onoff_event_handler(lv_obj_t * obj, lv_event_t event);
-static void doubleclick_onoff_event_handler(lv_obj_t * obj, lv_event_t event);
-static void tilt_onoff_event_handler(lv_obj_t * obj, lv_event_t event);
+//static void doubleclick_onoff_event_handler(lv_obj_t * obj, lv_event_t event);
+//static void tilt_onoff_event_handler(lv_obj_t * obj, lv_event_t event);
 static void daily_stepcounter_onoff_event_handler(lv_obj_t * obj, lv_event_t event);
 
 void move_settings_tile_setup( void ) {
@@ -95,6 +95,7 @@ void move_settings_tile_setup( void ) {
     lv_label_set_text( stepcounter_label, "not implemented");
     lv_obj_align( stepcounter_label, stepcounter_cont, LV_ALIGN_IN_LEFT_MID, 5, 0 );
 
+/*
     lv_obj_t *doubleclick_cont = lv_obj_create( move_settings_tile, NULL );
     lv_obj_set_size(doubleclick_cont, lv_disp_get_hor_res( NULL ) , 40);
     lv_obj_add_style( doubleclick_cont, LV_OBJ_PART_MAIN, &move_settings_style  );
@@ -124,11 +125,12 @@ void move_settings_tile_setup( void ) {
     lv_obj_add_style( tilt_label, LV_OBJ_PART_MAIN, &move_settings_style  );
     lv_label_set_text( tilt_label, "tilt to wake");
     lv_obj_align( tilt_label, tilt_cont, LV_ALIGN_IN_LEFT_MID, 5, 0 );
+*/
 
     lv_obj_t *daily_stepcounter_cont = lv_obj_create( move_settings_tile, NULL );
     lv_obj_set_size(daily_stepcounter_cont, lv_disp_get_hor_res( NULL ) , 40);
     lv_obj_add_style( daily_stepcounter_cont, LV_OBJ_PART_MAIN, &move_settings_style  );
-    lv_obj_align( daily_stepcounter_cont, tilt_cont, LV_ALIGN_OUT_BOTTOM_MID, 0, 0 );
+    lv_obj_align( daily_stepcounter_cont, stepcounter_cont, LV_ALIGN_OUT_BOTTOM_MID, 0, 0 );
     daily_stepcounter_onoff = lv_switch_create( daily_stepcounter_cont, NULL );
     lv_obj_add_protect( daily_stepcounter_onoff, LV_PROTECT_CLICK_FOCUS);
     lv_obj_add_style( daily_stepcounter_onoff, LV_SWITCH_PART_INDIC, mainbar_get_switch_style() );
@@ -140,21 +142,22 @@ void move_settings_tile_setup( void ) {
     lv_label_set_text( daily_stepcounter_label, "not implemented");
     lv_obj_align( daily_stepcounter_label, daily_stepcounter_cont, LV_ALIGN_IN_LEFT_MID, 5, 0 );
 
+/*
     if ( bma_get_config( BMA_DOUBLECLICK ) )
         lv_switch_on( doubleclick_onoff, LV_ANIM_OFF );
     else
         lv_switch_off( doubleclick_onoff, LV_ANIM_OFF );
-
+*/
     if ( bma_get_config( BMA_STEPCOUNTER ) )
         lv_switch_on( stepcounter_onoff, LV_ANIM_OFF );
     else
         lv_switch_off( stepcounter_onoff, LV_ANIM_OFF );
-
+/*
     if ( bma_get_config( BMA_TILT ) )
         lv_switch_on( tilt_onoff, LV_ANIM_OFF );
     else
         lv_switch_off( tilt_onoff, LV_ANIM_OFF );
-
+*/
     if ( bma_get_config( BMA_DAILY_STEPCOUNTER ) )
         lv_switch_on( daily_stepcounter_onoff, LV_ANIM_OFF );
     else
@@ -181,7 +184,7 @@ static void stepcounter_onoff_event_handler(lv_obj_t * obj, lv_event_t event) {
         case( LV_EVENT_VALUE_CHANGED):  bma_set_config( BMA_STEPCOUNTER, lv_switch_get_state( obj ) );
     }
 }
-
+/*
 static void doubleclick_onoff_event_handler(lv_obj_t * obj, lv_event_t event) {
     switch( event ) {
         case( LV_EVENT_VALUE_CHANGED):  bma_set_config( BMA_DOUBLECLICK, lv_switch_get_state( obj ) );
@@ -193,7 +196,7 @@ static void tilt_onoff_event_handler(lv_obj_t * obj, lv_event_t event) {
         case( LV_EVENT_VALUE_CHANGED):  bma_set_config( BMA_TILT, lv_switch_get_state( obj ) );
     }
 }
-
+*/
 static void daily_stepcounter_onoff_event_handler(lv_obj_t * obj, lv_event_t event) {
     switch( event ) {
         case( LV_EVENT_VALUE_CHANGED):  bma_set_config( BMA_DAILY_STEPCOUNTER, lv_switch_get_state( obj ) );
