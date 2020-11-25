@@ -130,7 +130,7 @@ void time_settings_tile_setup( void ) {
     lv_obj_set_event_cb( wifisync_onoff, wifisync_onoff_event_handler );
     lv_obj_t *wifisync_label = lv_label_create( wifisync_cont, NULL);
     lv_obj_add_style( wifisync_label, LV_OBJ_PART_MAIN, &time_settings_style  );
-    lv_label_set_text( wifisync_label, "sync when connect");
+    lv_label_set_text( wifisync_label, "sync when connected");
     lv_obj_align( wifisync_label, wifisync_cont, LV_ALIGN_IN_LEFT_MID, 5, 0 );
 
     lv_obj_t *clock_fmt_cont = lv_obj_create( time_settings_tile, NULL );

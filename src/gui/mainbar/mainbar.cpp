@@ -290,14 +290,6 @@ void mainbar_jump_to_tilenumber( uint32_t tile_number, lv_anim_enable_t anim ) {
     }
 }
 
-/*
-void mainbar_tilevent_action() {
-    uint32_t tile_number;
-    tile_number = lv_tileview_get_tile_act(mainbar, MAINBAR_APP_TILE_X_START, y);
-    lv_tilevie
-}
-*/
-
 lv_obj_t * mainbar_obj_create(lv_obj_t *parent)
 {
     lv_obj_t * child = lv_obj_create( parent, NULL );

@@ -33,8 +33,6 @@
 #include "hardware/motor.h"
 #include "hardware/display.h"
 
-
-
 lv_obj_t *utilities_tile=NULL;
 lv_style_t utilities_style;
 uint32_t utilities_tile_num;
@@ -98,11 +96,11 @@ void utilities_tile_setup( void ) {
     //Add button for SPIFFS format
     format_spiffs_btn = lv_btn_create( utilities_tile, NULL);
     lv_obj_set_event_cb( format_spiffs_btn, format_SPIFFS_utilities_event_cb );
-    lv_obj_set_size( format_spiffs_btn, 80, 60);
+    lv_obj_set_size( format_spiffs_btn, 140, 40);
     lv_obj_add_style( format_spiffs_btn, LV_BTN_PART_MAIN, mainbar_get_button_style() );
-    lv_obj_align( format_spiffs_btn, utilities_tile, LV_ALIGN_CENTER, 0, -15);
+    lv_obj_align( format_spiffs_btn, utilities_tile, LV_ALIGN_CENTER, 0, -25);
     lv_obj_t *format_spiffs_btn_label = lv_label_create( format_spiffs_btn, NULL );
-    lv_label_set_text( format_spiffs_btn_label, "Format\nSPIFFS");
+    lv_label_set_text( format_spiffs_btn_label, "clear settings");
     
     //Add button for reboot
     reboot_btn = lv_btn_create( utilities_tile, NULL);
@@ -126,7 +124,7 @@ void utilities_tile_setup( void ) {
     lv_obj_t *last_reboot_label = lv_label_create( utilities_tile, NULL);
     lv_obj_add_style( last_reboot_label, LV_OBJ_PART_MAIN, &utilities_style  );
     lv_label_set_text( last_reboot_label, "Last Reboot Reason:");
-    lv_obj_align( last_reboot_label, format_spiffs_btn, LV_ALIGN_OUT_BOTTOM_MID, 0, 5 );
+    lv_obj_align( last_reboot_label, format_spiffs_btn, LV_ALIGN_OUT_BOTTOM_LEFT, 5, 5 );
     
     lv_obj_t *last_reason_label = lv_label_create( utilities_tile, NULL);
     lv_obj_add_style( last_reason_label, LV_OBJ_PART_MAIN, &utilities_style  );
@@ -142,38 +140,38 @@ void utilities_tile_setup( void ) {
                                         lv_label_set_text( last_reason_label, "Power On");//Power On
                                         break;
       case (ESP_RST_EXT):
-                                        lv_label_set_text( last_reason_label, "External\nPin");
+                                        lv_label_set_text( last_reason_label, "External Pin");
                                         break;
       case (ESP_RST_SW):
-                                        lv_label_set_text( last_reason_label, "Software\nReset");
+                                        lv_label_set_text( last_reason_label, "Software Reset");
                                         break;
       case (ESP_RST_PANIC):
-                                        lv_label_set_text( last_reason_label, "Exception\nor Panic");
+                                        lv_label_set_text( last_reason_label, "Exception or Panic");
                                         break;
       case (ESP_RST_INT_WDT):
-                                        lv_label_set_text( last_reason_label, "Interrupt\nWatchdog");
+                                        lv_label_set_text( last_reason_label, "Interrupt Watchdog");
                                         break;
       case (ESP_RST_TASK_WDT):
-                                        lv_label_set_text( last_reason_label, "Task\nWatchdog");
+                                        lv_label_set_text( last_reason_label, "Task Watchdog");
                                         break;
       case (ESP_RST_WDT):
-                                        lv_label_set_text( last_reason_label, "Other\nWatchdogs");
+                                        lv_label_set_text( last_reason_label, "Other Watchdogs");
                                         break;
       case (ESP_RST_DEEPSLEEP):
-                                        lv_label_set_text( last_reason_label, "Exit Deep\nSleep");
+                                        lv_label_set_text( last_reason_label, "Exit Deep Sleep");
                                         break;
       case (ESP_RST_BROWNOUT):
                                         lv_label_set_text( last_reason_label, "Brownout");
                                         break;
       case (ESP_RST_SDIO):
-                                        lv_label_set_text( last_reason_label, "Rst by\nSDIO");
+                                        lv_label_set_text( last_reason_label, "Reset by SDIO");
                                         break;
       default:
-                                        lv_label_set_text( last_reason_label, "No Reason\nReturned");
+                                        lv_label_set_text( last_reason_label, "No Reason Returned");
                                         break;
     }
     lv_label_set_align( last_reason_label, LV_LABEL_ALIGN_CENTER );
-    lv_obj_align( last_reason_label, last_reboot_label, LV_ALIGN_OUT_BOTTOM_MID, 0, 5 );//Now that the text has changed, align it.
+    lv_obj_align( last_reason_label, last_reboot_label, LV_ALIGN_OUT_BOTTOM_LEFT, 5, 5 );//Now that the text has changed, align it.
 }
 
 static void enter_utilities_event_cb( lv_obj_t * obj, lv_event_t event ) {

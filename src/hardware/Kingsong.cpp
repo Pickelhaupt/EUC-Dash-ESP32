@@ -147,28 +147,28 @@ void kingsong_decode_serial( void ) {
             wheelctl_set_constant(WHEELCTL_CONST_BATTVOLT, 67);
             wheelctl_set_constant(WHEELCTL_CONST_BATT_P, 2);
             wheelctl_set_info(WHEELCTL_INFO_MODEL, "KS14D");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTWARN, KS_14D_BATTWARN);
+            wheelctl_set_constant(WHEELCTL_CONST_BATTWARN, 40);
         }
         else if (ks_battsize == "D2") {
             wheelctl_set_info(WHEELCTL_INFO_BATTCAP, "420");
             wheelctl_set_constant(WHEELCTL_CONST_BATTVOLT, 67);
             wheelctl_set_constant(WHEELCTL_CONST_BATT_P, 2);
             wheelctl_set_info(WHEELCTL_INFO_MODEL, "KS14D");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTWARN, KS_14D_BATTWARN);
+            wheelctl_set_constant(WHEELCTL_CONST_BATTWARN, 40);
         }
         else if (ks_battsize == "D3") {
             wheelctl_set_info(WHEELCTL_INFO_BATTCAP, "680");
             wheelctl_set_constant(WHEELCTL_CONST_BATTVOLT, 67);
             wheelctl_set_constant(WHEELCTL_CONST_BATT_P, 4);
             wheelctl_set_info(WHEELCTL_INFO_MODEL, "KS14S");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTWARN, KS_14S_BATTWARN);
+            wheelctl_set_constant(WHEELCTL_CONST_BATTWARN, 25);
         }
         else if (ks_battsize == "D4") {
             wheelctl_set_info(WHEELCTL_INFO_BATTCAP, "840");
             wheelctl_set_constant(WHEELCTL_CONST_BATTVOLT, 67);
             wheelctl_set_constant(WHEELCTL_CONST_BATT_P, 4);
             wheelctl_set_info(WHEELCTL_INFO_MODEL, "KS14S");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTWARN, KS_14S_BATTWARN);
+            wheelctl_set_constant(WHEELCTL_CONST_BATTWARN, 25);
         }
     }
     else if (ks_size == "KS16"){
@@ -361,11 +361,11 @@ void kingsong_decode_serial( void ) {
             wheelctl_set_constant(WHEELCTL_CONST_MAXCURRENT, 50);
         }
     }
-    if (wheelctl_get_constant(WHEELCTL_CONST_BATT_P) == 1) wheelctl_set_constant(WHEELCTL_CONST_BATT_IR, 0.3);
-    if (wheelctl_get_constant(WHEELCTL_CONST_BATT_P) == 2) wheelctl_set_constant(WHEELCTL_CONST_BATT_IR, 0.23);
-    if (wheelctl_get_constant(WHEELCTL_CONST_BATT_P) == 3) wheelctl_set_constant(WHEELCTL_CONST_BATT_IR, 0.20);
-    if (wheelctl_get_constant(WHEELCTL_CONST_BATT_P) == 4) wheelctl_set_constant(WHEELCTL_CONST_BATT_IR, 0.15);
-    if (wheelctl_get_constant(WHEELCTL_CONST_BATT_P) == 8) wheelctl_set_constant(WHEELCTL_CONST_BATT_IR, 0.12);
+    if (wheelctl_get_constant(WHEELCTL_CONST_BATT_P) == 1) wheelctl_set_constant(WHEELCTL_CONST_BATT_IR, 30);
+    if (wheelctl_get_constant(WHEELCTL_CONST_BATT_P) == 2) wheelctl_set_constant(WHEELCTL_CONST_BATT_IR, 23);
+    if (wheelctl_get_constant(WHEELCTL_CONST_BATT_P) == 3) wheelctl_set_constant(WHEELCTL_CONST_BATT_IR, 20);
+    if (wheelctl_get_constant(WHEELCTL_CONST_BATT_P) == 4) wheelctl_set_constant(WHEELCTL_CONST_BATT_IR, 15);
+    if (wheelctl_get_constant(WHEELCTL_CONST_BATT_P) == 8) wheelctl_set_constant(WHEELCTL_CONST_BATT_IR, 12);
 
     if (ks_colour == "B") wheelctl_set_info(WHEELCTL_INFO_WHEELCOLOR, "black");
     if (ks_colour == "C") wheelctl_set_info(WHEELCTL_INFO_WHEELCOLOR, "custom");

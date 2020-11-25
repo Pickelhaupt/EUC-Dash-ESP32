@@ -62,7 +62,7 @@ void gui_setup( void )
     lv_obj_set_height( img_bin, lv_disp_get_ver_res( NULL ) );
     lv_obj_align( img_bin, NULL, LV_ALIGN_CENTER, 0, 0 );
     mainbar_setup();
-    /* add the four mainbar screens */
+    /* add the six mainbar screens */
     main_tile_setup();
     fulldash_tile_setup();
     simpledash_tile_setup();
@@ -70,7 +70,7 @@ void gui_setup( void )
     tripinfo_tile_setup();
     wheelinfo_tile_setup();
 
-    /* add setup */
+    /* add setup screens */
     battery_settings_tile_setup();
     display_settings_tile_setup();
     move_settings_tile_setup();
@@ -84,7 +84,7 @@ void gui_setup( void )
     //statusbar_setup();
     lv_disp_trig_activity( NULL );
 
-    gui_set_background_image( display_get_background_image() );
+    //gui_set_background_image( display_get_background_image() );
 
     keyboard_setup();
 

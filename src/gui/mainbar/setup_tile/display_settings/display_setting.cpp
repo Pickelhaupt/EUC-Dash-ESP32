@@ -49,7 +49,9 @@ lv_obj_t *display_rotation_list = NULL;
 lv_obj_t *display_bg_img_list = NULL;
 lv_obj_t *display_vibe_onoff = NULL;
 lv_obj_t *display_block_return_maintile_onoff = NULL;
-lv_obj_t *display_background_image = NULL;
+lv_obj_t *doubleclick_onoff = NULL;
+lv_obj_t *tilt_onoff = NULL;
+//lv_obj_t *display_background_image = NULL;
 
 LV_IMG_DECLARE(brightness_64px);
 LV_IMG_DECLARE(exit_32px);
@@ -72,7 +74,9 @@ static void display_timeout_setup_event_cb( lv_obj_t * obj, lv_event_t event );
 static void display_rotation_event_handler(lv_obj_t * obj, lv_event_t event);
 static void display_vibe_setup_event_cb( lv_obj_t * obj, lv_event_t event );
 static void display_block_return_maintile_setup_event_cb( lv_obj_t * obj, lv_event_t event );
-static void display_background_image_setup_event_cb( lv_obj_t * obj, lv_event_t event );
+//static void display_background_image_setup_event_cb( lv_obj_t * obj, lv_event_t event );
+static void doubleclick_onoff_event_handler(lv_obj_t * obj, lv_event_t event);
+static void tilt_onoff_event_handler(lv_obj_t * obj, lv_event_t event);
 
 void display_settings_tile_setup( void ) {
     // get an app tile and copy mainstyle
@@ -181,7 +185,7 @@ void display_settings_tile_setup( void ) {
     lv_obj_t *vibe_cont = lv_obj_create( display_settings_tile_2, NULL );
     lv_obj_set_size(vibe_cont, lv_disp_get_hor_res( NULL ) , 40);
     lv_obj_add_style( vibe_cont, LV_OBJ_PART_MAIN, &display_settings_style );
-    lv_obj_align( vibe_cont, display_settings_tile_2, LV_ALIGN_IN_TOP_RIGHT, 0, 55 );
+    lv_obj_align( vibe_cont, display_settings_tile_2, LV_ALIGN_IN_TOP_RIGHT, 0, 40 );
     display_vibe_onoff = lv_switch_create( vibe_cont, NULL );
     lv_obj_add_protect( display_vibe_onoff, LV_PROTECT_CLICK_FOCUS);
     lv_obj_add_style( display_vibe_onoff, LV_SWITCH_PART_INDIC, mainbar_get_switch_style() );
@@ -197,7 +201,7 @@ void display_settings_tile_setup( void ) {
     lv_obj_t *block_return_maintile_cont = lv_obj_create( display_settings_tile_2, NULL );
     lv_obj_set_size(block_return_maintile_cont, lv_disp_get_hor_res( NULL ) , 40 );
     lv_obj_add_style( block_return_maintile_cont, LV_OBJ_PART_MAIN, &display_settings_style  );
-    lv_obj_align( block_return_maintile_cont, vibe_cont, LV_ALIGN_OUT_BOTTOM_MID, 0, 10 );
+    lv_obj_align( block_return_maintile_cont, vibe_cont, LV_ALIGN_OUT_BOTTOM_MID, 0, 0 );
     display_block_return_maintile_onoff = lv_switch_create( block_return_maintile_cont, NULL );
     lv_obj_add_protect( display_block_return_maintile_onoff, LV_PROTECT_CLICK_FOCUS);
     lv_obj_add_style( display_block_return_maintile_onoff, LV_SWITCH_PART_INDIC, mainbar_get_switch_style() );
@@ -210,10 +214,41 @@ void display_settings_tile_setup( void ) {
     lv_label_set_text( display_block_return_maintile_label, "block return maintile" );
     lv_obj_align( display_block_return_maintile_label, block_return_maintile_cont, LV_ALIGN_IN_LEFT_MID, 5, 0 );
 
+    lv_obj_t *doubleclick_cont = lv_obj_create( display_settings_tile_2, NULL );
+    lv_obj_set_size(doubleclick_cont, lv_disp_get_hor_res( NULL ) , 40);
+    lv_obj_add_style( doubleclick_cont, LV_OBJ_PART_MAIN, &display_settings_style  );
+    lv_obj_align( doubleclick_cont, block_return_maintile_cont, LV_ALIGN_OUT_BOTTOM_MID, 0, 0 );
+    doubleclick_onoff = lv_switch_create( doubleclick_cont, NULL );
+    lv_obj_add_protect( doubleclick_onoff, LV_PROTECT_CLICK_FOCUS);
+    lv_obj_add_style( doubleclick_onoff, LV_SWITCH_PART_INDIC, mainbar_get_switch_style() );
+    lv_switch_off( doubleclick_onoff, LV_ANIM_ON );
+    lv_obj_align( doubleclick_onoff, doubleclick_cont, LV_ALIGN_IN_RIGHT_MID, -5, 0 );
+    lv_obj_set_event_cb( doubleclick_onoff, doubleclick_onoff_event_handler );
+    lv_obj_t *doubleclick_label = lv_label_create( doubleclick_cont, NULL);
+    lv_obj_add_style( doubleclick_label, LV_OBJ_PART_MAIN, &display_settings_style  );
+    lv_label_set_text( doubleclick_label, "doubletap to wake");
+    lv_obj_align( doubleclick_label, doubleclick_cont, LV_ALIGN_IN_LEFT_MID, 5, 0 );
+
+    lv_obj_t *tilt_cont = lv_obj_create( display_settings_tile_2, NULL );
+    lv_obj_set_size(tilt_cont, lv_disp_get_hor_res( NULL ) , 40);
+    lv_obj_add_style( tilt_cont, LV_OBJ_PART_MAIN, &display_settings_style  );
+    lv_obj_align( tilt_cont, doubleclick_cont, LV_ALIGN_OUT_BOTTOM_MID, 0, 0 );
+    tilt_onoff = lv_switch_create( tilt_cont, NULL );
+    lv_obj_add_protect( tilt_onoff, LV_PROTECT_CLICK_FOCUS);
+    lv_obj_add_style( tilt_onoff, LV_SWITCH_PART_INDIC, mainbar_get_switch_style() );
+    lv_switch_off( tilt_onoff, LV_ANIM_ON );
+    lv_obj_align( tilt_onoff, tilt_cont, LV_ALIGN_IN_RIGHT_MID, -5, 0 );
+    lv_obj_set_event_cb( tilt_onoff, tilt_onoff_event_handler );
+    lv_obj_t *tilt_label = lv_label_create( tilt_cont, NULL);
+    lv_obj_add_style( tilt_label, LV_OBJ_PART_MAIN, &display_settings_style  );
+    lv_label_set_text( tilt_label, "tilt to wake");
+    lv_obj_align( tilt_label, tilt_cont, LV_ALIGN_IN_LEFT_MID, 5, 0 );
+
+/*
     lv_obj_t *display_background_image_cont = lv_obj_create( display_settings_tile_2, NULL );
     lv_obj_set_size(display_background_image_cont, lv_disp_get_hor_res( NULL ) , 40 );
     lv_obj_add_style( display_background_image_cont, LV_OBJ_PART_MAIN, &display_settings_style  );
-    lv_obj_align( display_background_image_cont, block_return_maintile_cont, LV_ALIGN_OUT_BOTTOM_MID, 0, 10 );
+    lv_obj_align( display_background_image_cont, block_return_maintile_cont, LV_ALIGN_OUT_BOTTOM_MID, 0, 0 );
     lv_obj_t *display_background_image_label = lv_label_create( display_background_image_cont, NULL );
     lv_obj_add_style( display_background_image_label, LV_OBJ_PART_MAIN, &display_settings_style  );
     lv_label_set_text( display_background_image_label, "Bg image" );
@@ -223,7 +258,7 @@ void display_settings_tile_setup( void ) {
     lv_obj_set_size( display_bg_img_list, 100, 40 );
     lv_obj_align( display_bg_img_list, display_background_image_cont, LV_ALIGN_IN_RIGHT_MID, -5, 0 );
     lv_obj_set_event_cb(display_bg_img_list, display_background_image_setup_event_cb);
-
+*/
 
     lv_slider_set_value( display_brightness_slider, display_get_brightness(), LV_ANIM_OFF );
     lv_slider_set_value( display_timeout_slider, display_get_timeout(), LV_ANIM_OFF );
@@ -250,12 +285,25 @@ void display_settings_tile_setup( void ) {
     else
         lv_switch_off( display_block_return_maintile_onoff, LV_ANIM_OFF );
 
+    if ( bma_get_config( BMA_DOUBLECLICK ) )
+        lv_switch_on( doubleclick_onoff, LV_ANIM_OFF );
+    else
+        lv_switch_off( doubleclick_onoff, LV_ANIM_OFF );
+
+    if ( bma_get_config( BMA_TILT ) )
+        lv_switch_on( tilt_onoff, LV_ANIM_OFF );
+    else
+        lv_switch_off( tilt_onoff, LV_ANIM_OFF );
+    
     lv_tileview_add_element( display_settings_tile_1, brightness_cont );
     lv_tileview_add_element( display_settings_tile_1, timeout_cont );
     lv_tileview_add_element( display_settings_tile_1, rotation_cont );
     lv_tileview_add_element( display_settings_tile_2, vibe_cont );
     lv_tileview_add_element( display_settings_tile_2, block_return_maintile_cont );
-    lv_tileview_add_element( display_settings_tile_2, display_background_image_cont );
+    lv_tileview_add_element( display_settings_tile_2, tilt_cont );
+    lv_tileview_add_element( display_settings_tile_2, doubleclick_cont );
+
+    //lv_tileview_add_element( display_settings_tile_2, display_background_image_cont );
 
     display_register_cb( DISPLAYCTL_BRIGHTNESS, display_displayctl_brightness_event_cb, "display settings" );
 }
@@ -343,6 +391,18 @@ static void display_timeout_setup_event_cb( lv_obj_t * obj, lv_event_t event ) {
     }
 }
 
+static void doubleclick_onoff_event_handler(lv_obj_t * obj, lv_event_t event) {
+    switch( event ) {
+        case( LV_EVENT_VALUE_CHANGED):  bma_set_config( BMA_DOUBLECLICK, lv_switch_get_state( obj ) );
+    }
+}
+
+static void tilt_onoff_event_handler(lv_obj_t * obj, lv_event_t event) {
+    switch( event ) {
+        case( LV_EVENT_VALUE_CHANGED):  bma_set_config( BMA_TILT, lv_switch_get_state( obj ) );
+    }
+}
+
 static void display_rotation_event_handler( lv_obj_t * obj, lv_event_t event ) {
     switch( event ) {
         case( LV_EVENT_VALUE_CHANGED ):     display_set_rotation( lv_dropdown_get_selected( obj ) * 90 );
@@ -350,6 +410,7 @@ static void display_rotation_event_handler( lv_obj_t * obj, lv_event_t event ) {
     }
 }
 
+/*
 static void display_background_image_setup_event_cb( lv_obj_t * obj, lv_event_t event ) {
     switch( event ) {
         case( LV_EVENT_VALUE_CHANGED ):     
@@ -357,4 +418,5 @@ static void display_background_image_setup_event_cb( lv_obj_t * obj, lv_event_t 
                                             gui_set_background_image( lv_dropdown_get_selected( obj ) );
     }
 }
+*/
 
