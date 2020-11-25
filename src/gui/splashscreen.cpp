@@ -45,6 +45,8 @@ void splash_screen_stage_one( void ) {
     lv_style_set_radius( &style, LV_OBJ_PART_MAIN, 0 );
     lv_style_set_bg_color( &style, LV_OBJ_PART_MAIN, LV_COLOR_BLACK );
     lv_style_set_bg_opa( &style, LV_OBJ_PART_MAIN, LV_OPA_100 );
+    lv_style_set_line_rounded(&style, LV_BAR_PART_INDIC, false);
+    lv_style_set_radius(&style, LV_STATE_DEFAULT, 0);
     lv_style_set_border_width( &style, LV_OBJ_PART_MAIN, 0 );
     lv_style_set_text_font( &style, LV_STATE_DEFAULT, &DIN1451_m_cond_28 );
     lv_style_set_text_color( &style, LV_OBJ_PART_MAIN, LV_COLOR_RED );
@@ -78,16 +80,17 @@ void splash_screen_stage_one( void ) {
     
 
     preload = lv_bar_create( lv_scr_act(), NULL );
-    lv_obj_set_size( preload, lv_disp_get_hor_res( NULL ) - 80, 20 );
+    lv_obj_set_size( preload, lv_disp_get_hor_res( NULL ) - 40, 20 );
     lv_obj_add_style( preload, LV_OBJ_PART_MAIN, &style );
-    lv_obj_align( preload, logo, LV_ALIGN_OUT_BOTTOM_MID, 0, 30 );
-    lv_bar_set_anim_time( preload, 500);
+    lv_obj_align( preload, logo, LV_ALIGN_OUT_BOTTOM_MID, 0, 10 );
+    lv_bar_set_range(preload, 0, 100);
+    lv_bar_set_anim_time( preload, 100);
     lv_bar_set_value( preload, 0, LV_ANIM_ON);
 
     preload_label = lv_label_create( lv_scr_act(), NULL );
     lv_label_set_text( preload_label, "booting" );
     lv_obj_add_style( preload_label, LV_OBJ_PART_MAIN, &style );
-    lv_obj_align( preload_label, preload, LV_ALIGN_OUT_BOTTOM_MID, 0, 0 );
+    lv_obj_align( preload_label, preload, LV_ALIGN_OUT_BOTTOM_MID, 0, 10 );
 
     lv_disp_trig_activity( NULL );
 
@@ -106,10 +109,10 @@ void splash_screen_stage_update( const char* msg, int value ) {
     lv_disp_trig_activity( NULL );
     lv_task_handler();
     delay(50);
-//    lv_bar_set_value( preload, value, LV_ANIM_ON );
-    lv_bar_set_value( preload, 0, LV_ANIM_ON );
+    lv_bar_set_value( preload, value, LV_ANIM_ON );
+    //lv_bar_set_value( preload, 0, LV_ANIM_ON );
     lv_label_set_text( preload_label, msg );
-    lv_obj_align( preload_label, preload, LV_ALIGN_OUT_BOTTOM_MID, 0, 0 );
+    lv_obj_align( preload_label, preload, LV_ALIGN_OUT_BOTTOM_MID, 0, 10 );
     lv_task_handler();
     delay(50);
 }

@@ -185,7 +185,7 @@ void display_settings_tile_setup( void ) {
     lv_obj_t *vibe_cont = lv_obj_create( display_settings_tile_2, NULL );
     lv_obj_set_size(vibe_cont, lv_disp_get_hor_res( NULL ) , 40);
     lv_obj_add_style( vibe_cont, LV_OBJ_PART_MAIN, &display_settings_style );
-    lv_obj_align( vibe_cont, display_settings_tile_2, LV_ALIGN_IN_TOP_RIGHT, 0, 40 );
+    lv_obj_align( vibe_cont, display_settings_tile_2, LV_ALIGN_IN_TOP_RIGHT, 0, 50 );
     display_vibe_onoff = lv_switch_create( vibe_cont, NULL );
     lv_obj_add_protect( display_vibe_onoff, LV_PROTECT_CLICK_FOCUS);
     lv_obj_add_style( display_vibe_onoff, LV_SWITCH_PART_INDIC, mainbar_get_switch_style() );

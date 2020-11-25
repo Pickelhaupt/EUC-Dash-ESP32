@@ -49,7 +49,8 @@ void wheelctl_update_regen_current(int entry, float value);
 void wheelctl_update_battpct_max_min(int entry, float value);
 void update_calc_battery(float value);
 void wheelctl_calc_power(float value);
-void wheelctl_update_ridetime(float uptime);
+void wheelctl_update_ridetime( void );
+void wheelctl_update_powercons( void );
 
 bool shakeoff[3] = {true, true, true};
 bool lightsoff = true;
@@ -150,7 +151,8 @@ void wheelctl_set_data(int entry, float value)
             break;
         case WHEELCTL_UPTIME:
         if (wheelctl_data[entry].value != value) {
-                wheelctl_update_ridetime(value);
+                wheelctl_update_ridetime();
+                wheelctl_update_powercons();
             }
             break;
         case WHEELCTL_FANSTATE:
@@ -163,12 +165,16 @@ void wheelctl_set_data(int entry, float value)
     }
 }
 
-void wheelctl_update_ridetime(float uptime)
+void wheelctl_update_ridetime()
 {
     if (wheelctl_data[WHEELCTL_SPEED].value >= MIN_RIDE_SPEED)
     {
-        wheelctl_data[WHEELCTL_RIDETIME].value =+ 1;
+        wheelctl_data[WHEELCTL_RIDETIME].value++;
     }
+}
+
+void wheelctl_update_powercons() {
+    wheelctl_data[WHEELCTL_POWERCONS].value = wheelctl_data[WHEELCTL_POWERCONS].value + (wheelctl_data[WHEELCTL_POWER].value / 3600);
 }
 
 void wheelctl_update_max_min(int entry, float value, bool update_min)

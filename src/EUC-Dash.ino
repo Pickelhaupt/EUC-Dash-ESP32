@@ -50,7 +50,7 @@ void setup()
 
     ttgo->begin();
 
-    ttgo->tft->initDMA();
+    //ttgo->tft->initDMA();
     ttgo->lvgl_begin();
 
     SPIFFS.begin();
@@ -82,20 +82,20 @@ void setup()
         }
     }
 
-    splash_screen_stage_update( "init powermgm", 50 );
+    splash_screen_stage_update( "init powermgm", 60 );
     powermgm_setup();
     
-    splash_screen_stage_update( "init wifi", 60 );
+    splash_screen_stage_update( "init wifi", 70 );
     if ( wifictl_get_autoon() && ( pmu_is_charging() || pmu_is_vbus_plug() || ( pmu_get_battery_voltage() > 3400) ) )
         wifictl_on();
 
     // enable to store data in normal heap
-    splash_screen_stage_update( "alloc heap", 70 );
+    splash_screen_stage_update( "alloc heap", 80 );
     heap_caps_malloc_extmem_enable( 16*1024 );
 
-    splash_screen_stage_update( "init wheel data", 80 );
+    splash_screen_stage_update( "init wheel data", 90 );
     
-    splash_screen_stage_update( "init gui", 90 );
+    splash_screen_stage_update( "init gui", 100 );
     gui_setup();
     wheelctl_setup();
 

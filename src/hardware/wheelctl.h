@@ -105,6 +105,7 @@
         WHEELCTL_ALARM3,    //Speed when third alarm is triggered
         WHEELCTL_TILTBACK,  //Speed when tiltback is triggered  -required
         WHEELCTL_RIDETIME,  //Total time in motion since power on
+        WHEELCTL_POWERCONS,  //Power cunsumed 
         WHEELCTL_DATA_NUM   //number of data entries
     };
     
