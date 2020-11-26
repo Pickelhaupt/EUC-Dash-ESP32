@@ -591,7 +591,6 @@ void simpledash_tile_setup(void)
 {
     simpledash_tile_num = mainbar_add_tile(2, 0, "sd tile");
     simpledash_cont = mainbar_get_tile_obj(simpledash_tile_num);
-    //simpledash_cont = mainbar_get_tile_obj(mainbar_add_tile(2, 0, "simpledash tile"));
     style = mainbar_get_style();
     Serial.println("setting up dashboard");
     lv_sd_define_styles_1();

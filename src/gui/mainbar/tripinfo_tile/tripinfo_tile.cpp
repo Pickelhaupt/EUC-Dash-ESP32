@@ -47,6 +47,8 @@ lv_obj_t *max_speed_data;
 lv_obj_t *max_current_data;
 lv_obj_t *max_power_data;
 lv_obj_t *ride_time_data;
+lv_obj_t *energy_consumption_data;
+lv_obj_t *trip_economy_data;
 
 void tripinfo_tile_setup(void)
 {
@@ -135,6 +137,24 @@ void tripinfo_setup_obj( void ) {
     lv_obj_add_style( ride_time_data, LV_OBJ_PART_MAIN, &tripinfo_data_style  );
     lv_label_set_text( ride_time_data, "35 min");
     lv_obj_align( ride_time_data, max_power_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
+
+    lv_obj_t *energy_consumption_label = lv_label_create( tripinfo_cont, NULL);
+    lv_obj_add_style( energy_consumption_label, LV_OBJ_PART_MAIN, &tripinfo_style );
+    lv_label_set_text( energy_consumption_label, "consumed energy");
+    lv_obj_align( energy_consumption_label, ride_time_label, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0 );
+    energy_consumption_data = lv_label_create( tripinfo_cont, NULL);
+    lv_obj_add_style( energy_consumption_data, LV_OBJ_PART_MAIN, &tripinfo_data_style  );
+    lv_label_set_text( energy_consumption_data, "35 Wh");
+    lv_obj_align( energy_consumption_data, ride_time_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
+
+    lv_obj_t *trip_economy_label = lv_label_create( tripinfo_cont, NULL);
+    lv_obj_add_style( trip_economy_label, LV_OBJ_PART_MAIN, &tripinfo_style );
+    lv_label_set_text( trip_economy_label, "trip economy");
+    lv_obj_align( trip_economy_label, energy_consumption_label, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0 );
+    trip_economy_data = lv_label_create( tripinfo_cont, NULL);
+    lv_obj_add_style( trip_economy_data, LV_OBJ_PART_MAIN, &tripinfo_data_style  );
+    lv_label_set_text( trip_economy_data, "3.1 Wh/km");
+    lv_obj_align( trip_economy_data, energy_consumption_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
 }
 
 void tripinfo_activate_cb(void)
@@ -202,7 +222,28 @@ void tripinfo_update( void ) {
     lv_label_set_text( max_power_data, temp);
     lv_obj_align( max_power_data, max_current_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
 
-    snprintf( temp, sizeof( temp ), "%0.0f s", wheelctl_get_data(WHEELCTL_RIDETIME) );
+    int seconds =  wheelctl_get_data(WHEELCTL_RIDETIME);
+    int r_hours = seconds / 3600;
+    int r_remain = seconds % 3600;
+    int r_minutes = r_remain / 60;
+    int r_seconds = r_remain % 60;
+
+    snprintf( temp, sizeof( temp ), "%02d:%02d:%02d", r_hours, r_minutes, r_seconds );
     lv_label_set_text( ride_time_data, temp);
     lv_obj_align( ride_time_data, max_power_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
+
+    snprintf( temp, sizeof( temp ), "%0.1f Wh", wheelctl_get_data(WHEELCTL_POWERCONS) );
+    lv_label_set_text( energy_consumption_data, temp);
+    lv_obj_align( energy_consumption_data, ride_time_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
+
+    static float r_econo = 0.0;
+    if (wheelctl_get_data(WHEELCTL_TRIP) != 0 ) r_econo = wheelctl_get_data(WHEELCTL_POWERCONS) / wheelctl_get_data(WHEELCTL_TRIP);
+    if (dashboard_get_config(DASHBOARD_IMPDIST)) {
+        r_econo = r_econo * 1.6;
+        snprintf( temp, sizeof( temp ), "%0.1f Wh/mi", r_econo );
+    } else {
+        snprintf( temp, sizeof( temp ), "%0.1f Wh/km", r_econo );
+    }
+    lv_label_set_text( trip_economy_data, temp);
+    lv_obj_align( trip_economy_data, energy_consumption_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
 }
