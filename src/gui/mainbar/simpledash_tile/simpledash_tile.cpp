@@ -113,44 +113,39 @@ void lv_sd_define_styles_1(void)
 {
     //style template
     lv_style_copy(&sd_arc_style, style);
-    //lv_style_init(&arc_style);
     lv_style_set_line_rounded(&sd_arc_style, LV_STATE_DEFAULT, false);
     lv_style_set_line_width(&sd_arc_style, LV_STATE_DEFAULT, sd_arclinew);
     lv_style_set_bg_opa(&sd_arc_style, LV_STATE_DEFAULT, LV_OPA_TRANSP);
     lv_style_set_border_width(&sd_arc_style, LV_STATE_DEFAULT, 0);
     lv_style_set_border_opa(&sd_arc_style, LV_STATE_DEFAULT, LV_OPA_TRANSP);
+   
     //General styles
 
     //Speed label
     lv_style_init(&sd_speed_label_style);
     lv_style_set_text_color(&sd_speed_label_style, LV_STATE_DEFAULT, sd_speed_fg_clr);
     lv_style_set_text_font(&sd_speed_label_style, LV_STATE_DEFAULT, &DIN1451_m_cond_180);
-
     // Battery Arc
     lv_style_copy(&sd_batt_indic_style, &sd_arc_style);
     lv_style_copy(&sd_batt_main_style, &sd_arc_style);
     lv_style_set_line_color(&sd_batt_main_style, LV_STATE_DEFAULT, sd_batt_bg_clr);
-
     // Current Arc
     lv_style_copy(&sd_current_indic_style, &sd_arc_style);
     lv_style_copy(&sd_current_main_style, &sd_arc_style);
     lv_style_set_line_color(&sd_current_main_style, LV_STATE_DEFAULT, sd_current_bg_clr);
-
     //Bar background -- transparent
     lv_style_copy(&sd_bar_main_style, &sd_arc_style);
     lv_style_set_line_opa(&sd_bar_main_style, LV_STATE_DEFAULT, LV_OPA_TRANSP);
-
     //Max bar
     lv_style_copy(&sd_max_bar_indic_style, &sd_arc_style);
     lv_style_set_line_color(&sd_max_bar_indic_style, LV_STATE_DEFAULT, sd_max_bar_clr);
-
     //min bar
     lv_style_copy(&sd_min_bar_indic_style, &sd_arc_style);
     lv_style_set_line_color(&sd_min_bar_indic_style, LV_STATE_DEFAULT, sd_min_bar_clr);
-
     //regen bar
     lv_style_copy(&sd_regen_bar_indic_style, &sd_arc_style);
     lv_style_set_line_color(&sd_regen_bar_indic_style, LV_STATE_DEFAULT, sd_regen_bar_clr);
+    
     //alerts
     lv_style_copy(&sd_alert_style, style);
     lv_style_set_bg_opa(&sd_alert_style, LV_STATE_DEFAULT, LV_OPA_TRANSP);
@@ -164,7 +159,6 @@ void lv_sd_define_styles_1(void)
     lv_style_set_text_font(&sd_overlay_label_style, LV_STATE_DEFAULT, &DIN1451_m_cond_36);
     lv_style_set_text_opa(&sd_overlay_label_style, LV_STATE_DEFAULT, LV_OPA_70);
     lv_style_set_bg_opa(&sd_overlay_label_style, LV_STATE_DEFAULT, LV_OPA_TRANSP);
-
 } //End Define LVGL default object styles
 
 /***************************
@@ -213,7 +207,6 @@ void lv_sd_batt_arc_1(void)
     lv_obj_reset_style_list(sd_batt_arc, LV_OBJ_PART_MAIN);
     lv_obj_add_style(sd_batt_arc, LV_ARC_PART_INDIC, &sd_batt_indic_style);
     lv_obj_add_style(sd_batt_arc, LV_OBJ_PART_MAIN, &sd_batt_main_style);
-    //lv_arc_set_type(sd_batt_arc, LV_ARC_TYPE_REVERSE);
     lv_arc_set_bg_angles(sd_batt_arc, sd_batt_arc_start, sd_batt_arc_end);
     lv_arc_set_angles(sd_batt_arc, sd_batt_arc_start, sd_batt_arc_end);
     lv_arc_set_range(sd_batt_arc, 0, 100);
@@ -295,7 +288,7 @@ void lv_sd_alerts(void)
     lv_obj_add_style(sd_fan_indic, LV_OBJ_PART_MAIN, &sd_alert_style);
     lv_img_set_src(sd_fan_indic, &fan_40px);
     lv_obj_set_hidden(sd_fan_indic, true);
-    lv_obj_align(sd_fan_indic, NULL, LV_ALIGN_IN_TOP_RIGHT, -10, -10);
+    lv_obj_align(sd_fan_indic, NULL, LV_ALIGN_IN_TOP_RIGHT, 0, 0);
 
     sd_batt_alert = lv_img_create(simpledash_cont, NULL);
     lv_obj_reset_style_list(sd_batt_alert, LV_OBJ_PART_MAIN);
@@ -454,7 +447,7 @@ void simpledash_batt_update(float current_battpct, float min_battpct, float max_
     }
     lv_obj_add_style(sd_batt_arc, LV_ARC_PART_INDIC, &sd_batt_indic_style);
 
-    // draw batt arc
+    // update batt arc
 
     lv_arc_set_value(sd_batt_arc, current_battpct);
 
@@ -549,10 +542,6 @@ void simpledash_overlay_update()
     }
 }
 
-/************************
-   Task update functions
- ***********************/
-
 static void simpledash_overlay_task(lv_task_t *overlay_task)
 {
     simpledash_overlay_update();
@@ -565,9 +554,6 @@ uint32_t simpledash_get_tile(void)
 
 void simpledash_activate_cb(void)
 {
-    //Create task -- update freq 4/s
-    //sd_dash_task = lv_task_create(lv_sd_dash_task, 250, LV_TASK_PRIO_LOWEST, NULL);
-    //lv_task_ready(sd_dash_task);
     overlay_task = lv_task_create(simpledash_overlay_task, 2000, LV_TASK_PRIO_LOWEST, NULL);
     lv_task_ready(overlay_task);
     simpledash_active = true;
@@ -576,7 +562,6 @@ void simpledash_activate_cb(void)
 
 void simpledash_hibernate_cb(void)
 {
-    //lv_task_del( sd_dash_task );
     lv_task_del(overlay_task);
     simpledash_active = false;
 }
@@ -597,10 +582,7 @@ void simpledash_tile_setup(void)
     lv_sd_alerts();
     lv_sd_speed_arc_1();
     lv_sd_batt_arc_1();
-    if (dashboard_get_config(DASHBOARD_CURRENT))
-    {
-        lv_sd_current_arc_1();
-    }
+    if (dashboard_get_config(DASHBOARD_CURRENT)) lv_sd_current_arc_1();
     lv_sd_overlay();
 
     mainbar_add_tile_activate_cb(simpledash_tile_num, simpledash_activate_cb);

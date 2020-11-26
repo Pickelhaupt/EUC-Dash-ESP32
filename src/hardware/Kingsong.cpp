@@ -32,7 +32,6 @@
 #include "json_psram_allocator.h"
 #include "alloc.h"
 
-int add_ride_millis (void);
 byte KS_BLEreq[20];
 String wheelmodel = "KS14D";
 
@@ -122,7 +121,6 @@ void decodeKS(byte KSdata[])
         mstring[sizeof(model_name)] = 0;
         wheelctl_set_info(WHEELCTL_INFO_MODEL, mstring);
     }
-    //wheelctl_set_data(WHEELCTL_RIDETIME, (add_ride_millis() / 1000));
 } // End decodeKS
 
 void kingsong_decode_serial( void ) {
@@ -358,11 +356,12 @@ void kingsong_decode_serial( void ) {
     if (wheelctl_get_constant(WHEELCTL_CONST_BATT_P) == 2) wheelctl_set_constant(WHEELCTL_CONST_BATT_IR, 23);
     if (wheelctl_get_constant(WHEELCTL_CONST_BATT_P) == 3) wheelctl_set_constant(WHEELCTL_CONST_BATT_IR, 20);
     if (wheelctl_get_constant(WHEELCTL_CONST_BATT_P) == 4) wheelctl_set_constant(WHEELCTL_CONST_BATT_IR, 15);
+    if (wheelctl_get_constant(WHEELCTL_CONST_BATT_P) == 6) wheelctl_set_constant(WHEELCTL_CONST_BATT_IR, 13);
     if (wheelctl_get_constant(WHEELCTL_CONST_BATT_P) == 8) wheelctl_set_constant(WHEELCTL_CONST_BATT_IR, 12);
 
     if (ks_colour == "B") wheelctl_set_info(WHEELCTL_INFO_WHEELCOLOR, "black");
     if (ks_colour == "C") wheelctl_set_info(WHEELCTL_INFO_WHEELCOLOR, "custom");
-    if (ks_colour == "D") wheelctl_set_info(WHEELCTL_INFO_WHEELCOLOR, "rubber");
+    if (ks_colour == "D") wheelctl_set_info(WHEELCTL_INFO_WHEELCOLOR, "black rubber");
     if (ks_colour == "R") wheelctl_set_info(WHEELCTL_INFO_WHEELCOLOR, "red");
     if (ks_colour == "S") wheelctl_set_info(WHEELCTL_INFO_WHEELCOLOR, "silver");
     if (ks_colour == "W") wheelctl_set_info(WHEELCTL_INFO_WHEELCOLOR, "white");
@@ -429,16 +428,6 @@ void ks_ble_set(byte parameter, byte value)
     KS_BLEreq[18] = 0x5A;
     KS_BLEreq[19] = 0x5A;
     writeBLE(KS_BLEreq, 20);
-}
-
-int add_ride_millis () {
-    static unsigned long ride_millis;
-    static unsigned long old_millis = 0;
-    if (wheelctl_get_data(WHEELCTL_SPEED) > 1) {
-        ride_millis =+ (millis() - old_millis);
-    }
-    old_millis = millis();
-    return ride_millis;
 }
 
 void initks()
