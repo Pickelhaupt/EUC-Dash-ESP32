@@ -49,6 +49,7 @@ lv_obj_t *maxvolt_data;
 lv_obj_t *model_data;
 lv_obj_t *serial_data;
 lv_obj_t *capacity_data;
+lv_obj_t *odometer_data;
 
 void wheelinfo_tile_setup(void)
 {
@@ -103,14 +104,23 @@ void wheelinfo_setup_obj( void ) {
     lv_label_set_text( model_data, "KS99X");
     lv_obj_align( model_data, serial_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
 
+    lv_obj_t *odometer_label = lv_label_create( wheelinfo_cont, NULL);
+    lv_obj_add_style( odometer_label, LV_OBJ_PART_MAIN, &wheelinfo_style );
+    lv_label_set_text( odometer_label, "odometer");
+    lv_obj_align( odometer_label, model_label, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0 );
+    odometer_data = lv_label_create( wheelinfo_cont, NULL);
+    lv_obj_add_style( odometer_data, LV_OBJ_PART_MAIN, &wheelinfo_data_style  );
+    lv_label_set_text( odometer_data, "300 km");
+    lv_obj_align( odometer_data, model_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
+
     lv_obj_t *maxvolt_label = lv_label_create( wheelinfo_cont, NULL);
     lv_obj_add_style( maxvolt_label, LV_OBJ_PART_MAIN, &wheelinfo_style );
     lv_label_set_text( maxvolt_label, "max voltage");
-    lv_obj_align( maxvolt_label, model_label, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0 );
+    lv_obj_align( maxvolt_label, odometer_label, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0 );
     maxvolt_data = lv_label_create( wheelinfo_cont, NULL);
     lv_obj_add_style( maxvolt_data, LV_OBJ_PART_MAIN, &wheelinfo_data_style  );
     lv_label_set_text( maxvolt_data, "67 V");
-    lv_obj_align( maxvolt_data, model_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
+    lv_obj_align( maxvolt_data, odometer_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
 
     lv_obj_t *voltage_label = lv_label_create( wheelinfo_cont, NULL);
     lv_obj_add_style( voltage_label, LV_OBJ_PART_MAIN, &wheelinfo_style );
@@ -187,9 +197,18 @@ void wheelinfo_update( void ) {
     lv_label_set_text( model_data, wheelctl_get_info(WHEELCTL_INFO_MODEL).c_str());
     lv_obj_align( model_data, serial_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
 
+    if (dashboard_get_config(DASHBOARD_IMPDIST)) {
+        float impodo = wheelctl_get_data(WHEELCTL_ODO) / 1.6;
+        snprintf( temp, sizeof( temp ), "%0.1f mi", impodo );
+    } else {
+        snprintf( temp, sizeof( temp ), "%0.1f km", wheelctl_get_data(WHEELCTL_ODO) );
+    }
+    lv_label_set_text( odometer_data, temp);
+    lv_obj_align( odometer_data, model_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
+
     snprintf( temp, sizeof( temp ), "%d V", wheelctl_get_constant(WHEELCTL_CONST_BATTVOLT) );
     lv_label_set_text( maxvolt_data, temp);
-    lv_obj_align( maxvolt_data, model_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
+    lv_obj_align( maxvolt_data, odometer_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
 
     snprintf( temp, sizeof( temp ), "%0.2f V", wheelctl_get_data(WHEELCTL_VOLTAGE) );
     lv_label_set_text( voltage_data, temp);

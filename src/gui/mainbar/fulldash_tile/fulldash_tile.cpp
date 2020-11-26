@@ -33,7 +33,6 @@ lv_task_t *dash_task = nullptr;
 lv_task_t *time_task = nullptr;
 
 // Function declarations
-//static void lv_dash_task(lv_task_t *dash_task);
 static void lv_time_task(lv_task_t *time_task);
 static void overlay_event_cb(lv_obj_t * obj, lv_event_t event);
 
@@ -132,9 +131,6 @@ int arc_spacing = 7;
 bool rev_batt_arc = true;
 bool rev_current_arc = false;
 bool fulldash_active = false;
-
-//int display_xres = lv_disp_get_hor_res( NULL );
-//int display_yres = lv_disp_get_ver_res( NULL );
 
 int out_arc_x = 240;
 int out_arc_y = 240;
@@ -458,7 +454,7 @@ void lv_alerts(void)
     lv_obj_add_style(fan_indic, LV_OBJ_PART_MAIN, &alert_style);
     lv_img_set_src(fan_indic, &fan_40px);
     lv_obj_set_hidden(fan_indic, true);
-    lv_obj_align(fan_indic, NULL, LV_ALIGN_IN_TOP_RIGHT, -10, -10);
+    lv_obj_align(fan_indic, NULL, LV_ALIGN_IN_TOP_RIGHT, 0, 0);
 
     batt_alert = lv_img_create(fulldash_cont, NULL);
     lv_obj_reset_style_list(batt_alert, LV_OBJ_PART_MAIN);
@@ -556,17 +552,8 @@ int value2angle(int arcstart, int arcstop, float minvalue, float maxvalue, float
     return rAngle;
 }
 
-/***************************************************************
-   Dashboard GUI Update Functions, called via the task handler
-   runs every 250ms
- ***************************************************************/
-
 void fulldash_speed_update(float current_speed, float warn_speed, float tiltback_speed, float top_speed)
 {
-    //float tiltback_speed = wheelctl_get_data(WHEELCTL_TILTBACK);
-    //float current_speed = wheelctl_get_data(WHEELCTL_SPEED);
-    //float warn_speed = wheelctl_get_data(WHEELCTL_ALARM3);
-    //float top_speed = wheelctl_get_data(WHEELCTL_TOPSPEED);
     if (top_speed < tiltback_speed + 5) top_speed = tiltback_speed + 5;
 
     if (current_speed >= tiltback_speed)
@@ -627,8 +614,6 @@ void fulldash_speed_update(float current_speed, float warn_speed, float tiltback
 
 void fulldash_batt_update(float current_battpct, float min_battpct, float max_battpct)
 {
-    //float current_battpct = wheelctl_get_data(WHEELCTL_BATTPCT);
-
     if (current_battpct < 10)
     {
         lv_style_set_line_color(&batt_indic_style, LV_STATE_DEFAULT, LV_COLOR_RED);
@@ -683,9 +668,6 @@ void fulldash_batt_update(float current_battpct, float min_battpct, float max_ba
 
 void fulldash_current_update(float current_current, byte maxcurrent, float min_current, float max_current)
 {
-    // Set warning and alert colour
-    //byte maxcurrent = wheelctl_get_constant(WHEELCTL_CONST_MAXCURRENT);
-    //float current_current = wheelctl_get_data(WHEELCTL_CURRENT);
     float amps = current_current;
     
     if (current_current > (maxcurrent * 0.75))
@@ -739,9 +721,6 @@ void fulldash_current_update(float current_current, byte maxcurrent, float min_c
 
 void fulldash_temp_update(float current_temp, byte warn_temp, byte crit_temp, float max_temp)
 {
-    //byte crit_temp = wheelctl_get_constant(WHEELCTL_CONST_CRITTEMP);
-    //float current_temp = wheelctl_get_data(WHEELCTL_TEMP);
-    // Set warning and alert colour
     if (current_temp > crit_temp)
     {
         lv_style_set_line_color(&temp_indic_style, LV_STATE_DEFAULT, LV_COLOR_RED);
@@ -799,7 +778,6 @@ void fulldash_overlay_update()
 
 void updateTime()
 {
-    // TTGOClass *ttgo = TTGOClass::getWatch();
     time_t now;
     struct tm info;
     char buf[64];
@@ -807,7 +785,6 @@ void updateTime()
 
     localtime_r(&now, &info);
     strftime(buf, sizeof(buf), "%H:%M", &info);
-    //int watchbatt = ttgo->power->getBattPercentage();
 
     int32_t watchbatt = pmu_get_battery_percent();
     if (watchbatt > 99) watchbatt = 99;
@@ -836,25 +813,7 @@ void updateTime()
         lv_label_set_text(trip, tripstring);
         lv_obj_align(trip, fulldash_cont, LV_ALIGN_IN_TOP_MID, 0, 25);
     }
-    //ttgo->rtc->syncToRtc();
 }
-
-/************************
-   Task update functions
- ***********************/
-/*
-static void lv_dash_task(lv_task_t *dash_task)
-{
-    if (blectl_cli_getconnected())
-    {
-        fulldash_speed_update();
-        fulldash_batt_update();
-        fulldash_current_update();
-        fulldash_temp_update();
-    }
-    fulldash_overlay_update();
-}
-*/
 
 static void lv_time_task(lv_task_t *time_task)
 {
@@ -873,15 +832,12 @@ void fulldash_activate_cb(void)
     lv_task_ready(time_task);
     fulldash_active = true;
     wheelctl_update_values();
-    //dash_task = lv_task_create(lv_dash_task, 250, LV_TASK_PRIO_LOWEST, NULL);
-    //lv_task_ready(dash_task);
 }
 
 void fulldash_hibernate_cb(void)
 {
     if (time_task != nullptr) lv_task_del(time_task);
     fulldash_active = false;
-    //if (dash_task != nullptr) lv_task_del(dash_task);
 }
 
 void fulldash_tile_reload(void)
@@ -894,7 +850,6 @@ void fulldash_tile_setup(void)
 {
     fulldash_tile_num = mainbar_add_tile(1, 0, "fd tile");
     fulldash_cont = mainbar_get_tile_obj(fulldash_tile_num);
-    //fulldash_cont = mainbar_get_tile_obj( mainbar_add_tile( 1, 0, "fulldash tile" ) );
     style = mainbar_get_style();
     Serial.println("setting up dashboard");
     lv_define_styles_1();

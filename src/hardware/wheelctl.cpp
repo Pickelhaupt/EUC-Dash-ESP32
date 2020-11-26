@@ -51,11 +51,13 @@ void update_calc_battery(float value);
 void wheelctl_calc_power(float value);
 void wheelctl_update_ridetime( void );
 void wheelctl_update_powercons( void );
+void wheelctl_update_avgspeed(float value);
 
 bool shakeoff[3] = {true, true, true};
 bool lightsoff = true;
 bool firstrun[WHEELCTL_DATA_NUM];
 float old_uptime = 0;
+float old_trip = 0.0;
 
 wheelctl_data_t wheelctl_data[WHEELCTL_DATA_NUM];
 wheelctl_constants_t wheelctl_constants[WHEELCTL_CONST_NUM];
@@ -155,6 +157,10 @@ void wheelctl_set_data(int entry, float value)
                 wheelctl_update_powercons();
             }
             break;
+        case WHEELCTL_TRIP:
+            if (firstrun[entry]) old_trip = value;
+            wheelctl_update_avgspeed(value);
+            break;
         case WHEELCTL_FANSTATE:
             if (fulldash_active) fulldash_fan_indic(value);
             if (simpledash_active) simpledash_fan_indic(value);
@@ -170,6 +176,14 @@ void wheelctl_update_ridetime()
     if (wheelctl_data[WHEELCTL_SPEED].value >= MIN_RIDE_SPEED)
     {
         wheelctl_data[WHEELCTL_RIDETIME].value++;
+    }
+}
+
+void wheelctl_update_avgspeed(float value)
+{
+    float trip_distance = value - old_trip;
+    if (wheelctl_data[WHEELCTL_RIDETIME].value != 0) {
+        wheelctl_data[WHEELCTL_SPEED].min_value = trip_distance / (wheelctl_data[WHEELCTL_RIDETIME].value / 3600);
     }
 }
 
