@@ -78,21 +78,45 @@ Reads BLE notifications from the electric unicycle and display data on the ESP32
 - Trip meter -- full dash only
 - Current time -- full dash only
 - Watch battery level -- full dash only
+
+Dashboard functions:
+<div> 
+<img src="https://github.com/Pickelhaupt/EUC-Dash-ESP32/raw/master/Images/dashboards-s.png" width="70%" align="center"/>
+</div>
+
+Dashboard alerts:
+<div> 
+<img src="https://github.com/Pickelhaupt/EUC-Dash-ESP32/raw/master/Images/alerts-note-s.png" width="60%" align="center"/>
+</div>
+
 ### Other screens
 - Time and date screen
 - Settings screen
 - Unfinished trip info screen
 - Unfinished wheel info screen
+
+Screen layout:
+<div> 
+<img src="https://github.com/Pickelhaupt/EUC-Dash-ESP32/raw/master/Images/maintile-s.png" width="80%" align="center"/>
+</div>
+
+Map of all settings screens:
+<div> 
+<img src="https://github.com/Pickelhaupt/EUC-Dash-ESP32/raw/master/Images/settingsmanual2s.png" width="100%" align="center"/>
+</div>
+
 ### Supported Models
 Only supports Kingsong wheels at the moment. Might work with Gotway as well since the protocols are very similar.
-## Screenshot
+## Screenshots
 Some new screenshots, colours are a bit off though
 <div> 
   <img src="https://github.com/Pickelhaupt/EUC-Dash-ESP32/raw/master/Images/20201114_005122-fix_proc.jpg" width="20%" align="left"/>
   <img src="https://github.com/Pickelhaupt/EUC-Dash-ESP32/raw/master/Images/20201114_005212-fix_proc.jpg" width="20%" align="center"/>
   <img src="https://github.com/Pickelhaupt/EUC-Dash-ESP32/raw/master/Images/20201114_005143-fix_proc.jpg" width="20%" align="left"/>
+  
   <img src="https://github.com/Pickelhaupt/EUC-Dash-ESP32/raw/master/Images/20201114_005231-fix_proc.jpg" width="20%" align="center"/>
 </div>
+
 
 ## Dependencies
 ### Required libraries:
