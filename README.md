@@ -3,13 +3,6 @@
 
 **2020-11-24 Autodetection of KS wheels has been implemented, at the moment only KS14M/D/S, KS16/KS16S and KS18A/S are detected**
 
-**2020-11-21 Major performance overhaul, scrolling should be fairly smooth now**
-
-**2020-11-09 All features that was available in the old version now works plus a number of newly added features**
-
-
-**2020-11-09 fixed a couple bugs causing issues with current and temperature arcs**
-
 
 Complete rewrite added, only buildable with PlatformIO please see https://github.com/Pickelhaupt/EUC-Dash-ESP32/tree/master/src for more info
 
