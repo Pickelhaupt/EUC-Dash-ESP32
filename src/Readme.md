@@ -1,33 +1,5 @@
 # PlatformIO version
 Completely rewritten using the My-TTGO-Watch as template, still only works with ttgo-t-watch and Kingsong wheels
-## Current features
-- Tile based multiple screens 
-- Clock display
-- Simple Dashboard
-- Full dashboard
-- wifi NTP clock sync with timezone support
-- Kingsong EUC support
-- OTA updates on wifi (no binary available yet)
-- Settings storage on flash
-- haptic feedback for speed, current and temperature
-- long press on dashboard to toggle lights
-- Store settings to flash
-- settings for:
-  - clock
-  - dashboard
-  - BLE
-  - system utilities
-  - battery and power
-  - display (contrast, wake time, rotation)
-  - OTA upgrades
-  - wifi
-## In progress:
-- Adding wheel settings 
-- Adding wheel model autodetection --done for KS wheels, still some models missing though
-## Next steps
-- Add support for more wheel types, Gotway will be implemented next
-## Still todo
-- Add wheel selection setting
 
 This version requires the TTGO_TWatch_Library, this will automatically be downloaded when building the project the first time.
 I have forked the Twatch library and upgraded the LVGL version, the forked version is the one that is downloaded when building the project.
