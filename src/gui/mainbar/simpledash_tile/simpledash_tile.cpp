@@ -123,16 +123,18 @@ void lv_sd_define_styles_1(void)
 
     //Speed label
     lv_style_init(&sd_speed_label_style);
-    lv_style_set_text_color(&sd_speed_label_style, LV_STATE_DEFAULT, sd_speed_fg_clr);
+    lv_style_set_text_color(&sd_speed_label_style, LV_STATE_DEFAULT, sd_speed_bg_clr);
     lv_style_set_text_font(&sd_speed_label_style, LV_STATE_DEFAULT, &DIN1451_m_cond_180);
     // Battery Arc
     lv_style_copy(&sd_batt_indic_style, &sd_arc_style);
     lv_style_copy(&sd_batt_main_style, &sd_arc_style);
     lv_style_set_line_color(&sd_batt_main_style, LV_STATE_DEFAULT, sd_batt_bg_clr);
+    lv_style_set_line_color(&sd_batt_indic_style, LV_STATE_DEFAULT, sd_batt_bg_clr);
     // Current Arc
     lv_style_copy(&sd_current_indic_style, &sd_arc_style);
     lv_style_copy(&sd_current_main_style, &sd_arc_style);
     lv_style_set_line_color(&sd_current_main_style, LV_STATE_DEFAULT, sd_current_bg_clr);
+    lv_style_set_line_color(&sd_current_indic_style, LV_STATE_DEFAULT, sd_current_bg_clr);
     //Bar background -- transparent
     lv_style_copy(&sd_bar_main_style, &sd_arc_style);
     lv_style_set_line_opa(&sd_bar_main_style, LV_STATE_DEFAULT, LV_OPA_TRANSP);
@@ -391,11 +393,6 @@ int sd_value2angle(int arcstart, int arcstop, float minvalue, float maxvalue, fl
     return rAngle;
 }
 
-/***************************************************************
-   Dashboard GUI Update Functions, called via the task handler
-   runs every 250ms
- ***************************************************************/
-
 void simpledash_speed_update(float current_speed, float warn_speed, float tiltback_speed, float top_speed)
 {
     if (current_speed >= tiltback_speed)
@@ -433,7 +430,7 @@ void simpledash_speed_update(float current_speed, float warn_speed, float tiltba
 
 void simpledash_batt_update(float current_battpct, float min_battpct, float max_battpct)
 {
-    if (current_battpct < 10)
+    if (current_battpct < wheelctl_get_constant(WHEELCTL_CONST_BATTCRIT))
     {
         lv_style_set_line_color(&sd_batt_indic_style, LV_STATE_DEFAULT, LV_COLOR_RED);
     }

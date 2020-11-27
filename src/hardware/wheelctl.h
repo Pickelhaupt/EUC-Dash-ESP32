@@ -34,8 +34,11 @@
         bool enable=true;
     } wheelctl_config_t;
 
-    enum { 
-        WHEELCTL_CONFIG_LIGHTS,        //enable long press on dashboard to toggle lights
+    enum {  
+        WHEELCTL_CONFIG_LED,            //toggle leds when toggling light
+        WHEELCTL_CONFIG_HORN,           //long press on dash activates horn if speed > 3kmh
+        WHEELCTL_CONFIG_HAPTIC,         //Enable haptic feedback for alerts
+        WHEELCTL_CONFIG_LIGHTS_OFF,     //turn off lights when connecting to wheel
         WHEELCTL_CONFIG_NUM     //number of wheel configuration parameters
     };
 
@@ -51,7 +54,8 @@
         WHEELCTL_CONST_CRITTEMP,    //Critical internal temperature -required, might e made optional
         WHEELCTL_CONST_WARNTEMP,    //internal temperature to trigger warning -required, might e made optional
         WHEELCTL_CONST_BATTVOLT,    //Voltage of the battery pack for the wheel model -required
-        WHEELCTL_CONST_BATTWARN,    //Percentage of battery remaining when warning should be triggered for the specific wheel model -required     
+        WHEELCTL_CONST_BATTWARN,    //Percentage of battery remaining when warning should be triggered for the specific wheel model -required
+        WHEELCTL_CONST_BATTCRIT,     
         WHEELCTL_CONST_BATT_IR,     //battery pack internal resistance
         WHEELCTL_CONST_BATT_P,     //number of battery cells in parallel
         WHEELCTL_CONST_NUM          //number of wheel constants
@@ -221,6 +225,11 @@
      * @brief force all dashboard elements to update
      */
     void wheelctl_update_values(void);
+    /**
+     * @brief set startup wheel settings according to configuration.
+     * available settings: lights off when connect.
+     */
+    void wheelctl_set_connect_options(void);
 
 
     #endif

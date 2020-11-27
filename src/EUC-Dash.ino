@@ -94,10 +94,10 @@ void setup()
     heap_caps_malloc_extmem_enable( 16*1024 );
 
     splash_screen_stage_update( "init wheel data", 90 );
-    
+    wheelctl_setup();
     splash_screen_stage_update( "init gui", 100 );
     gui_setup();
-    wheelctl_setup();
+   
 
     //blectl_setup();
     blectl_scan_setup();

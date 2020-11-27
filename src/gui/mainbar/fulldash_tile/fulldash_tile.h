@@ -135,7 +135,7 @@ void fulldash_temp_alert(bool enabled);
 void fulldash_fan_indic(bool enabled);
 
 //variable declarations
-// extern struct Wheel_constants wheelconst;
+
 extern bool fulldash_active;
 
 #endif // _FULLDASH_TILE_H

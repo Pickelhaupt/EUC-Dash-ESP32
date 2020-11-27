@@ -172,9 +172,11 @@ void lv_define_styles_1(void)
     lv_style_copy(&batt_indic_style, &arc_style);
     lv_style_copy(&batt_main_style, &arc_style);
     lv_style_set_line_color(&batt_main_style, LV_STATE_DEFAULT, batt_bg_clr);
+    lv_style_set_line_color(&batt_indic_style, LV_STATE_DEFAULT, batt_bg_clr);
 
     lv_style_init(&batt_label_style);
     lv_style_set_text_font(&batt_label_style, LV_STATE_DEFAULT, &DIN1451_m_cond_66);
+    lv_style_set_text_color(&batt_label_style, LV_STATE_DEFAULT, batt_bg_clr);
 
     // Current Arc and label
     lv_style_copy(&current_indic_style, &arc_style);
@@ -183,6 +185,7 @@ void lv_define_styles_1(void)
 
     lv_style_init(&current_label_style);
     lv_style_set_text_font(&current_label_style, LV_STATE_DEFAULT, &DIN1451_m_cond_44);
+    lv_style_set_text_color(&current_label_style, LV_STATE_DEFAULT, current_bg_clr);
 
     // Temperature Arc
     lv_style_copy(&temp_indic_style, &arc_style);
@@ -191,7 +194,7 @@ void lv_define_styles_1(void)
 
     lv_style_init(&temp_label_style);
     lv_style_set_text_font(&temp_label_style, LV_STATE_DEFAULT, &DIN1451_m_cond_44);
-
+    lv_style_set_text_color(&temp_label_style, LV_STATE_DEFAULT, temp_bg_clr);
     //Bar background -- transparent
     lv_style_copy(&bar_main_style, &arc_style);
     lv_style_set_line_opa(&bar_main_style, LV_STATE_DEFAULT, LV_OPA_TRANSP);
@@ -301,6 +304,7 @@ void lv_batt_arc_1(void)
     lv_arc_set_bg_angles(batt_arc, batt_arc_start, batt_arc_end);
     lv_arc_set_angles(batt_arc, batt_arc_start, batt_arc_end);
     lv_arc_set_range(batt_arc, 0, 100);
+    lv_arc_set_value(batt_arc, 0);
     lv_obj_set_size(batt_arc, out_arc_x, out_arc_y);
     lv_obj_align(batt_arc, NULL, LV_ALIGN_CENTER, 0, 0);
 

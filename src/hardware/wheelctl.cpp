@@ -57,11 +57,25 @@ bool shakeoff[3] = {true, true, true};
 bool lightsoff = true;
 bool firstrun[WHEELCTL_DATA_NUM];
 float old_uptime = 0;
+bool newtrip = true;
 float old_trip = 0.0;
 
 wheelctl_data_t wheelctl_data[WHEELCTL_DATA_NUM];
 wheelctl_constants_t wheelctl_constants[WHEELCTL_CONST_NUM];
 wheelctl_info_t wheelctl_info[WHEELCTL_INFO_NUM];
+
+/**
+* @brief set wheel constants to initial default values
+*/
+void wheelctl_init_constants( void ) {
+    wheelctl_constants[WHEELCTL_CONST_MAXCURRENT].value = 40;
+    wheelctl_constants[WHEELCTL_CONST_CRITTEMP].value = 65;
+    wheelctl_constants[WHEELCTL_CONST_WARNTEMP].value = 55;
+    wheelctl_constants[WHEELCTL_CONST_BATTVOLT].value = 67;
+    wheelctl_constants[WHEELCTL_CONST_BATTWARN].value = 40;
+    wheelctl_constants[WHEELCTL_CONST_BATTCRIT].value = 10;
+    wheelctl_constants[WHEELCTL_CONST_BATT_IR].value = 20;
+}
 
 void wheelctl_setup(void)
 {
@@ -72,9 +86,11 @@ void wheelctl_setup(void)
     wheelctl_data[WHEELCTL_CURRENT].max_value = 0;
     wheelctl_data[WHEELCTL_CURRENT].min_value = 0;
     wheelctl_data[WHEELCTL_TEMP].min_value = 0;
+    wheelctl_init_constants();
     wheelctl_update_values();
     motor_vibe(5, true);
 }
+
 
 void wheelctl_update_values(void)
 {
@@ -158,7 +174,6 @@ void wheelctl_set_data(int entry, float value)
             }
             break;
         case WHEELCTL_TRIP:
-            if (firstrun[entry]) old_trip = value;
             wheelctl_update_avgspeed(value);
             break;
         case WHEELCTL_FANSTATE:
@@ -181,6 +196,10 @@ void wheelctl_update_ridetime()
 
 void wheelctl_update_avgspeed(float value)
 {
+    if (newtrip) {
+        old_trip = value;
+        newtrip = false;
+    }
     float trip_distance = value - old_trip;
     if (wheelctl_data[WHEELCTL_RIDETIME].value != 0) {
         wheelctl_data[WHEELCTL_SPEED].min_value = trip_distance / (wheelctl_data[WHEELCTL_RIDETIME].value / 3600);

@@ -31,7 +31,7 @@
      * @brief dashboard config structure
      */
     typedef struct {
-        bool enable=true;
+        bool enable = false;
     } dashboard_config_t;
 
     enum { 

@@ -43,7 +43,7 @@
         uint32_t brightness = 128;                      /** @brief display brightness */
         uint32_t timeout = 30;                          /** @brief display time out */
         uint32_t rotation = 180;                        /** @brief display rotation */
-        bool block_return_maintile = true;              /** @brief block back to main tile on standby */
+        bool block_return_maintile = false;              /** @brief block back to main tile on standby */
         uint32_t background_image = 4;                  /** @brief background image */
     } display_config_t;
 
