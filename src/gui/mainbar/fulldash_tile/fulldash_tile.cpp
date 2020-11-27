@@ -288,7 +288,7 @@ void lv_speed_arc_1(void)
     lv_label_set_text(speed_label, speedstring);
     lv_label_set_align(speed_label, LV_LABEL_ALIGN_CENTER);
     lv_obj_align(speed_label, speed_arc, LV_ALIGN_CENTER, 0, -5);
-    mainbar_add_slide_element(speed_label);
+    //mainbar_add_slide_element(speed_label);
 }
 
 void lv_batt_arc_1(void)
@@ -410,7 +410,7 @@ void lv_temp_arc_1(void)
     lv_arc_set_value(temp_arc, ((crit_temp + 10) - current_temp));
     lv_obj_set_size(temp_arc, in_arc_x, in_arc_y);
     lv_obj_align(temp_arc, NULL, LV_ALIGN_CENTER, 0, 0);
-    mainbar_add_slide_element(temp_arc);
+    //mainbar_add_slide_element(temp_arc);
 
     //Max bar
     temp_max_bar = lv_arc_create(fulldash_cont, NULL);
@@ -421,7 +421,7 @@ void lv_temp_arc_1(void)
     lv_arc_set_range(temp_max_bar, 0, (crit_temp + 10));
     lv_obj_set_size(temp_max_bar, in_arc_x, in_arc_y);
     lv_obj_align(temp_max_bar, NULL, LV_ALIGN_CENTER, 0, 0);
-    mainbar_add_slide_element(temp_max_bar);
+    //mainbar_add_slide_element(temp_max_bar);
 
     //Label
     temp_label = lv_label_create(fulldash_cont, NULL);
@@ -499,7 +499,7 @@ void lv_overlay(void)
     lv_label_set_text(overlay_label, "disconnected");
     lv_obj_reset_style_list(overlay_label, LV_OBJ_PART_MAIN);
     lv_obj_add_style(overlay_label, LV_OBJ_PART_MAIN, &overlay_label_style);
-    lv_obj_align(overlay_label, NULL, LV_ALIGN_CENTER, 0, -40);
+    lv_obj_align(overlay_label, NULL, LV_ALIGN_CENTER, 0, 0);
     mainbar_add_slide_element(overlay_label);
     lv_obj_set_event_cb(overlay_label, overlay_event_cb);
 } //End Create Dashboard objects

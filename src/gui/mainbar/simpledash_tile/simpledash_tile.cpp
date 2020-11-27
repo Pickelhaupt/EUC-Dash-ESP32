@@ -186,7 +186,7 @@ void lv_sd_speed_arc_1(void)
     lv_label_set_text(sd_speed_label, speedstring);
     lv_label_set_align(sd_speed_label, LV_LABEL_ALIGN_CENTER);
     lv_obj_align(sd_speed_label, sd_speed_arc, LV_ALIGN_CENTER, 0, 8);
-    mainbar_add_slide_element(sd_speed_label);
+    //mainbar_add_slide_element(sd_speed_label);
 }
 
 void lv_sd_batt_arc_1(void)
@@ -214,7 +214,7 @@ void lv_sd_batt_arc_1(void)
     lv_arc_set_range(sd_batt_arc, 0, 100);
     lv_obj_set_size(sd_batt_arc, sd_out_arc_x, sd_out_arc_y);
     lv_obj_align(sd_batt_arc, NULL, LV_ALIGN_CENTER, 0, 0);
-    mainbar_add_slide_element(sd_batt_arc);
+    //mainbar_add_slide_element(sd_batt_arc);
 
     if (dashboard_get_config(DASHBOARD_BARS))
     {
@@ -237,7 +237,7 @@ void lv_sd_batt_arc_1(void)
         lv_arc_set_range(sd_batt_min_bar, 0, 100);
         lv_obj_set_size(sd_batt_min_bar, sd_out_arc_x, sd_out_arc_y);
         lv_obj_align(sd_batt_min_bar, NULL, LV_ALIGN_CENTER, 0, 0);
-        mainbar_add_slide_element(sd_batt_min_bar);
+        //mainbar_add_slide_element(sd_batt_min_bar);
     }
 }
 
@@ -256,7 +256,7 @@ void lv_sd_current_arc_1(void)
     lv_arc_set_range(sd_current_arc, 0, maxcurrent);
     lv_obj_set_size(sd_current_arc, sd_out_arc_x, sd_out_arc_y);
     lv_obj_align(sd_current_arc, NULL, LV_ALIGN_CENTER, 0, 0);
-    mainbar_add_slide_element(sd_current_arc);
+    //mainbar_add_slide_element(sd_current_arc);
 
     if (dashboard_get_config(DASHBOARD_BARS))
     {
@@ -279,7 +279,7 @@ void lv_sd_current_arc_1(void)
         lv_arc_set_range(sd_current_regen_bar, 0, maxcurrent);
         lv_obj_set_size(sd_current_regen_bar, sd_out_arc_x, sd_out_arc_y);
         lv_obj_align(sd_current_regen_bar, NULL, LV_ALIGN_CENTER, 0, 0);
-        mainbar_add_slide_element(sd_current_regen_bar);
+        //mainbar_add_slide_element(sd_current_regen_bar);
     }
 }
 void lv_sd_alerts(void) 

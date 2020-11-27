@@ -207,7 +207,9 @@ void wheelctl_update_avgspeed(float value)
 }
 
 void wheelctl_update_powercons() {
+    float trip_distance = wheelctl_data[WHEELCTL_TRIP].value - old_trip;
     wheelctl_data[WHEELCTL_POWERCONS].value = wheelctl_data[WHEELCTL_POWERCONS].value + (wheelctl_data[WHEELCTL_POWER].value / 3600);
+    if (trip_distance !=0) wheelctl_data[WHEELCTL_ECONOMY].value = wheelctl_data[WHEELCTL_POWERCONS].value / trip_distance;
 }
 
 void wheelctl_update_max_min(int entry, float value, bool update_min)

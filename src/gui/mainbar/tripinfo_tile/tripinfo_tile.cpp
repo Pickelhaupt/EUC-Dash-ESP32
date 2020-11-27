@@ -237,7 +237,7 @@ void tripinfo_update( void ) {
     lv_obj_align( energy_consumption_data, max_power_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
 
     static float r_econo = 0.0;
-    if (wheelctl_get_data(WHEELCTL_TRIP) != 0 ) r_econo = wheelctl_get_data(WHEELCTL_POWERCONS) / wheelctl_get_data(WHEELCTL_TRIP);
+    r_econo = wheelctl_get_data(WHEELCTL_ECONOMY);
     if (dashboard_get_config(DASHBOARD_IMPDIST)) {
         r_econo = r_econo * 1.6;
         snprintf( temp, sizeof( temp ), "%0.1f Wh/mi", r_econo );

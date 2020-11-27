@@ -110,6 +110,7 @@
         WHEELCTL_TILTBACK,  //Speed when tiltback is triggered  -required
         WHEELCTL_RIDETIME,  //Total time in motion since power on
         WHEELCTL_POWERCONS,  //Power cunsumed 
+        WHEELCTL_ECONOMY,   //Wh/km(mi)
         WHEELCTL_DATA_NUM   //number of data entries
     };
     
