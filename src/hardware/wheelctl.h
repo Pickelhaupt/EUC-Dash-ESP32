@@ -24,7 +24,7 @@
     #include <TTGO.h>
     #include "callback.h"
 
-    #define MIN_RIDE_SPEED  2
+    #define MIN_RIDE_SPEED  1
     #define WHEELCTL_JSON_CONFIG_FILE    "/wheelctl.json" /** @brief defines json config file name */
 
     /**

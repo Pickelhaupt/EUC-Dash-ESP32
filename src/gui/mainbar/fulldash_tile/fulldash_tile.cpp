@@ -436,6 +436,7 @@ void lv_temp_arc_1(void)
 
 void lv_dashtime(void)
 {
+    /*
     dashtime = lv_label_create(fulldash_cont, NULL);
     lv_obj_reset_style_list(dashtime, LV_OBJ_PART_MAIN);
     lv_obj_add_style(dashtime, LV_OBJ_PART_MAIN, &dashtime_style);
@@ -444,6 +445,7 @@ void lv_dashtime(void)
     lv_obj_reset_style_list(wbatt, LV_OBJ_PART_MAIN);
     lv_obj_add_style(wbatt, LV_OBJ_PART_MAIN, &dashtime_style);
     lv_obj_align(wbatt, NULL, LV_ALIGN_IN_BOTTOM_RIGHT, 0, -25);
+    */
     trip = lv_label_create(fulldash_cont, NULL);
     lv_obj_reset_style_list(trip, LV_OBJ_PART_MAIN);
     lv_obj_add_style(trip, LV_OBJ_PART_MAIN, &trip_label_style);
@@ -558,6 +560,7 @@ int value2angle(int arcstart, int arcstop, float minvalue, float maxvalue, float
 
 void fulldash_speed_update(float current_speed, float warn_speed, float tiltback_speed, float top_speed)
 {
+    if (speed_arc == NULL || speed_max_bar == NULL || speed_avg_bar == NULL || speed_label == NULL) return;
     if (top_speed < tiltback_speed + 5) top_speed = tiltback_speed + 5;
 
     if (current_speed >= tiltback_speed)
@@ -618,6 +621,7 @@ void fulldash_speed_update(float current_speed, float warn_speed, float tiltback
 
 void fulldash_batt_update(float current_battpct, float min_battpct, float max_battpct)
 {
+    if (batt_arc == NULL || batt_max_bar == NULL || batt_min_bar == NULL || batt_label == NULL) return;
     if (current_battpct < 10)
     {
         lv_style_set_line_color(&batt_indic_style, LV_STATE_DEFAULT, LV_COLOR_RED);
@@ -672,6 +676,7 @@ void fulldash_batt_update(float current_battpct, float min_battpct, float max_ba
 
 void fulldash_current_update(float current_current, byte maxcurrent, float min_current, float max_current)
 {
+    if (current_arc == NULL || current_max_bar == NULL || current_regen_bar == NULL || current_label == NULL) return;
     float amps = current_current;
     
     if (current_current > (maxcurrent * 0.75))
@@ -725,6 +730,7 @@ void fulldash_current_update(float current_current, byte maxcurrent, float min_c
 
 void fulldash_temp_update(float current_temp, byte warn_temp, byte crit_temp, float max_temp)
 {
+    if (temp_arc == NULL || temp_max_bar == NULL || temp_label == NULL) return;
     if (current_temp > crit_temp)
     {
         lv_style_set_line_color(&temp_indic_style, LV_STATE_DEFAULT, LV_COLOR_RED);
@@ -766,6 +772,7 @@ void fulldash_temp_update(float current_temp, byte warn_temp, byte crit_temp, fl
 
 void fulldash_overlay_update()
 {
+    if (overlay_bar == NULL || overlay_label == NULL) return;
     if (blectl_cli_getconnected())
     {
         lv_style_set_bg_opa(&overlay_style, LV_STATE_DEFAULT, LV_OPA_TRANSP);
@@ -782,6 +789,8 @@ void fulldash_overlay_update()
 
 void updateTime()
 {
+    /*
+   
     time_t now;
     struct tm info;
     char buf[64];
@@ -793,19 +802,20 @@ void updateTime()
     int32_t watchbatt = pmu_get_battery_percent();
     if (watchbatt > 99) watchbatt = 99;
 
-    if (dashtime != nullptr)
+    if (dashtime != NULL)
     {
         lv_label_set_text(dashtime, buf);
         lv_obj_align(dashtime, fulldash_cont, LV_ALIGN_IN_BOTTOM_RIGHT, 0, 0);
     }
-    if (wbatt != nullptr)
+    if (wbatt != NULL)
     {
         char wbattstring[4];
         dtostrf(watchbatt, 2, 0, wbattstring);
         lv_label_set_text(wbatt, wbattstring);
         lv_obj_align(wbatt, fulldash_cont, LV_ALIGN_IN_BOTTOM_RIGHT, 0, -25);
     }
-    if (trip != nullptr)
+    */
+    if (trip != NULL)
     {
         char tripstring[6];
         float converted_trip = wheelctl_get_data(WHEELCTL_TRIP);

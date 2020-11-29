@@ -395,6 +395,7 @@ int sd_value2angle(int arcstart, int arcstop, float minvalue, float maxvalue, fl
 
 void simpledash_speed_update(float current_speed, float warn_speed, float tiltback_speed, float top_speed)
 {
+    if (sd_speed_label == NULL) return;
     if (current_speed >= tiltback_speed)
     {
         lv_style_set_text_color(&sd_speed_label_style, LV_STATE_DEFAULT, LV_COLOR_RED);
@@ -430,6 +431,7 @@ void simpledash_speed_update(float current_speed, float warn_speed, float tiltba
 
 void simpledash_batt_update(float current_battpct, float min_battpct, float max_battpct)
 {
+    if (sd_batt_arc == NULL) return;
     if (current_battpct < wheelctl_get_constant(WHEELCTL_CONST_BATTCRIT))
     {
         lv_style_set_line_color(&sd_batt_indic_style, LV_STATE_DEFAULT, LV_COLOR_RED);
@@ -450,6 +452,7 @@ void simpledash_batt_update(float current_battpct, float min_battpct, float max_
 
     if (dashboard_get_config(DASHBOARD_BARS))
     {
+        if (sd_batt_max_bar == NULL || sd_batt_min_bar == NULL) return;
         int ang_max = sd_value2angle(sd_batt_arc_start, sd_batt_arc_end, 0, 100, max_battpct, sd_rev_batt_arc);
         int ang_max2 = ang_max + 3;
         if (ang_max2 >= 360)
@@ -472,6 +475,7 @@ void simpledash_current_update(float current_current, byte maxcurrent, float min
 {
     if (dashboard_get_config(DASHBOARD_CURRENT))
     {
+        if (sd_current_arc == NULL) return;
         // Set warning and alert colour
         float amps = current_current;
 
@@ -504,6 +508,7 @@ void simpledash_current_update(float current_current, byte maxcurrent, float min
         }
         if (dashboard_get_config(DASHBOARD_BARS))
         {
+            if (sd_current_max_bar ==NULL || sd_current_regen_bar == NULL) return;
             int ang_max = sd_value2angle(sd_current_arc_start, sd_current_arc_end, 0, maxcurrent, max_current, sd_rev_current_arc);
             int ang_max2 = ang_max + 3;
             if (ang_max2 >= 360)
@@ -525,6 +530,7 @@ void simpledash_current_update(float current_current, byte maxcurrent, float min
 
 void simpledash_overlay_update()
 {
+    if (sd_overlay_bar == NULL || sd_overlay_label == NULL) return;
     if (blectl_cli_getconnected())
     {
         lv_style_set_bg_opa(&sd_overlay_style, LV_STATE_DEFAULT, LV_OPA_TRANSP);

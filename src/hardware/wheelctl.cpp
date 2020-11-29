@@ -23,9 +23,9 @@
 #include "wheelctl.h"
 #include "blectl.h"
 #include "motor.h"
-#include "callback.h"
+//#include "callback.h"
 #include "json_psram_allocator.h"
-#include "alloc.h"
+//#include "alloc.h"
 #include "Kingsong.h"
 #include "powermgm.h"
 #include "gui/mainbar/fulldash_tile/fulldash_tile.h"
@@ -63,6 +63,7 @@ float old_trip = 0.0;
 wheelctl_data_t wheelctl_data[WHEELCTL_DATA_NUM];
 wheelctl_constants_t wheelctl_constants[WHEELCTL_CONST_NUM];
 wheelctl_info_t wheelctl_info[WHEELCTL_INFO_NUM];
+wheelctl_config_t wheelctl_config[WHEELCTL_CONFIG_NUM];
 
 /**
 * @brief set wheel constants to initial default values
@@ -454,14 +455,14 @@ static void lv_current_shake(lv_task_t *current_shake)
 
 static void lv_temp_shake(lv_task_t *temp_shake)
 {
-    motor_vibe(10, true);
+    motor_vibe(20, true);
     delay(150);
-    motor_vibe(10, true);
+    motor_vibe(20, true);
 }
 
 static void lv_speed_shake(lv_task_t *speed_shake)
 {
-    motor_vibe(10, true);
+    motor_vibe(20, true);
 } //End haptic feedback
 
 void wheelctl_toggle_lights(void)
