@@ -456,11 +456,11 @@ void lv_alerts(void)
 {
     fan_indic = lv_img_create(fulldash_cont, NULL);
     lv_obj_reset_style_list(fan_indic, LV_OBJ_PART_MAIN);
-    lv_obj_set_size(fan_indic, 40, 40);
+    lv_obj_set_size(fan_indic, 32, 32);
     lv_obj_add_style(fan_indic, LV_OBJ_PART_MAIN, &alert_style);
     lv_img_set_src(fan_indic, &fan_40px);
     lv_obj_set_hidden(fan_indic, true);
-    lv_obj_align(fan_indic, NULL, LV_ALIGN_IN_TOP_RIGHT, 0, 0);
+    lv_obj_align(fan_indic, NULL, LV_ALIGN_IN_TOP_RIGHT, -5, 5);
 
     batt_alert = lv_img_create(fulldash_cont, NULL);
     lv_obj_reset_style_list(batt_alert, LV_OBJ_PART_MAIN);
