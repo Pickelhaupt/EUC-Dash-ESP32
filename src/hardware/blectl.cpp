@@ -400,7 +400,7 @@ static void notifyCallback(
     bool isNotify)
 {
     //Only decode if package contains relevant data
-    if (length == 20 && EUC_Brand == "KingSong") 
+    if (length == 20) 
     {
         if (pData[0] == 0xAA && pData[1] == 0x55)
         {
