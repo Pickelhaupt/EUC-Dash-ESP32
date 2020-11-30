@@ -561,7 +561,7 @@ int value2angle(int arcstart, int arcstop, float minvalue, float maxvalue, float
 void fulldash_speed_update(float current_speed, float warn_speed, float tiltback_speed, float top_speed)
 {
     if (speed_arc == NULL || speed_max_bar == NULL || speed_avg_bar == NULL || speed_label == NULL) return;
-    if (top_speed < tiltback_speed + 5) top_speed = tiltback_speed + 5;
+    if (top_speed > tiltback_speed + 5) top_speed = tiltback_speed + 5;
 
     if (current_speed >= tiltback_speed)
     {

@@ -29,11 +29,10 @@
 #include "hardware/wheelctl.h"
 
 //task declarations
-lv_task_t *sd_dash_task = nullptr;
 lv_task_t *overlay_task = nullptr;
 
 // Function declarations
-static void simpledash_overlay_task(lv_task_t *overlay_task);
+void simpledash_overlay_task(lv_task_t *overlay_task);
 static void sd_overlay_event_cb(lv_obj_t *obj, lv_event_t event);
 
 /*
@@ -52,7 +51,6 @@ static lv_style_t sd_arc_style;
 // Arc gauges and labels
 //arc background styles
 //Speed
-static lv_obj_t *sd_speed_arc = nullptr;
 static lv_obj_t *sd_speed_label = nullptr;
 static lv_style_t sd_speed_label_style;
 //Battery
@@ -185,7 +183,7 @@ void lv_sd_speed_arc_1(void)
     }
     lv_label_set_text(sd_speed_label, speedstring);
     lv_label_set_align(sd_speed_label, LV_LABEL_ALIGN_CENTER);
-    lv_obj_align(sd_speed_label, sd_speed_arc, LV_ALIGN_CENTER, 0, 8);
+    lv_obj_align(sd_speed_label, NULL, LV_ALIGN_CENTER, 0, 8);
     //mainbar_add_slide_element(sd_speed_label);
 }
 
@@ -395,6 +393,7 @@ int sd_value2angle(int arcstart, int arcstop, float minvalue, float maxvalue, fl
 
 void simpledash_speed_update(float current_speed, float warn_speed, float tiltback_speed, float top_speed)
 {
+    Serial.println("updating speed");
     if (sd_speed_label == NULL) return;
     if (current_speed >= tiltback_speed)
     {
@@ -416,7 +415,7 @@ void simpledash_speed_update(float current_speed, float warn_speed, float tiltba
     {
         converted_speed = current_speed / 1.6;
     }
-    if (converted_speed > 10)
+    if (converted_speed >= 10)
     {
         dtostrf(converted_speed, 2, 0, speedstring);
     }
@@ -426,7 +425,7 @@ void simpledash_speed_update(float current_speed, float warn_speed, float tiltba
     }
     lv_label_set_text(sd_speed_label, speedstring);
     lv_label_set_align(sd_speed_label, LV_LABEL_ALIGN_CENTER);
-    lv_obj_align(sd_speed_label, sd_speed_arc, LV_ALIGN_CENTER, 0, 8);
+    lv_obj_align(sd_speed_label, NULL, LV_ALIGN_CENTER, 0, 8);
 }
 
 void simpledash_batt_update(float current_battpct, float min_battpct, float max_battpct)
@@ -473,8 +472,10 @@ void simpledash_batt_update(float current_battpct, float min_battpct, float max_
 
 void simpledash_current_update(float current_current, byte maxcurrent, float min_current, float max_current)
 {
+     
     if (dashboard_get_config(DASHBOARD_CURRENT))
     {
+        Serial.println("updating current");
         if (sd_current_arc == NULL) return;
         // Set warning and alert colour
         float amps = current_current;
@@ -497,34 +498,38 @@ void simpledash_current_update(float current_current, byte maxcurrent, float min
             lv_style_set_line_color(&sd_current_indic_style, LV_STATE_DEFAULT, sd_current_fg_clr);
         }
         lv_obj_add_style(sd_current_arc, LV_ARC_PART_INDIC, &sd_current_indic_style);
-
-        if (sd_rev_current_arc)
-        {
-            lv_arc_set_value(sd_current_arc, (maxcurrent - amps));
-        }
-        else
-        {
-            lv_arc_set_value(sd_current_arc, amps);
-        }
+        lv_arc_set_value(sd_current_arc, (maxcurrent - amps));
+        
         if (dashboard_get_config(DASHBOARD_BARS))
         {
-            if (sd_current_max_bar ==NULL || sd_current_regen_bar == NULL) return;
-            int ang_max = sd_value2angle(sd_current_arc_start, sd_current_arc_end, 0, maxcurrent, max_current, sd_rev_current_arc);
+            Serial.println("updating current bars");
+            if (sd_current_max_bar == NULL || sd_current_regen_bar == NULL) return;
+            int ang_max = sd_value2angle(sd_current_arc_start, sd_current_arc_end, 0, maxcurrent, max_current, true);
             int ang_max2 = ang_max + 3;
             if (ang_max2 >= 360)
             {
                 ang_max2 = ang_max2 - 360;
             }
+            if (ang_max2 < 0)
+            {
+                ang_max2 = ang_max2 + 360;
+            }
             lv_arc_set_angles(sd_current_max_bar, ang_max, ang_max2);
 
-            int ang_regen = sd_value2angle(sd_current_arc_start, sd_current_arc_end, 0, maxcurrent, min_current, sd_rev_current_arc);
+            int ang_regen = sd_value2angle(sd_current_arc_start, sd_current_arc_end, 0, maxcurrent, min_current, true);
             int ang_regen2 = ang_regen + 3;
             if (ang_regen2 >= 360)
             {
                 ang_regen2 = ang_regen2 - 360;
             }
+            if (ang_regen2 < 0)
+            {
+                ang_regen2 = ang_regen2 + 360;
+            }
             lv_arc_set_angles(sd_current_regen_bar, ang_regen, ang_regen2);
+            Serial.println("current bars updated");
         }
+        Serial.println("current updated");
     }
 }
 
@@ -536,16 +541,18 @@ void simpledash_overlay_update()
         lv_style_set_bg_opa(&sd_overlay_style, LV_STATE_DEFAULT, LV_OPA_TRANSP);
         lv_obj_add_style(sd_overlay_bar, LV_OBJ_PART_MAIN, &sd_overlay_style);
         lv_obj_set_hidden(sd_overlay_label, true);
+        Serial.println("overlay disabled");
     }
     else
     {
         lv_style_set_bg_opa(&sd_overlay_style, LV_STATE_DEFAULT, LV_OPA_30);
         lv_obj_add_style(sd_overlay_bar, LV_OBJ_PART_MAIN, &sd_overlay_style);
         lv_obj_set_hidden(sd_overlay_label, false);
+        Serial.println("overlay enabled");
     }
 }
 
-static void simpledash_overlay_task(lv_task_t *overlay_task)
+void simpledash_overlay_task(lv_task_t *overlay_task)
 {
     simpledash_overlay_update();
 }
@@ -557,16 +564,22 @@ uint32_t simpledash_get_tile(void)
 
 void simpledash_activate_cb(void)
 {
-    overlay_task = lv_task_create(simpledash_overlay_task, 2000, LV_TASK_PRIO_LOWEST, NULL);
-    lv_task_ready(overlay_task);
-    simpledash_active = true;
-    wheelctl_update_values();
+    if (!simpledash_active) {
+        overlay_task = lv_task_create(simpledash_overlay_task, 2000, LV_TASK_PRIO_LOWEST, NULL);
+        lv_task_ready(overlay_task);
+        simpledash_active = true;
+        wheelctl_update_values();
+        Serial.println("overlay task created");
+    }
 }
 
 void simpledash_hibernate_cb(void)
 {
-    lv_task_del(overlay_task);
-    simpledash_active = false;
+    if (simpledash_active && overlay_task != nullptr) {
+        lv_task_del(overlay_task);
+        simpledash_active = false;
+        Serial.println("overlay task deleted");
+    }
 }
 
 void simpledash_tile_reload(void)

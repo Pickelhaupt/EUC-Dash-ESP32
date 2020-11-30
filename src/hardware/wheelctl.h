@@ -100,7 +100,7 @@
         WHEELCTL_RMODE,     //Wheel ride mode
         WHEELCTL_BATTPCT,   //Calculated percentage of remaining battery
         WHEELCTL_POWER,     //Wheel power output
-        WHEELCTL_TRIP,      //Ride distance since power on
+        WHEELCTL_TRIP,      //Value = Ride distance since wheel power on, max_value = trip1, min_value=trip2 managed by watch
         WHEELCTL_UPTIME,    //Time since power on in seconds
         WHEELCTL_TOPSPEED,  //max speed reached in kmh since power on
         WHEELCTL_FANSTATE,  //Internal fan run state
@@ -108,8 +108,8 @@
         WHEELCTL_ALARM2,    //Speed when second alarm is triggered
         WHEELCTL_ALARM3,    //Speed when third alarm is triggered
         WHEELCTL_TILTBACK,  //Speed when tiltback is triggered  -required
-        WHEELCTL_RIDETIME,  //Total time in motion since power on
-        WHEELCTL_POWERCONS,  //Power cunsumed 
+        WHEELCTL_RIDETIME,  //Total time in motion since trip reset
+        WHEELCTL_POWERCONS, //Power cunsumed 
         WHEELCTL_ECONOMY,   //Wh/km(mi)
         WHEELCTL_DATA_NUM   //number of data entries
     };

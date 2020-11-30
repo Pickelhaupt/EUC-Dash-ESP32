@@ -53,6 +53,7 @@ void wheelctl_calc_power(float value);
 void wheelctl_update_ridetime(lv_task_t *ride_tick);
 void wheelctl_update_powercons( void );
 void wheelctl_update_avgspeed(float value);
+void wheelctl_update_watch_trip(float value);
 
 bool shakeoff[3] = {true, true, true};
 bool lightsoff = true;
@@ -171,6 +172,7 @@ void wheelctl_set_data(int entry, float value)
             wheelctl_update_max_min(entry, value, false);
             break;
         case WHEELCTL_TRIP:
+            wheelctl_update_watch_trip(value);
             wheelctl_update_avgspeed(value);
             break;
         case WHEELCTL_FANSTATE:
@@ -191,13 +193,21 @@ void wheelctl_update_ridetime(lv_task_t *ride_tick)
     wheelctl_update_powercons();
 }
 
+void wheelctl_update_watch_trip(float value)
+{
+    static bool last_value_set = false;
+    static float last_value;
+    if (!last_value_set || value < last_value) { 
+        last_value = value; 
+        last_value_set = true;
+    }
+    wheelctl_data[WHEELCTL_TRIP].max_value += (value - last_value);
+    last_value = value;
+}
+
 void wheelctl_update_avgspeed(float value)
 {
-    if (newtrip) {
-        old_trip = value;
-        newtrip = false;
-    }
-    float trip_distance = value - old_trip;
+    float trip_distance = wheelctl_data[WHEELCTL_TRIP].max_value;
     if (wheelctl_data[WHEELCTL_RIDETIME].value != 0) {
         wheelctl_data[WHEELCTL_SPEED].min_value = trip_distance / (wheelctl_data[WHEELCTL_RIDETIME].value / 3600);
     }
