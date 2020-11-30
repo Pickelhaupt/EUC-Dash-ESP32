@@ -36,6 +36,7 @@
 lv_task_t *speed_shake = nullptr;
 lv_task_t *current_shake = nullptr;
 lv_task_t *temp_shake = nullptr;
+lv_task_t *ride_tick = nullptr;
 
 static void lv_speed_shake(lv_task_t *speed_shake);
 static void lv_current_shake(lv_task_t *current_shake);
@@ -49,7 +50,7 @@ void wheelctl_update_regen_current(int entry, float value);
 void wheelctl_update_battpct_max_min(int entry, float value);
 void update_calc_battery(float value);
 void wheelctl_calc_power(float value);
-void wheelctl_update_ridetime( void );
+void wheelctl_update_ridetime(lv_task_t *ride_tick);
 void wheelctl_update_powercons( void );
 void wheelctl_update_avgspeed(float value);
 
@@ -89,6 +90,7 @@ void wheelctl_setup(void)
     wheelctl_data[WHEELCTL_TEMP].min_value = 0;
     wheelctl_init_constants();
     wheelctl_update_values();
+    ride_tick = lv_task_create( wheelctl_update_ridetime, 1000, LV_TASK_PRIO_LOWEST, NULL );
     motor_vibe(5, true);
 }
 
@@ -168,12 +170,6 @@ void wheelctl_set_data(int entry, float value)
         case WHEELCTL_POWER:
             wheelctl_update_max_min(entry, value, false);
             break;
-        case WHEELCTL_UPTIME:
-        if (wheelctl_data[entry].value != value) {
-                wheelctl_update_ridetime();
-                wheelctl_update_powercons();
-            }
-            break;
         case WHEELCTL_TRIP:
             wheelctl_update_avgspeed(value);
             break;
@@ -187,12 +183,12 @@ void wheelctl_set_data(int entry, float value)
     }
 }
 
-void wheelctl_update_ridetime()
+void wheelctl_update_ridetime(lv_task_t *ride_tick)
 {
-    if (wheelctl_data[WHEELCTL_SPEED].value >= MIN_RIDE_SPEED)
-    {
+    if (wheelctl_data[WHEELCTL_SPEED].value >= MIN_RIDE_SPEED) {
         wheelctl_data[WHEELCTL_RIDETIME].value++;
     }
+    wheelctl_update_powercons();
 }
 
 void wheelctl_update_avgspeed(float value)
