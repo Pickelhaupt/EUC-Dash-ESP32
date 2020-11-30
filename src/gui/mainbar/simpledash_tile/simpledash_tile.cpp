@@ -39,10 +39,13 @@ static void sd_overlay_event_cb(lv_obj_t *obj, lv_event_t event);
    Declare LVGL Dashboard objects and styles
 */
 
- LV_IMG_DECLARE(currentalarm_128px);
- LV_IMG_DECLARE(battalarm_128px);
- LV_IMG_DECLARE(tempalarm_128px);
- LV_IMG_DECLARE(fan_40px);
+LV_IMG_DECLARE(currentalarm_128px);
+LV_IMG_DECLARE(battalarm_128px);
+LV_IMG_DECLARE(tempalarm_128px);
+LV_IMG_DECLARE(fan_40px);
+
+LV_FONT_DECLARE(DIN1451_m_cond_36);
+LV_FONT_DECLARE(DIN1451_m_cond_180);
 
 static lv_obj_t *simpledash_cont = NULL;
 static lv_style_t *style;
@@ -167,24 +170,13 @@ void lv_sd_define_styles_1(void)
 
 void lv_sd_speed_arc_1(void)
 {
-    float current_speed = wheelctl_get_data(WHEELCTL_SPEED);
     //Label
     sd_speed_label = lv_label_create(simpledash_cont, NULL);
     lv_obj_reset_style_list(sd_speed_label, LV_OBJ_PART_MAIN);
     lv_obj_add_style(sd_speed_label, LV_LABEL_PART_MAIN, &sd_speed_label_style);
-    char speedstring[4];
-    if (current_speed > 10)
-    {
-        dtostrf(current_speed, 2, 0, speedstring);
-    }
-    else
-    {
-        dtostrf(current_speed, 1, 0, speedstring);
-    }
-    lv_label_set_text(sd_speed_label, speedstring);
+    lv_label_set_text(sd_speed_label, "0");
     lv_label_set_align(sd_speed_label, LV_LABEL_ALIGN_CENTER);
-    lv_obj_align(sd_speed_label, NULL, LV_ALIGN_CENTER, 0, 8);
-    //mainbar_add_slide_element(sd_speed_label);
+    lv_obj_align(sd_speed_label, simpledash_cont, LV_ALIGN_CENTER, 0, 0);
 }
 
 void lv_sd_batt_arc_1(void)
@@ -284,11 +276,11 @@ void lv_sd_alerts(void)
 {
     sd_fan_indic = lv_img_create(simpledash_cont, NULL);
     lv_obj_reset_style_list(sd_fan_indic, LV_OBJ_PART_MAIN);
-    lv_obj_set_size(sd_fan_indic, 40, 40);
+    lv_obj_set_size(sd_fan_indic, 32, 32);
     lv_obj_add_style(sd_fan_indic, LV_OBJ_PART_MAIN, &sd_alert_style);
     lv_img_set_src(sd_fan_indic, &fan_40px);
     lv_obj_set_hidden(sd_fan_indic, true);
-    lv_obj_align(sd_fan_indic, NULL, LV_ALIGN_IN_TOP_RIGHT, 0, 0);
+    lv_obj_align(sd_fan_indic, NULL, LV_ALIGN_IN_TOP_RIGHT, -5, 5);
 
     sd_batt_alert = lv_img_create(simpledash_cont, NULL);
     lv_obj_reset_style_list(sd_batt_alert, LV_OBJ_PART_MAIN);
@@ -364,36 +356,21 @@ int sd_value2angle(int arcstart, int arcstop, float minvalue, float maxvalue, fl
 {
     int rAngle;
     int arcdegrees;
-    if (arcstop < arcstart)
-    {
-        arcdegrees = (arcstop + 360) - arcstart;
-    }
-    else
-    {
-        arcdegrees = arcstop - arcstart;
-    }
-    if (reverse)
-    {
-        rAngle = arcstop - (arcvalue * arcdegrees / (maxvalue - minvalue));
-    }
-    else
-    {
-        rAngle = arcstart + (arcvalue * arcdegrees / (maxvalue - minvalue));
-    }
-    if (rAngle >= 360)
-    {
-        rAngle = rAngle - 360;
-    }
-    else if (rAngle < 0)
-    {
-        rAngle = rAngle + 360;
-    }
+
+    if (arcstop < arcstart) arcdegrees = (arcstop + 360) - arcstart;
+    else arcdegrees = arcstop - arcstart;
+    
+    if (reverse) rAngle = arcstop - (arcvalue * arcdegrees / (maxvalue - minvalue));
+    else rAngle = arcstart + (arcvalue * arcdegrees / (maxvalue - minvalue));
+
+    if (rAngle >= 360) rAngle = rAngle - 360;
+    else if (rAngle < 0) rAngle = rAngle + 360;
+
     return rAngle;
 }
 
 void simpledash_speed_update(float current_speed, float warn_speed, float tiltback_speed, float top_speed)
 {
-    Serial.println("updating speed");
     if (sd_speed_label == NULL) return;
     if (current_speed >= tiltback_speed)
     {
@@ -407,25 +384,16 @@ void simpledash_speed_update(float current_speed, float warn_speed, float tiltba
     {
         lv_style_set_text_color(&sd_speed_label_style, LV_STATE_DEFAULT, sd_speed_fg_clr);
     }
-
     lv_obj_add_style(sd_speed_label, LV_LABEL_PART_MAIN, &sd_speed_label_style);
-    char speedstring[4];
-    float converted_speed = current_speed;
-    if (dashboard_get_config(DASHBOARD_IMPDIST))
-    {
-        converted_speed = current_speed / 1.6;
-    }
-    if (converted_speed >= 10)
-    {
-        dtostrf(converted_speed, 2, 0, speedstring);
-    }
-    else
-    {
-        dtostrf(converted_speed, 1, 0, speedstring);
-    }
-    lv_label_set_text(sd_speed_label, speedstring);
+
+    if (dashboard_get_config(DASHBOARD_IMPDIST)) current_speed = current_speed / 1.6;
+    
+    static char sd_speedstring[4];
+    dtostrf(current_speed, 2, 0, sd_speedstring);
+    
+    lv_label_set_text(sd_speed_label, sd_speedstring);
     lv_label_set_align(sd_speed_label, LV_LABEL_ALIGN_CENTER);
-    lv_obj_align(sd_speed_label, NULL, LV_ALIGN_CENTER, 0, 8);
+    lv_obj_align(sd_speed_label, simpledash_cont, LV_ALIGN_CENTER, 0, 0);
 }
 
 void simpledash_batt_update(float current_battpct, float min_battpct, float max_battpct)
@@ -475,7 +443,6 @@ void simpledash_current_update(float current_current, byte maxcurrent, float min
      
     if (dashboard_get_config(DASHBOARD_CURRENT))
     {
-        Serial.println("updating current");
         if (sd_current_arc == NULL) return;
         // Set warning and alert colour
         float amps = current_current;
@@ -502,17 +469,12 @@ void simpledash_current_update(float current_current, byte maxcurrent, float min
         
         if (dashboard_get_config(DASHBOARD_BARS))
         {
-            Serial.println("updating current bars");
             if (sd_current_max_bar == NULL || sd_current_regen_bar == NULL) return;
             int ang_max = sd_value2angle(sd_current_arc_start, sd_current_arc_end, 0, maxcurrent, max_current, true);
             int ang_max2 = ang_max + 3;
             if (ang_max2 >= 360)
             {
                 ang_max2 = ang_max2 - 360;
-            }
-            if (ang_max2 < 0)
-            {
-                ang_max2 = ang_max2 + 360;
             }
             lv_arc_set_angles(sd_current_max_bar, ang_max, ang_max2);
 
@@ -522,14 +484,8 @@ void simpledash_current_update(float current_current, byte maxcurrent, float min
             {
                 ang_regen2 = ang_regen2 - 360;
             }
-            if (ang_regen2 < 0)
-            {
-                ang_regen2 = ang_regen2 + 360;
-            }
             lv_arc_set_angles(sd_current_regen_bar, ang_regen, ang_regen2);
-            Serial.println("current bars updated");
         }
-        Serial.println("current updated");
     }
 }
 
@@ -541,14 +497,12 @@ void simpledash_overlay_update()
         lv_style_set_bg_opa(&sd_overlay_style, LV_STATE_DEFAULT, LV_OPA_TRANSP);
         lv_obj_add_style(sd_overlay_bar, LV_OBJ_PART_MAIN, &sd_overlay_style);
         lv_obj_set_hidden(sd_overlay_label, true);
-        Serial.println("overlay disabled");
     }
     else
     {
         lv_style_set_bg_opa(&sd_overlay_style, LV_STATE_DEFAULT, LV_OPA_30);
         lv_obj_add_style(sd_overlay_bar, LV_OBJ_PART_MAIN, &sd_overlay_style);
         lv_obj_set_hidden(sd_overlay_label, false);
-        Serial.println("overlay enabled");
     }
 }
 
@@ -569,7 +523,6 @@ void simpledash_activate_cb(void)
         lv_task_ready(overlay_task);
         simpledash_active = true;
         wheelctl_update_values();
-        Serial.println("overlay task created");
     }
 }
 
@@ -578,7 +531,6 @@ void simpledash_hibernate_cb(void)
     if (simpledash_active && overlay_task != nullptr) {
         lv_task_del(overlay_task);
         simpledash_active = false;
-        Serial.println("overlay task deleted");
     }
 }
 

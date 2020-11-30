@@ -29,7 +29,6 @@
 #include "hardware/motor.h"
 
 //task declarations
-lv_task_t *dash_task = nullptr;
 lv_task_t *time_task = nullptr;
 
 // Function declarations
@@ -97,8 +96,8 @@ static lv_style_t min_bar_indic_style; //also for avg speed
 static lv_style_t regen_bar_indic_style;
 static lv_style_t bar_main_style;
 //Dashclock objects and styles
-static lv_obj_t *dashtime = NULL;
-static lv_obj_t *wbatt = NULL;
+//static lv_obj_t *dashtime = NULL;
+//static lv_obj_t *wbatt = NULL;
 static lv_obj_t *trip = NULL;
 static lv_style_t trip_label_style;
 static lv_style_t dashtime_style;
@@ -111,7 +110,6 @@ static lv_style_t alert_style;
 
 //Overlay objects and styles
 static lv_obj_t *overlay_bar = NULL;
-//static lv_obj_t *overlay_line = NULL;
 static lv_obj_t *overlay_label = NULL;
 static lv_style_t overlay_style;
 static lv_style_t overlay_label_style;
@@ -606,7 +604,7 @@ void fulldash_speed_update(float current_speed, float warn_speed, float tiltback
         converted_speed = current_speed / 1.6;
     }
     char speedstring[4];
-    if (converted_speed > 10)
+    if (converted_speed >= 10)
     {
         dtostrf(converted_speed, 2, 0, speedstring);
     }
