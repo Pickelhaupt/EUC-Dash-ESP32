@@ -164,8 +164,8 @@ bool blectl_cli_powermgm_event_cb(EventBits_t event, void *arg)
         if (cliconnected)
         {
             retval = false;
-            fulldash_active = false;
-            simpledash_active = false;
+            //fulldash_active = false;
+            //simpledash_active = false;
             log_w("standby blocked by wheel being connected");
         }
         else
