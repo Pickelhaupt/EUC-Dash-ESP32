@@ -35,6 +35,7 @@
     #define DISPLAY_MAX_BRIGHTNESS      255             /** @brief max display brightness */
     #define DISPLAY_MIN_ROTATE          0               /** @brief min display rotation */
     #define DISPLAY_MAX_ROTATE          270             /** @brief max display rotation */
+    #define DISPLAY_DEFAULT_ROTATE      180             /** @brief default display rotation */
 
     /**
      * @brief display config structure

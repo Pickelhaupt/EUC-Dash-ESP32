@@ -181,7 +181,6 @@ void lv_sd_speed_arc_1(void)
 void lv_sd_batt_arc_1(void)
 {
     /*Create battery gauge arc*/
-
     if (dashboard_get_config(DASHBOARD_CURRENT))
     {
         sd_batt_arc_start = 110;

@@ -183,7 +183,7 @@ void display_read_config( void ) {
       
         else {
             display_config.brightness = doc["brightness"] | DISPLAY_MAX_BRIGHTNESS / 2;
-            display_config.rotation = doc["rotation"] | DISPLAY_MIN_ROTATE;
+            display_config.rotation = doc["rotation"] | DISPLAY_DEFAULT_ROTATE;
             display_config.timeout = doc["timeout"] | DISPLAY_MIN_TIMEOUT;
             display_config.block_return_maintile = doc["block_return_maintile"] | false;
             display_config.background_image = doc["background_image"] | 2;
