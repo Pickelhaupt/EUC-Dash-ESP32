@@ -114,15 +114,43 @@ class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks
         Serial.print("BLE Advertised Device found: ");
         Serial.println(advertisedDevice.toString().c_str());
         // We have found a device, let us now see if it contains the service we are looking for.
-        if (EUC_Brand = "KingSong")
+        
+        if (advertisedDevice.haveServiceUUID() && advertisedDevice.isAdvertisingService(KS_SERVICE_UUID_1))
         {
-            if (advertisedDevice.haveServiceUUID() && advertisedDevice.isAdvertisingService(KS_SERVICE_UUID_1))
-            {
-                BLEDevice::getScan()->stop();
-                myDevice = new BLEAdvertisedDevice(advertisedDevice);
-                clidoConnect = true;
-            } // Found our server
-        }
+            log_i("Kingsong wheel detected");
+            BLEDevice::getScan()->stop();
+            myDevice = new BLEAdvertisedDevice(advertisedDevice);
+            clidoConnect = true;
+            EUC_Brand = "KingSong";
+            wheelctl_set_info(WHEELCTL_INFO_MANUFACTURER, "KS");
+        } // Found our server
+        else if (advertisedDevice.haveServiceUUID() && advertisedDevice.isAdvertisingService(IM_SERVICE_UUID))
+        {
+            log_i("Inmotion wheel detected");
+            BLEDevice::getScan()->stop();
+            myDevice = new BLEAdvertisedDevice(advertisedDevice);
+            clidoConnect = true;
+            EUC_Brand = "Inmotion";
+            wheelctl_set_info(WHEELCTL_INFO_MANUFACTURER, "IM");
+        } // Found our server
+            else if (advertisedDevice.haveServiceUUID() && advertisedDevice.isAdvertisingService(NB_SERVICE_UUID))
+        {
+            log_i("Ninebot wheel detected");
+            BLEDevice::getScan()->stop();
+            myDevice = new BLEAdvertisedDevice(advertisedDevice);
+            clidoConnect = true;
+            EUC_Brand = "NineBot";
+            wheelctl_set_info(WHEELCTL_INFO_MANUFACTURER, "NB");
+        } // Found our server
+        else if (advertisedDevice.haveServiceUUID() && advertisedDevice.isAdvertisingService(NBZ_SERVICE_UUID))
+        {
+            log_i("Ninebot-Z wheel detected");
+            BLEDevice::getScan()->stop();
+            myDevice = new BLEAdvertisedDevice(advertisedDevice);
+            clidoConnect = true;
+            EUC_Brand = "NineBot-Z";
+            wheelctl_set_info(WHEELCTL_INFO_MANUFACTURER, "NBZ");
+        } // Found our server
     } // onResult
 };    // MyAdvertisedDeviceCallbacks
 
@@ -136,6 +164,8 @@ bool blectl_cli_powermgm_event_cb(EventBits_t event, void *arg)
         if (cliconnected)
         {
             retval = false;
+            fulldash_active = false;
+            simpledash_active = false;
             log_w("standby blocked by wheel being connected");
         }
         else
@@ -352,8 +382,7 @@ static void scanCompleteCB(BLEScanResults scanResults) {
 void blectl_cli_loop(void)
 {
     int scandelay = 15000;
-    String euctype = "KS"; //autodetect this
-    wheelctl_set_info(WHEELCTL_INFO_MANUFACTURER, euctype);
+    String EUC_Type = wheelctl_get_info(WHEELCTL_INFO_MANUFACTURER);
 
     if (clidoConnect)
     {
@@ -362,7 +391,7 @@ void blectl_cli_loop(void)
             Serial.println("We are now connected to the BLE Server.");
             if (wheelctl_get_info(WHEELCTL_INFO_BLENAME) == "KS-14SMD4735") Serial.println("Found KS Wheel");
 
-            if (EUC_Brand = "Kingsong")
+            if (EUC_Type = "KS")
             {
                 Serial.println("initialising KingSong");
                 initks();

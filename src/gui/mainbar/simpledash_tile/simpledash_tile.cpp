@@ -119,7 +119,6 @@ void lv_sd_define_styles_1(void)
     lv_style_set_bg_opa(&sd_arc_style, LV_STATE_DEFAULT, LV_OPA_TRANSP);
     lv_style_set_border_width(&sd_arc_style, LV_STATE_DEFAULT, 0);
     lv_style_set_border_opa(&sd_arc_style, LV_STATE_DEFAULT, LV_OPA_TRANSP);
-   
     //General styles
 
     //Speed label
