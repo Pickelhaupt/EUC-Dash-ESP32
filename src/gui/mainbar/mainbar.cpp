@@ -32,7 +32,7 @@
 #include "hardware/dashboard.h"
 #include "setup_tile/battery_settings/battery_settings.h"
 #include "setup_tile/wlan_settings/wlan_settings.h"
-#include "setup_tile/move_settings/move_settings.h"
+#include "setup_tile/wheel_settings/wheel_settings.h"
 #include "setup_tile/display_settings/display_settings.h"
 #include "setup_tile/time_settings/time_settings.h"
 #include "setup_tile/update/update.h"

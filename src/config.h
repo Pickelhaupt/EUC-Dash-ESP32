@@ -41,6 +41,6 @@
     /*
     * firmware version string
     */
-    #define __FIRMWARE__            "2020120201"
+    #define __FIRMWARE__            "2020120301"
 
 #endif // _CONFIG_H

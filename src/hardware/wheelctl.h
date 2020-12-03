@@ -219,6 +219,22 @@
      */
     void wheelctl_set_info( int entry, String value );
     /**
+     * @brief get the state of the wheel configuraion setting
+     * 
+     * @param   config     configitem: WHEELCTL_CONFIG_LED, WHEELCTL_CONFIG_HORN, 
+     * WHEELCTL_CONFIG_HAPTIC, WHEELCTL_CONFIG_LIGHTS_OFF, WHEELCTL_CONST_BATTWARN
+     */
+    bool wheelctl_get_config( int config );
+    /**
+     * @brief set the state of the wheel configuration entry
+     * 
+     * @param   config     configitem: WHEELCTL_INFO_SERIAL, WHEELCTL_INFO_MANUFACTURER, 
+     * WHEELCTL_INFO_MODEL, WHEELCTL_INFO_VERSION
+     * 
+     * @param   enable     if the setting is true or false
+     */
+    void wheelctl_set_config( int config, bool enable );
+    /**
      * @brief toggle EUC main lights
      */
     void wheelctl_toggle_lights( void );
@@ -231,6 +247,8 @@
      * available settings: lights off when connect.
      */
     void wheelctl_set_connect_options(void);
+
+    void wheelctl_save_config( void );
 
 
     #endif

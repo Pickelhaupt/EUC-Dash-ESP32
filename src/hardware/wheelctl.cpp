@@ -54,6 +54,8 @@ void wheelctl_update_ridetime(lv_task_t *ride_tick);
 void wheelctl_update_powercons( void );
 void wheelctl_update_avgspeed(float value);
 void wheelctl_update_watch_trip(float value);
+void wheelctl_read_config( void );
+
 
 bool shakeoff[3] = {true, true, true};
 bool lightsoff = true;
@@ -91,10 +93,10 @@ void wheelctl_setup(void)
     wheelctl_data[WHEELCTL_TEMP].min_value = 0;
     wheelctl_init_constants();
     wheelctl_update_values();
+    wheelctl_read_config();
     ride_tick = lv_task_create( wheelctl_update_ridetime, 1000, LV_TASK_PRIO_LOWEST, NULL );
     motor_vibe(5, true);
 }
-
 
 void wheelctl_update_values(void)
 {
@@ -498,5 +500,65 @@ void wheelctl_toggle_lights(void)
     {
         //if (blectl_cli_getconnected()) nb_lights(lightsoff);
         //if (lightsoff) lightsoff = false; else lightsoff = true;
+    }
+}
+
+void wheelctl_save_config( void ) {
+    fs::File file = SPIFFS.open( WHEELCTL_JSON_CONFIG_FILE, FILE_WRITE );
+
+    if (!file) {
+        log_e("Can't open file: %s!", WHEELCTL_JSON_CONFIG_FILE );
+    }
+    else {
+        SpiRamJsonDocument doc( 1000 );
+
+        doc["lightsoff"] = wheelctl_config[ WHEELCTL_CONFIG_LIGHTS_OFF ].enable;
+        doc["led"] = wheelctl_config[ WHEELCTL_CONFIG_LED ].enable;
+        doc["horn"] = wheelctl_config[ WHEELCTL_CONFIG_HORN ].enable;
+        doc["simple"] = wheelctl_config[ WHEELCTL_CONFIG_HAPTIC ].enable;
+        if ( serializeJsonPretty( doc, file ) == 0) {
+            log_e("Failed to write config file");
+        }
+        doc.clear();
+    }
+    file.close();
+}
+
+void wheelctl_read_config( void ) {
+    fs::File file = SPIFFS.open( WHEELCTL_JSON_CONFIG_FILE, FILE_READ );
+    if (!file) {
+        log_e("Can't open file: %s!", WHEELCTL_JSON_CONFIG_FILE );
+    }
+    else {
+        int filesize = file.size();
+        SpiRamJsonDocument doc( filesize * 2 );
+
+        DeserializationError error = deserializeJson( doc, file );
+        if ( error ) {
+            log_e("update check deserializeJson() failed: %s", error.c_str() );
+        }
+        else {
+            wheelctl_config[ WHEELCTL_CONFIG_LIGHTS_OFF ].enable = doc["lightsoff"] | true;
+            wheelctl_config[ WHEELCTL_CONFIG_LED ].enable = doc["led"] | true;
+            wheelctl_config[ WHEELCTL_CONFIG_HORN ].enable = doc["horn"] | false;
+            wheelctl_config[ WHEELCTL_CONFIG_HAPTIC ].enable = doc["haptic"] | false;
+        }        
+        doc.clear();
+    }
+    file.close();
+}
+
+bool wheelctl_get_config( int config ) {
+    if ( config < WHEELCTL_CONFIG_NUM ) {
+        return( wheelctl_config[ config ].enable );
+    }
+    return false;
+}
+
+void wheelctl_set_config( int config, bool enable ) {
+    if ( config < WHEELCTL_CONFIG_NUM ) {
+        wheelctl_config[ config ].enable = enable;
+        wheelctl_save_config();
+        simpledash_tile_reload();
     }
 }

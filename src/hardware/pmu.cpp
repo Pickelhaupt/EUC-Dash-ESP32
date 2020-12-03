@@ -140,10 +140,6 @@ void pmu_loop( void ) {
             return;
         }
         ttgo->power->clearIRQ();
-        bool plug = ttgo->power->isVBUSPlug();
-        bool charging = ttgo->power->isChargeing();
-        //pmu_send_cb( PMUCTL_VBUS_PLUG, (void *)&plug );
-        //pmu_send_cb( PMUCTL_CHARGING, (void *)&charging );
         pmu_update = true;
     }
 

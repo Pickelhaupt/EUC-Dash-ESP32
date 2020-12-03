@@ -24,7 +24,7 @@
 #include "splashscreen.h"
 
 #include "hardware/display.h"
-#include "gui/png_decoder/png_decoder.h"
+//#include "gui/png_decoder/png_decoder.h"
 
 lv_obj_t *logo = NULL;
 lv_obj_t *preload = NULL;

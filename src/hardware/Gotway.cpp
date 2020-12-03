@@ -123,7 +123,7 @@ void decodeGW(byte GWdata[])
     }
 } // End decodeGW
 
-void gotway_decode_serial( void ) {
+void gotway_decode_serial( void ) { //redo this when GW serial no structure is known
     String gw_serialno = wheelctl_get_info(WHEELCTL_INFO_SERIAL);
     String gw_size = gw_serialno.substring(0,4);
     String gw_battsize = gw_serialno.substring(4,6);
@@ -353,11 +353,11 @@ void gotway_decode_serial( void ) {
         }
     }
     if (wheelctl_get_constant(WHEELCTL_CONST_BATT_P) == 1) wheelctl_set_constant(WHEELCTL_CONST_BATT_IR, 30);
-    if (wheelctl_get_constant(WHEELCTL_CONST_BATT_P) == 2) wheelctl_set_constant(WHEELCTL_CONST_BATT_IR, 23);
-    if (wheelctl_get_constant(WHEELCTL_CONST_BATT_P) == 3) wheelctl_set_constant(WHEELCTL_CONST_BATT_IR, 20);
-    if (wheelctl_get_constant(WHEELCTL_CONST_BATT_P) == 4) wheelctl_set_constant(WHEELCTL_CONST_BATT_IR, 15);
-    if (wheelctl_get_constant(WHEELCTL_CONST_BATT_P) == 6) wheelctl_set_constant(WHEELCTL_CONST_BATT_IR, 13);
-    if (wheelctl_get_constant(WHEELCTL_CONST_BATT_P) == 8) wheelctl_set_constant(WHEELCTL_CONST_BATT_IR, 12);
+    else if (wheelctl_get_constant(WHEELCTL_CONST_BATT_P) == 2) wheelctl_set_constant(WHEELCTL_CONST_BATT_IR, 23);
+    else if (wheelctl_get_constant(WHEELCTL_CONST_BATT_P) == 3) wheelctl_set_constant(WHEELCTL_CONST_BATT_IR, 20);
+    else if (wheelctl_get_constant(WHEELCTL_CONST_BATT_P) == 4) wheelctl_set_constant(WHEELCTL_CONST_BATT_IR, 15);
+    else if (wheelctl_get_constant(WHEELCTL_CONST_BATT_P) == 6) wheelctl_set_constant(WHEELCTL_CONST_BATT_IR, 13);
+    else if (wheelctl_get_constant(WHEELCTL_CONST_BATT_P) == 8) wheelctl_set_constant(WHEELCTL_CONST_BATT_IR, 12);
 
     if (gw_colour == "B") wheelctl_set_info(WHEELCTL_INFO_WHEELCOLOR, "black");
     if (gw_colour == "C") wheelctl_set_info(WHEELCTL_INFO_WHEELCOLOR, "custom");
