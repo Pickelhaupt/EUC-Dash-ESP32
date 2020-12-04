@@ -1,5 +1,7 @@
 # EUC-Dash-ESP32
 
+**2020-12-04 added wheel settings**
+
 **2020-12-03 Gotway/Veteran support in progress**
 
 **2020-11-24 Added KS16X/XS, KS18L/XL and KS-S18**
@@ -16,8 +18,7 @@ For instructions on how to setup PlatformIO and building the project see the REA
 ## Introduction
 The latest version will no longer build using the Arduino IDE, I have migrated to PlatformIO and will not update the arduino versions.
 
-
-This is an early version of a dashboard for electric unicycles. It currently only supports KingSong wheels and ttgo t-watch 2020. The code is still quite unpolished and there are probably some bugs. 
+This pre-release version of a dashboard for electric unicycles. It currently only supports KingSong wheels and ttgo t-watch 2020. There are probably still some bugs. 
 
 I got a lot of help from reading the code from the WheelLogAndroid project, it spared me from having to reverse engineer the protocol.
 I used My-TTGO-Watch by Dirk Brosswick as a template to implement multiple screen support, settings and a lot of other functions:
@@ -88,8 +89,8 @@ Dashboard alerts:
 ### Other screens
 - Time and date screen
 - Settings screen
-- Unfinished trip info screen
-- Unfinished wheel info screen
+- trip info screen
+- wheel info screen
 
 Screen layout:
 <div> 
@@ -102,7 +103,13 @@ Map of all settings screens:
 </div>
 
 ### Supported Models
-Only supports Kingsong wheels at the moment. Might work with Gotway as well since the protocols are very similar.
+Only supports Kingsong wheels at the moment. it autodetects the following models:
+- KS14M/D/S
+- KS16/KS16/S/X/XS
+- KS18A/S/L/XL
+- KS-S18
+
+Gotway support is being actively worked on.
 ## Screenshots
 Some new screenshots, colours are a bit off though
 <div> 
@@ -113,7 +120,6 @@ Some new screenshots, colours are a bit off though
   <img src="https://github.com/Pickelhaupt/EUC-Dash-ESP32/raw/master/Images/20201114_005231-fix_proc.jpg" width="20%" align="center"/>
 </div>
 
-
 ## Dependencies
 ### Required libraries:
 Libraries are downloaded automatically by PlatformIO when compiling for the first time.
@@ -123,25 +129,11 @@ Libraries are downloaded automatically by PlatformIO when compiling for the firs
 - PubSubClient@>=2.8
 
 ## Bugs and issues
-- time zone settings only work if the wifi enable on wakeup setting is on when booting
-- wheel settings are not implemented yet, only the icons and a settings screen containing unrelated settings are present.
 - I have not verified if the http upgrade feature works, also the published firmware is out of date.
 
 ## Todo
-- Add haptic feedback to alarms  --done
-- Add missing dashboard objects  --done
-  - Alert icons and red corners --done
-- Add simple dashboard --done
-- Add multiple screens (2 dashboard detail levels) --done
-- Add info screen --done, additional info items to be added
-- Add settings screen and settings --done, only wheel settings remain
-- Make alarms wake up screens --done
-- Add persistent settings storage --done
-- Add gesture controls of light and horn --lights done
-- Support for more wheel models
+- Support for more wheel brands (Gotway/Veteran, Inmotion, Ninebot planned)
 - Autodetection of wheel make and model --done, only detects KS at this time
-
-Removed the old mockups of the planned end state for version 1.0 as this has changed a bit and I will add new images when I find the time.
 
 ## Building the project
 Requires PlatformIO and driver for the USB chip in the t-watch. for more info see: 
