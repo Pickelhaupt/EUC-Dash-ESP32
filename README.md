@@ -103,7 +103,13 @@ Map of all settings screens:
 </div>
 
 ### Supported Models
-Only supports Kingsong wheels at the moment. Might work with Gotway as well since the protocols are very similar.
+Only supports Kingsong wheels at the moment. it autodetects the following models:
+- KS14M/D/S
+- KS16/KS16/S/X/XS
+- KS18A/S/L/XL
+- KS-S18
+
+Gotway support is eing actively worked on.
 ## Screenshots
 Some new screenshots, colours are a bit off though
 <div> 
