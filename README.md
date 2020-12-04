@@ -1,4 +1,7 @@
 # EUC-Dash-ESP32
+
+**2020-12-03 Gotway/Veteran support in progress**
+
 **2020-11-24 Added KS16X/XS, KS18L/XL and KS-S18**
 
 **2020-11-24 Autodetection of KS wheels has been implemented, at the moment only KS14M/D/S, KS16/KS16S and KS18A/S are detected**
