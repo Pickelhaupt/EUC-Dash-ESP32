@@ -109,7 +109,7 @@ Only supports Kingsong wheels at the moment. it autodetects the following models
 - KS18A/S/L/XL
 - KS-S18
 
-Gotway support is eing actively worked on.
+Gotway support is being actively worked on.
 ## Screenshots
 Some new screenshots, colours are a bit off though
 <div> 
