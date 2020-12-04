@@ -315,22 +315,22 @@ void update_calc_battery(float value)
     {
         if (centivolt > 8350)
             wheelctl_set_data(WHEELCTL_BATTPCT, 100.0);
-        else if (centivolt > 6810)
-            wheelctl_set_data(WHEELCTL_BATTPCT, (centivolt - 6650) / 13.6);
-        else if (centivolt > 6420)
-            wheelctl_set_data(WHEELCTL_BATTPCT, (centivolt - 6400) / 36.0);
+        else if (centivolt > 6800)
+            wheelctl_set_data(WHEELCTL_BATTPCT, (centivolt - 6650) / 17);
+        else if (centivolt > 6400)
+            wheelctl_set_data(WHEELCTL_BATTPCT, (centivolt - 6400) / 45);
         else
             wheelctl_set_data(WHEELCTL_BATTPCT, 0.0);
         return;
     }
     else if (wheelctl_constants[WHEELCTL_CONST_BATTVOLT].value < 105)
     {
-        if (centivolt > 9986)
+        if (centivolt > 10020)
             wheelctl_set_data(WHEELCTL_BATTPCT, 100.0);
-        else if (centivolt > 8132)
-            wheelctl_set_data(WHEELCTL_BATTPCT, (centivolt - 8040) / 13.6);
+        else if (centivolt > 8160)
+            wheelctl_set_data(WHEELCTL_BATTPCT, (centivolt - 8070) / 19.5);
         else if (centivolt > 7660)
-            wheelctl_set_data(WHEELCTL_BATTPCT, (centivolt - 7660) / 36.0);
+            wheelctl_set_data(WHEELCTL_BATTPCT, (centivolt - 7935) / 48.75);
         else
             wheelctl_set_data(WHEELCTL_BATTPCT, 0.0);
         return;
