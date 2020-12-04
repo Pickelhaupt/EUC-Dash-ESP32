@@ -98,6 +98,14 @@ void wheelctl_setup(void)
     motor_vibe(5, true);
 }
 
+void wheelctl_set_connect_options(void) 
+{
+    if (wheelctl_config[WHEELCTL_CONFIG_LIGHTS_OFF].enable) {
+        lightsoff = true;
+        wheelctl_toggle_lights();
+    }
+}
+
 void wheelctl_update_values(void)
 {
     for (int i = 0; i < WHEELCTL_DATA_NUM; i++)
@@ -478,7 +486,10 @@ void wheelctl_toggle_lights(void)
     String wheeltype = wheelctl_info[WHEELCTL_INFO_MANUFACTURER].value;
     if (wheeltype == "KS")
     {
-        if (blectl_cli_getconnected()) ks_lights(lightsoff);
+        if (blectl_cli_getconnected()) {
+            ks_lights(lightsoff);
+            if (wheelctl_config[WHEELCTL_CONFIG_LED].enable) ks_led(lightsoff);
+        }
         if (lightsoff) lightsoff = false; else lightsoff = true;
     }
     else if (wheeltype == "GW")

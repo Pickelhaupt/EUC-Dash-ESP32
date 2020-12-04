@@ -27,6 +27,7 @@
 #include "gui/setup.h"
 
 #include "hardware/bma.h"
+#include "hardware/blectl.h"
 #include "hardware/motor.h"
 #include "hardware/wheelctl.h"
 
@@ -215,7 +216,7 @@ void wheel_settings_tile_setup( void ) {
     else
         lv_switch_off( horn_press_onoff, LV_ANIM_OFF );
 
-    if ( wheelctl_get_config( WHEELCTL_CONFIG_LED ) ) //change to blectl config!!!!
+    if ( blectl_get_autoconnect )
         lv_switch_on( autoconnect_onoff, LV_ANIM_OFF );
     else
         lv_switch_off( autoconnect_onoff, LV_ANIM_OFF );
@@ -255,6 +256,6 @@ static void toggle_horn_onoff_event_handler(lv_obj_t * obj, lv_event_t event) {
 }
 static void toggle_autoconnect_onoff_event_handler(lv_obj_t * obj, lv_event_t event) {
     switch( event ) {
-        case( LV_EVENT_VALUE_CHANGED):  wheelctl_set_config(WHEELCTL_CONFIG_HORN, lv_switch_get_state( obj ));
+        case( LV_EVENT_VALUE_CHANGED):  blectl_set_autoconnect(lv_switch_get_state( obj ));
     }
 }

@@ -70,6 +70,13 @@
 * 
 */
 void ks_lights(byte mode);
+/**
+* @brief toggle leds when toggling lights
+* 
+* @param   mode     configitem: byte containing the desired led state: 0x00 = on, 0x01 = off
+* 
+*/
+void ks_led(byte mode);
 
 /*************************************************************
     Kingsong wheel data decoder adds current values to

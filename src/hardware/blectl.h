@@ -127,7 +127,7 @@
         bool autoon = false;             /** @brief auto on/off */
         bool enable_on_standby = false; /** @brief enable on standby on/off */
         int32_t txpower = 1;            /** @brief tx power, valide values are from 0 to 4 */
-        String wheelmac = "NULL";      /** @brief Mac address of wheel, string */
+        bool autoconnect = true;      /** @brief Mac address of wheel, string */
     } blectl_config_t;
 
     /**
@@ -192,6 +192,11 @@
      * @param   advertising true means enabled, false means disabled
      */
     void blectl_set_advertising( bool advertising );
+
+    void blectl_set_autoconnect(bool autoconnect);
+
+    bool blectl_get_autoconnect(void);
+
     /**
      * @brief get the current enable_on_standby config
      * 

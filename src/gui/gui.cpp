@@ -24,15 +24,16 @@
 #include <TTGO.h>
 
 #include "gui.h"
-//#include "statusbar.h"
-//#include "screenshot.h"
 #include "keyboard.h"
 
 #include "mainbar/mainbar.h"
+
 #include "mainbar/main_tile/main_tile.h"
 #include "mainbar/fulldash_tile/fulldash_tile.h"
 #include "mainbar/simpledash_tile/simpledash_tile.h"
 #include "mainbar/setup_tile/setup_tile.h"
+#include "mainbar/tripinfo_tile/tripinfo_tile.h"
+#include "mainbar/wheelinfo_tile/wheelinfo_tile.h"
 
 #include "mainbar/setup_tile/battery_settings/battery_settings.h"
 #include "mainbar/setup_tile/display_settings/display_settings.h"
@@ -42,26 +43,21 @@
 #include "mainbar/setup_tile/wlan_settings/wlan_settings.h"
 #include "mainbar/setup_tile/bluetooth_settings/bluetooth_settings.h"
 #include "mainbar/setup_tile/dashboard_settings/dashboard_settings.h"
-#include "mainbar/tripinfo_tile/tripinfo_tile.h"
-#include "mainbar/wheelinfo_tile/wheelinfo_tile.h"
 #include "mainbar/setup_tile/utilities/utilities.h"
 
 #include "hardware/powermgm.h"
 #include "hardware/display.h"
 
-lv_obj_t *img_bin;
+
 
 bool gui_powermgm_event_cb( EventBits_t event, void *arg );
 bool gui_powermgm_loop_event_cb( EventBits_t event, void *arg );
 
 void gui_setup( void )
 {
-    //Create wallpaper
-    img_bin = lv_img_create( lv_scr_act() , NULL );
-    lv_obj_set_width( img_bin, lv_disp_get_hor_res( NULL ) );
-    lv_obj_set_height( img_bin, lv_disp_get_ver_res( NULL ) );
-    lv_obj_align( img_bin, NULL, LV_ALIGN_CENTER, 0, 0 );
+    /* Setup the tile view*/
     mainbar_setup();
+
     /* add the six mainbar screens */
     main_tile_setup();
     fulldash_tile_setup();
@@ -81,10 +77,7 @@ void gui_setup( void )
     utilities_tile_setup();
     dashboard_settings_tile_setup();
 
-    //statusbar_setup();
     lv_disp_trig_activity( NULL );
-
-    gui_set_background_image( display_get_background_image() );
 
     keyboard_setup();
 
@@ -112,59 +105,6 @@ bool gui_powermgm_event_cb( EventBits_t event, void *arg ) {
                                         break;
     }
     return( true );
-}
-
-void gui_set_background_image ( uint32_t background_image ) {
-    /*
-    switch ( background_image ) {
-        case 0:
-            LV_IMG_DECLARE( bg );
-            lv_img_set_src( img_bin, &bg );
-            lv_obj_align( img_bin, NULL, LV_ALIGN_CENTER, 0, 0 );
-            lv_obj_set_hidden( img_bin, false );
-            break;
-        case 1:
-            LV_IMG_DECLARE( bg1 );
-            lv_img_set_src( img_bin, &bg1 );
-            lv_obj_align( img_bin, NULL, LV_ALIGN_CENTER, 0, 0 );
-            lv_obj_set_hidden( img_bin, false );
-            break;
-        case 2:
-            LV_IMG_DECLARE( bg2 );
-            lv_img_set_src( img_bin, &bg2 );
-            lv_obj_align( img_bin, NULL, LV_ALIGN_CENTER, 0, 0 );
-            lv_obj_set_hidden( img_bin, false );
-            break;
-        case 3:
-            LV_IMG_DECLARE( bg3 );
-            lv_img_set_src( img_bin, &bg3 );
-            lv_obj_align( img_bin, NULL, LV_ALIGN_CENTER, 0, 0 );
-            lv_obj_set_hidden( img_bin, false );
-            break;
-        case 4:
-            lv_obj_set_hidden( img_bin, true );
-            break;
-        case 5:
-            FILE* file;
-            file = fopen( BACKGROUNDIMAGE, "rb" );
-
-            if ( file ) {
-                log_i("set custom background image from spiffs");
-                fclose( file );
-                lv_img_set_src( img_bin, BACKGROUNDIMAGE );
-                lv_obj_align( img_bin, NULL, LV_ALIGN_CENTER, 0, 0 );
-                lv_obj_set_hidden( img_bin, false );
-            }
-            else {
-                log_i("not custom background image found on spiffs, set to black");
-                lv_obj_set_hidden( img_bin, true );
-            }
-            break;
-        
-        default:
-            lv_obj_set_hidden( img_bin, true ); 
-    } */
-    lv_obj_set_hidden( img_bin, true ); 
 }
 
 bool gui_powermgm_loop_event_cb( EventBits_t event, void *arg ) {

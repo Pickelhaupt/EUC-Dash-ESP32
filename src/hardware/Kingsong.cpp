@@ -446,4 +446,5 @@ void initks()
     delay(200);
 
     kingsong_decode_serial();
+    wheelctl_set_connect_options();
 } //End of initks

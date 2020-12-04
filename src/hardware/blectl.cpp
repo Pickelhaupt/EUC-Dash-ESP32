@@ -77,6 +77,7 @@ uint8_t txValue = 0;
 String EUC_Brand = "KingSong";
 String blename;
 String blemfg;
+BLEClient *pClient = NULL;
 
 static BLERemoteCharacteristic *pRemoteCharacteristic;
 static BLEAdvertisedDevice *myDevice;
@@ -316,6 +317,18 @@ bool blectl_get_autoon(void)
     return (blectl_config.autoon);
 }
 
+void blectl_set_autoconnect(bool autoconnect)
+{
+    blectl_config.autoconnect = autoconnect;
+    blectl_save_config();
+}
+
+bool blectl_get_autoconnect(void)
+{
+    return (blectl_config.autoconnect);
+}
+
+
 void blectl_save_config(void)
 {
     fs::File file = SPIFFS.open(BLECTL_JSON_COFIG_FILE, FILE_WRITE);
@@ -331,7 +344,7 @@ void blectl_save_config(void)
         doc["autoon"] = blectl_config.autoon;
         doc["enable_on_standby"] = blectl_config.enable_on_standby;
         doc["tx_power"] = blectl_config.txpower;
-        doc["wheel_mac"] = blectl_config.wheelmac;
+        doc["autoconnect"] = blectl_config.autoconnect;
 
         if (serializeJsonPretty(doc, file) == 0)
         {
@@ -365,7 +378,7 @@ void blectl_read_config(void)
             blectl_config.autoon = doc["autoon"] | true;
             blectl_config.enable_on_standby = doc["enable_on_standby"] | false;
             blectl_config.txpower = doc["tx_power"] | 1;
-            blectl_config.wheelmac = doc["wheel_mac"] | "NULL";
+            blectl_config.autoconnect = doc["autoconnect"] | true;
         }
         doc.clear();
     }
@@ -381,8 +394,9 @@ static void scanCompleteCB(BLEScanResults scanResults) {
 
 void blectl_cli_loop(void)
 {
-    int scandelay = 15000;
+    static int scandelay = 15000;
     String EUC_Type = wheelctl_get_info(WHEELCTL_INFO_MANUFACTURER);
+    if(!blectl_get_autoconnect() && pClient != NULL) pClient->disconnect();
 
     if (clidoConnect)
     {
@@ -409,7 +423,7 @@ void blectl_cli_loop(void)
     if (millis() - NextMillis > scandelay)
     {
         NextMillis += scandelay;
-        if (!cliconnected)
+        if (!cliconnected && blectl_config.autoconnect)
         {
             Serial.println("Disconnected... starting scan");
             BLEDevice::getScan()->start(2, scanCompleteCB);
@@ -456,7 +470,8 @@ bool connectToServer()
  
     //wheelctl_set_info(WHEELCTL_INFO_BLENAME, "kalle");
 
-    BLEClient *pClient = BLEDevice::createClient();
+    //BLEClient *pClient = BLEDevice::createClient();
+    pClient = BLEDevice::createClient();
     Serial.println(" - Created client");
 
     pClient->setClientCallbacks(new MyClientCallback());
@@ -524,6 +539,7 @@ void blectl_scan_once(int scantime)
 void blectl_scan_setup()
 {
     Serial.println("Starting Arduino BLE Client application...");
+    blectl_read_config();
     BLEDevice::init("");
     // Retrieve a Scanner and set the callback we want to use to be informed when we
     // have detected a new device.  Specify that we want active scanning and start the
