@@ -62,7 +62,6 @@ bool lightsoff = true;
 bool firstrun[WHEELCTL_DATA_NUM];
 float old_uptime = 0;
 bool newtrip = true;
-float old_trip = 0.0;
 bool sync_trip = true;
 
 wheelctl_data_t wheelctl_data[WHEELCTL_DATA_NUM];
@@ -227,7 +226,7 @@ void wheelctl_update_avgspeed(float value)
 }
 
 void wheelctl_update_powercons() {
-    float trip_distance = wheelctl_data[WHEELCTL_TRIP].value - old_trip;
+    float trip_distance = wheelctl_data[WHEELCTL_TRIP].max_value;
     wheelctl_data[WHEELCTL_POWERCONS].value = wheelctl_data[WHEELCTL_POWERCONS].value + (wheelctl_data[WHEELCTL_POWER].value / 3600);
     if (trip_distance !=0) wheelctl_data[WHEELCTL_ECONOMY].value = wheelctl_data[WHEELCTL_POWERCONS].value / trip_distance;
 }
