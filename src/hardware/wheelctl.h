@@ -26,6 +26,28 @@
 
     #define MIN_RIDE_SPEED  1
     #define WHEELCTL_JSON_CONFIG_FILE    "/wheelctl.json" /** @brief defines json config file name */
+    #define CURRENT_TRIP_JSON_FILE    "/c-tripsave.json" /** @brief defines json config file name */
+    #define LAST_TRIP_JSON_FILE    "/l-tripsave.json" /** @brief defines json config file name */
+    #define TOTAL_TRIP_JSON_FILE    "/t-tripsave.json" /** @brief defines json config file name */
+
+    /**
+     * @brief persistent tripdata structure
+     */
+    typedef struct {
+        long timestamp = 0;
+        float trip = 0.0;
+        int ride_time = 0;
+        float avg_speed = 0;
+        float max_speed = 0;
+        float max_current = 0;
+        float max_regen_current = 0;
+        float max_power = 0;
+        float min_battery = 0;
+        float max_battery = 0;
+        float max_temperature = 0;
+        float consumed_energy = 0;
+        float trip_economy = 0;
+    } trip_data_t;
 
     /**
      * @brief wheel config structure
@@ -250,5 +272,6 @@
 
     void wheelctl_save_config( void );
 
+    void wheelctl_reset_trip( void );
 
     #endif
