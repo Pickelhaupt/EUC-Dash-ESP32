@@ -63,6 +63,7 @@ bool firstrun[WHEELCTL_DATA_NUM];
 float old_uptime = 0;
 bool newtrip = true;
 float old_trip = 0.0;
+bool sync_trip = true;
 
 wheelctl_data_t wheelctl_data[WHEELCTL_DATA_NUM];
 wheelctl_constants_t wheelctl_constants[WHEELCTL_CONST_NUM];
@@ -104,6 +105,7 @@ void wheelctl_set_connect_options(void)
         lightsoff = true;
         wheelctl_toggle_lights();
     }
+    sync_trip = true;
 }
 
 void wheelctl_update_values(void)
@@ -207,12 +209,13 @@ void wheelctl_update_watch_trip(float value)
 {
     static bool last_value_set = false;
     static float last_value;
-    if (!last_value_set || value < last_value) { 
+    if (!last_value_set || value < last_value || sync_trip) { 
         last_value = value; 
         last_value_set = true;
     }
     wheelctl_data[WHEELCTL_TRIP].max_value += (value - last_value);
     last_value = value;
+    sync_trip = false;
 }
 
 void wheelctl_update_avgspeed(float value)
