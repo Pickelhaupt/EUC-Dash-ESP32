@@ -42,7 +42,7 @@
         float max_current = 0;
         float max_regen_current = 0;
         float max_power = 0;
-        float min_battery = 0;
+        float min_battery = 100;
         float max_battery = 0;
         float max_temperature = 0;
         float consumed_energy = 0;

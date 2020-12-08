@@ -556,7 +556,7 @@ int value2angle(int arcstart, int arcstop, float minvalue, float maxvalue, float
     return rAngle;
 }
 
-void fulldash_speed_update(float current_speed, float warn_speed, float tiltback_speed, float top_speed)
+void fulldash_speed_update(float current_speed, float warn_speed, float tiltback_speed, float top_speed, float avg_speed)
 {
     if (speed_arc == NULL || speed_max_bar == NULL || speed_avg_bar == NULL || speed_label == NULL) return;
     if (top_speed > tiltback_speed + 5) top_speed = tiltback_speed + 5;
@@ -581,7 +581,7 @@ void fulldash_speed_update(float current_speed, float warn_speed, float tiltback
     lv_arc_set_range(speed_arc, 0, (tiltback_speed + 5));
     lv_arc_set_value(speed_arc, current_speed);
 
-    int ang_max = value2angle(speed_arc_start, speed_arc_end, 0, (tiltback_speed + 5), wheelctl_get_data(WHEELCTL_TOPSPEED), false);
+    int ang_max = value2angle(speed_arc_start, speed_arc_end, 0, (tiltback_speed + 5), top_speed, false);
     int ang_max2 = ang_max + 3;
     if (ang_max2 >= 360)
     {
@@ -589,7 +589,7 @@ void fulldash_speed_update(float current_speed, float warn_speed, float tiltback
     }
     lv_arc_set_angles(speed_max_bar, ang_max, ang_max2);
 
-    int ang_avg = value2angle(speed_arc_start, speed_arc_end, 0, (tiltback_speed + 5), wheelctl_get_min_data(WHEELCTL_SPEED), false);
+    int ang_avg = value2angle(speed_arc_start, speed_arc_end, 0, (tiltback_speed + 5), avg_speed, false);
     int ang_avg2 = ang_avg + 3;
     if (ang_avg2 >= 360)
     {
@@ -816,10 +816,10 @@ void updateTime()
     if (trip != NULL)
     {
         char tripstring[6];
-        float converted_trip = wheelctl_get_data(WHEELCTL_TRIP);
+        float converted_trip = wheelctl_get_max_data(WHEELCTL_TRIP);
         if (dashboard_get_config(DASHBOARD_IMPDIST))
         {
-            converted_trip = wheelctl_get_data(WHEELCTL_TRIP) / 1.6;
+            converted_trip = wheelctl_get_max_data(WHEELCTL_TRIP) / 1.6;
         }
         dtostrf(converted_trip, 2, 1, tripstring);
         lv_label_set_text(trip, tripstring);

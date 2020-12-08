@@ -140,7 +140,7 @@ void wheelctl_set_data(int entry, float value)
             {
                 update_speed_shake(value);
                 wheelctl_update_max_min(entry, value, false);
-                if (fulldash_active) fulldash_speed_update(value, wheelctl_data[WHEELCTL_ALARM3].value, wheelctl_data[WHEELCTL_TILTBACK].value, wheelctl_data[WHEELCTL_SPEED].max_value);
+                if (fulldash_active) fulldash_speed_update(value, wheelctl_data[WHEELCTL_ALARM3].value, wheelctl_data[WHEELCTL_TILTBACK].value, wheelctl_data[WHEELCTL_SPEED].max_value, wheelctl_data[WHEELCTL_SPEED].min_value);
                 if (simpledash_active) simpledash_speed_update(value, wheelctl_data[WHEELCTL_ALARM3].value, wheelctl_data[WHEELCTL_TILTBACK].value, wheelctl_data[WHEELCTL_SPEED].max_value);
                 firstrun[entry] = false;
             }
@@ -212,7 +212,7 @@ void wheelctl_update_ridetime(lv_task_t *ride_tick)
     current_trip.max_current = wheelctl_data[WHEELCTL_CURRENT].max_value;
     current_trip.max_power = wheelctl_data[WHEELCTL_POWER].max_value;
     current_trip.max_temperature = wheelctl_data[WHEELCTL_TEMP].max_value;
-    if (i >= 20) {
+    if (i >= 20) { //save trip data every 20 seconds
         current_trip_save_data();
         i = 0;
     }
@@ -594,6 +594,7 @@ void current_trip_save_data(void)
     }
     else
     {
+        log_e("Saving trip data file %s", CURRENT_TRIP_JSON_FILE);
         SpiRamJsonDocument doc(1500);
 
         doc["timestamp"] = current_trip.timestamp;
@@ -603,7 +604,7 @@ void current_trip_save_data(void)
         doc["avg_speed"] = current_trip.avg_speed;
         doc["max_current"] = current_trip.max_current;
         doc["max_regen_current"] = current_trip.max_regen_current;
-        doc["max_regen_current"] = current_trip.max_power;
+        doc["max_power"] = current_trip.max_power;
         doc["max_battery"] = current_trip.max_battery;
         doc["min_battery"] = current_trip.min_battery;
         doc["max_temperature"] =  current_trip.max_temperature;
@@ -648,7 +649,7 @@ void current_trip_read_data(void)
             current_trip.max_regen_current = doc["max_regen_current"] | 0.0;
             current_trip.max_power = doc["max_power"] | 0.0;
             current_trip.max_battery = doc["max_battery"] | 0.0;
-            current_trip.min_battery = doc["min_battery"] | 0.0;
+            current_trip.min_battery = doc["min_battery"] | 100.0;
             current_trip.max_temperature = doc["max_temperature"] | 0.0;
             current_trip.consumed_energy= doc["cunsumed_energy"] | 0.0;
             current_trip.trip_economy = doc["trip_economy"] | 0.0;
@@ -672,6 +673,7 @@ void current_trip_read_data(void)
 }
 
 void wheelctl_reset_trip( void ) {
+    motor_vibe(5, true);
     current_trip.ride_time = 0.0;
     current_trip.trip = 0.0;
     current_trip.max_speed = 0.0;
@@ -680,7 +682,7 @@ void wheelctl_reset_trip( void ) {
     current_trip.max_regen_current = 0.0;
     current_trip.max_power = 0.0;
     current_trip.max_battery = 0.0;
-    current_trip.min_battery = 0.0;
+    current_trip.min_battery = 100.0;
     current_trip.max_temperature =  0.0;
     current_trip.consumed_energy= 0.0;
     current_trip.trip_economy = 0.0;

@@ -93,7 +93,7 @@ uint32_t fulldash_get_tile (void);
 /**
 * @brief update speed arc and label
 */
-void fulldash_speed_update(float current_speed, float warn_speed, float tiltback_speed, float top_speed);
+void fulldash_speed_update(float current_speed, float warn_speed, float tiltback_speed, float top_speed, float avg_speed);
 /**
 * @brief update battery arc and label
 */
