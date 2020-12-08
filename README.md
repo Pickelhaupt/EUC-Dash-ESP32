@@ -1,5 +1,7 @@
 # EUC-Dash-ESP32
 
+**2020-12-08 Trip info now persistent, long press on trip display to reset**
+
 **2020-12-04 added wheel settings**
 
 **2020-12-03 Gotway/Veteran support in progress**
