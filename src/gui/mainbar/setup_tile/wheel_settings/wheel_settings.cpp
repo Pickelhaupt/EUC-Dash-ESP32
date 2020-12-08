@@ -167,40 +167,6 @@ void wheel_settings_tile_setup( void ) {
     lv_label_set_text( horn_press_label, "sound horn on\npress at > 3kmh");
     lv_obj_align( horn_press_label, horn_press_cont, LV_ALIGN_IN_LEFT_MID, 5, 0 );
 
-/*
-    lv_obj_t *three_cont = lv_obj_create( wheel_page, NULL );
-    lv_page_glue_obj(three_cont, true);
-    lv_obj_set_size(three_cont, lv_disp_get_hor_res( NULL ) - 10, 60);
-    lv_obj_add_style( three_cont, LV_OBJ_PART_MAIN, &wheel_settings_style  );
-    lv_obj_align( three_cont, horn_press_cont, LV_ALIGN_OUT_BOTTOM_MID, 0, 0 );
-    three_onoff = lv_switch_create( three_cont, NULL );
-    lv_obj_add_protect( three_onoff, LV_PROTECT_CLICK_FOCUS);
-    lv_obj_add_style( three_onoff, LV_SWITCH_PART_INDIC, mainbar_get_switch_style() );
-    lv_switch_off( three_onoff, LV_ANIM_ON );
-    lv_obj_align( three_onoff, three_cont, LV_ALIGN_IN_RIGHT_MID, -5, 0 );
-    lv_obj_set_event_cb( three_onoff, toggle_leds_onoff_event_handler );
-    lv_obj_t *three_label = lv_label_create( three_cont, NULL);
-    lv_obj_add_style( three_label, LV_OBJ_PART_MAIN, &wheel_settings_style  );
-    lv_label_set_text( three_label, "three");
-    lv_obj_align( three_label, three_cont, LV_ALIGN_IN_LEFT_MID, 5, 0 );
-
-    lv_obj_t *four_cont = lv_obj_create( wheel_page, NULL );
-    lv_page_glue_obj(four_cont, true);
-    lv_obj_set_size(four_cont, lv_disp_get_hor_res( NULL ) - 10, 60);
-    lv_obj_add_style( four_cont, LV_OBJ_PART_MAIN, &wheel_settings_style  );
-    lv_obj_align( four_cont, three_cont, LV_ALIGN_OUT_BOTTOM_MID, 0, 0 );
-    four_onoff = lv_switch_create( four_cont, NULL );
-    lv_obj_add_protect( four_onoff, LV_PROTECT_CLICK_FOCUS);
-    lv_obj_add_style( four_onoff, LV_SWITCH_PART_INDIC, mainbar_get_switch_style() );
-    lv_switch_off( four_onoff, LV_ANIM_ON );
-    lv_obj_align( four_onoff, four_cont, LV_ALIGN_IN_RIGHT_MID, -5, 0 );
-    lv_obj_set_event_cb( four_onoff, toggle_leds_onoff_event_handler );
-    lv_obj_t *four_label = lv_label_create( four_cont, NULL);
-    lv_obj_add_style( four_label, LV_OBJ_PART_MAIN, &wheel_settings_style  );
-    lv_label_set_text( four_label, "four");
-    lv_obj_align( four_label, four_cont, LV_ALIGN_IN_LEFT_MID, 5, 0 );
-*/
-
     if ( wheelctl_get_config( WHEELCTL_CONFIG_LIGHTS_OFF ) )
         lv_switch_on( disable_startuplights_onoff, LV_ANIM_OFF );
     else
@@ -220,9 +186,7 @@ void wheel_settings_tile_setup( void ) {
         lv_switch_on( autoconnect_onoff, LV_ANIM_OFF );
     else
         lv_switch_off( autoconnect_onoff, LV_ANIM_OFF );
-
 }
-
 
 static void enter_wheel_setup_event_cb( lv_obj_t * obj, lv_event_t event ) {
     switch( event ) {

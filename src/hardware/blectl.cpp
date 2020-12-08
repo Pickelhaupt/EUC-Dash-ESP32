@@ -329,7 +329,6 @@ bool blectl_get_autoconnect(void)
     return (blectl_config.autoconnect);
 }
 
-
 void blectl_save_config(void)
 {
     fs::File file = SPIFFS.open(BLECTL_JSON_COFIG_FILE, FILE_WRITE);

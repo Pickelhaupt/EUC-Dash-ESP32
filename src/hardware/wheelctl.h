@@ -269,11 +269,17 @@
      * available settings: lights off when connect.
      */
     void wheelctl_connect_actions(void);
-
+    /**
+     * @brief set actions to perform when wheel is disconnected
+     */
     void wheelctl_disconnect_actions(void);
-
+     /**
+     * @brief Save wheel configuration
+     */
     void wheelctl_save_config( void );
-
+    /**
+     * @brief Reset trip data
+     */
     void wheelctl_reset_trip( void );
 
     #endif

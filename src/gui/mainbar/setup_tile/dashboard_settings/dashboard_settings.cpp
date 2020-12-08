@@ -34,7 +34,6 @@ lv_style_t dashboard_settings_heading_style;
 lv_style_t dashboard_settings_data_style;
 uint32_t dashboard_tile_num;
 
-lv_obj_t *lights_onoff=NULL;
 lv_obj_t *simple_onoff=NULL;
 lv_obj_t *current_onoff=NULL;
 lv_obj_t *bars_onoff=NULL;
@@ -46,7 +45,6 @@ LV_IMG_DECLARE(dashboard_64px);
 
 static void enter_dashboard_setup_event_cb( lv_obj_t * obj, lv_event_t event );
 static void exit_dashboard_setup_event_cb( lv_obj_t * obj, lv_event_t event );
-static void lights_onoff_event_handler(lv_obj_t * obj, lv_event_t event);
 static void simple_onoff_event_handler(lv_obj_t * obj, lv_event_t event);
 static void current_onoff_event_handler(lv_obj_t * obj, lv_event_t event);
 static void bars_onoff_event_handler(lv_obj_t * obj, lv_event_t event);
@@ -177,11 +175,6 @@ void dashboard_settings_tile_setup( void ) {
     else
         lv_switch_off( tempunit_onoff, LV_ANIM_OFF );
 
-    //if ( dashboard_get_config( DASHBOARD_LIGHTS ) )
-    //    lv_switch_on( lights_onoff, LV_ANIM_OFF );
-    //else
-    //    lv_switch_off( lights_onoff, LV_ANIM_OFF );
-
     if ( dashboard_get_config( DASHBOARD_SIMPLE ) )
         lv_switch_on( simple_onoff, LV_ANIM_OFF );
     else
@@ -197,7 +190,6 @@ void dashboard_settings_tile_setup( void ) {
     else
         lv_switch_off( current_onoff, LV_ANIM_OFF );
 }
-
 
 static void enter_dashboard_setup_event_cb( lv_obj_t * obj, lv_event_t event ) {
     switch( event ) {
@@ -228,12 +220,6 @@ static void tempunit_onoff_event_handler(lv_obj_t * obj, lv_event_t event) {
 static void simple_onoff_event_handler(lv_obj_t * obj, lv_event_t event) {
     switch( event ) {
         case( LV_EVENT_VALUE_CHANGED):  dashboard_set_config( DASHBOARD_SIMPLE, lv_switch_get_state( obj ) );
-    }
-}
-
-static void lights_onoff_event_handler(lv_obj_t * obj, lv_event_t event) {
-    switch( event ) {
-        case( LV_EVENT_VALUE_CHANGED):  dashboard_set_config( DASHBOARD_LIGHTS, lv_switch_get_state( obj ) );
     }
 }
 
