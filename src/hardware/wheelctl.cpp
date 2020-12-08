@@ -37,6 +37,7 @@ lv_task_t *speed_shake = nullptr;
 lv_task_t *current_shake = nullptr;
 lv_task_t *temp_shake = nullptr;
 lv_task_t *ride_tick = nullptr;
+lv_task_t *save_trip_task = nullptr;
 
 static void lv_speed_shake(lv_task_t *speed_shake);
 static void lv_current_shake(lv_task_t *current_shake);
@@ -50,7 +51,8 @@ void wheelctl_update_regen_current(int entry, float value);
 void wheelctl_update_battpct_max_min(int entry, float value);
 void update_calc_battery(float value);
 void wheelctl_calc_power(float value);
-void wheelctl_update_ridetime(lv_task_t *ride_tick);
+void wheelctl_minute_update(lv_task_t *ride_tick);
+void wheelctl_save_trip_task(lv_task_t *save_trip_task);
 void wheelctl_update_powercons( void );
 void wheelctl_update_avgspeed(float value);
 void wheelctl_update_watch_trip(float value);
@@ -98,17 +100,24 @@ void wheelctl_setup(void)
     wheelctl_update_values();
     wheelctl_read_config();
     current_trip_read_data();
-    ride_tick = lv_task_create( wheelctl_update_ridetime, 1000, LV_TASK_PRIO_LOWEST, NULL );
+    
     motor_vibe(5, true);
 }
 
-void wheelctl_set_connect_options(void) 
+void wheelctl_connect_actions(void) 
 {
     if (wheelctl_config[WHEELCTL_CONFIG_LIGHTS_OFF].enable) {
         lightsoff = true;
         wheelctl_toggle_lights();
     }
     sync_trip = true;
+    ride_tick = lv_task_create( wheelctl_minute_update, 1000, LV_TASK_PRIO_LOW, NULL );
+    save_trip_task = lv_task_create( wheelctl_save_trip_task, 20000, LV_TASK_PRIO_LOW, NULL );
+}
+
+void wheelctl_disconnect_actions(){
+    if (ride_tick != nullptr) lv_task_del(ride_tick);
+    if (save_trip_task != nullptr) lv_task_del(save_trip_task);
 }
 
 void wheelctl_update_values(void)
@@ -200,23 +209,22 @@ void wheelctl_set_data(int entry, float value)
     }
 }
 
-void wheelctl_update_ridetime(lv_task_t *ride_tick)
+void wheelctl_minute_update(lv_task_t *ride_tick)
 {
-    static int i = 0;
     if (wheelctl_data[WHEELCTL_SPEED].value >= MIN_RIDE_SPEED) {
         wheelctl_data[WHEELCTL_RIDETIME].value++;
         current_trip.ride_time++;
     }
+    
     wheelctl_update_powercons();
     current_trip.max_speed = wheelctl_data[WHEELCTL_SPEED].max_value;
     current_trip.max_current = wheelctl_data[WHEELCTL_CURRENT].max_value;
     current_trip.max_power = wheelctl_data[WHEELCTL_POWER].max_value;
     current_trip.max_temperature = wheelctl_data[WHEELCTL_TEMP].max_value;
-    if (i >= 20) { //save trip data every 20 seconds
-        current_trip_save_data();
-        i = 0;
-    }
-    i++;
+}
+
+void wheelctl_save_trip_task(lv_task_t *save_trip_task) {
+    current_trip_save_data();
 }
 
 void wheelctl_update_watch_trip(float value)
@@ -439,13 +447,13 @@ void update_speed_shake(float value)
         speed_shake = lv_task_create(lv_speed_shake, 250, LV_TASK_PRIO_LOWEST, NULL);
         lv_task_ready(speed_shake);
         shakeoff[0] = false;
-        Serial.println("speedshake on");
+        log_i("speedshake on");
     }
     else if (value < wheelctl_data[WHEELCTL_ALARM3].value && !shakeoff[0] && speed_shake != nullptr)
     {
         lv_task_del(speed_shake);
         shakeoff[0] = true;
-        Serial.println("speedshake off");
+        log_i("speedshake off");
     }
 }
 

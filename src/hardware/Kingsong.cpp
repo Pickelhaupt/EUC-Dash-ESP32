@@ -435,16 +435,16 @@ void initks()
     //Setting of some model specific parametes,
     setKSconstants();
 
-    Serial.println("requesting model..");
+    log_i("requesting model..");
     ks_ble_request(0x9B);
     delay(200);
-    Serial.println("requesting serial..");
+    log_i("requesting serial..");
     ks_ble_request(0x63);
     delay(200);
-    Serial.println("requesting speed settings..");
+    log_i("requesting speed settings..");
     ks_ble_request(0x98);
     delay(200);
 
     kingsong_decode_serial();
-    wheelctl_set_connect_options();
+    wheelctl_connect_actions();
 } //End of initks

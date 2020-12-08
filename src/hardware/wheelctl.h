@@ -268,7 +268,9 @@
      * @brief set startup wheel settings according to configuration.
      * available settings: lights off when connect.
      */
-    void wheelctl_set_connect_options(void);
+    void wheelctl_connect_actions(void);
+
+    void wheelctl_disconnect_actions(void);
 
     void wheelctl_save_config( void );
 

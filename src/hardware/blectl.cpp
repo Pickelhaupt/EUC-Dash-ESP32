@@ -94,13 +94,14 @@ class MyClientCallback : public BLEClientCallbacks
 {
     void onConnect(BLEClient *pclient)
     {
-        Serial.println("onConnect");
+        log_i("onConnect");
     }
     void onDisconnect(BLEClient *pclient)
     {
         cli_ondisconnect = true;
         cliconnected = false;
-        Serial.println("onDisconnect -- cliconnected is false");
+        wheelctl_disconnect_actions();
+        log_i("onDisconnect -- cliconnected is false");
         return;
     }
 };
@@ -402,12 +403,12 @@ void blectl_cli_loop(void)
     {
         if (connectToServer())
         {
-            Serial.println("We are now connected to the BLE Server.");
-            if (wheelctl_get_info(WHEELCTL_INFO_BLENAME) == "KS-14SMD4735") Serial.println("Found KS Wheel");
+            log_i("We are now connected to the BLE Server.");
+            if (wheelctl_get_info(WHEELCTL_INFO_BLENAME) == "KS-14SMD4735") log_i("Found KS Wheel");
 
             if (EUC_Type = "KS")
             {
-                Serial.println("initialising KingSong");
+                log_i("initialising KingSong");
                 initks();
                 fulldash_tile_reload();
                 simpledash_tile_reload();
@@ -416,7 +417,7 @@ void blectl_cli_loop(void)
         }
         else
         {
-            Serial.println("We have failed to connect to the server;");
+            log_w("We have failed to connect to the server;");
         }
         clidoConnect = false;
     }
@@ -425,7 +426,7 @@ void blectl_cli_loop(void)
         NextMillis += scandelay;
         if (!cliconnected && blectl_config.autoconnect)
         {
-            Serial.println("Disconnected... starting scan");
+            log_i("Disconnected... starting scan");
             BLEDevice::getScan()->start(2, scanCompleteCB);
         }
     }
@@ -455,7 +456,7 @@ static void notifyCallback(
 bool connectToServer()
 {
     cli_ondisconnect = false;
-    Serial.print("Forming a connection to ");
+    log_i("Forming a connection to ");
 
     Serial.println(myDevice->getAddress().toString().c_str());
     Serial.println(myDevice->getName().c_str());
@@ -472,46 +473,44 @@ bool connectToServer()
 
     //BLEClient *pClient = BLEDevice::createClient();
     pClient = BLEDevice::createClient();
-    Serial.println(" - Created client");
+    log_i(" - Created client");
 
     pClient->setClientCallbacks(new MyClientCallback());
 
     // Connect to the remote BLE Server.
     pClient->connect(myDevice); // if you pass BLEAdvertisedDevice instead of address, it will be recognized type of peer device address (public or private)
-    Serial.println(" - Connected to server");
+    log_i(" - Connected to server");
     delay(50);
     if (cli_ondisconnect){
-        Serial.println("connection lost unexpectedly");
+        log_w("connection lost unexpectedly");
         return false;
     }
     // Obtain a reference to the service we are after in the remote BLE server.
     BLERemoteService *pRemoteService = pClient->getService(KS_SERVICE_UUID_2);
     if (cli_ondisconnect){
-        Serial.println("connection lost unexpectedly - 2");
+        log_w("connection lost unexpectedly - 2");
         return false;
     }
 
     if (pRemoteService == nullptr)
     {
-        Serial.print("Failed to find our service UUID: ");
-        Serial.println(KS_SERVICE_UUID_2.toString().c_str());
+        log_e("Failed to find our service UUID: ", KS_SERVICE_UUID_2.toString().c_str());
         pClient->disconnect();
         cliconnected = false;
         return false;
     }
-    Serial.println(" - Found our service");
+    log_i(" - Found our service");
 
     // Obtain a reference to the characteristic in the service of the remote BLE server.
     pRemoteCharacteristic = pRemoteService->getCharacteristic(KS_CHAR_UUID);
     if (pRemoteCharacteristic == nullptr)
     {
-        Serial.print("Failed to find our characteristic UUID: ");
-        Serial.println(KS_CHAR_UUID.toString().c_str());
+        log_e("Failed to find our characteristic UUID: ", KS_CHAR_UUID.toString().c_str());
         pClient->disconnect();
         cliconnected = false;
         return false;
     }
-    Serial.println(" - Found our characteristic");
+    log_i(" - Found our characteristic");
     // Read the value of the characteristic.
     if (pRemoteCharacteristic->canRead())
     {

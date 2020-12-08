@@ -216,7 +216,7 @@ void wheel_settings_tile_setup( void ) {
     else
         lv_switch_off( horn_press_onoff, LV_ANIM_OFF );
 
-    if ( blectl_get_autoconnect )
+    if ( blectl_get_autoconnect() )
         lv_switch_on( autoconnect_onoff, LV_ANIM_OFF );
     else
         lv_switch_off( autoconnect_onoff, LV_ANIM_OFF );
