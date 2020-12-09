@@ -56,12 +56,10 @@ void setup()
     SPIFFS.begin();
     motor_setup();
 
-    dashboard_setup();
-
-
-
     // force to store all new heap allocations in psram to get more internal ram
     heap_caps_malloc_extmem_enable( 1 );
+
+    dashboard_setup();
     
     display_setup();
 

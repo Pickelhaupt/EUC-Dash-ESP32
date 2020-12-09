@@ -61,10 +61,12 @@ void main_tile_format_time( char *, size_t, struct tm * );
 bool main_tile_powermgm_event_cb( EventBits_t event, void *arg );
 
 void main_tile_setup( void ) {
+    log_i("maintile add to tileview");
     main_tile_num = mainbar_add_tile( 0, 0, "main tile" );
     main_cont = mainbar_get_tile_obj( main_tile_num );
     style = mainbar_get_style();
 
+    log_i("maintile setup styles");
     lv_style_copy( &timestyle, style);
     lv_style_set_text_color( &timestyle, LV_OBJ_PART_MAIN, watch_colour );
     lv_style_set_text_font( &timestyle, LV_STATE_DEFAULT, &DIN1451_m_cond_120);
@@ -77,6 +79,7 @@ void main_tile_setup( void ) {
     lv_style_set_text_color( &battstyle, LV_OBJ_PART_MAIN, watch_colour );
     lv_style_set_text_font( &battstyle, LV_STATE_DEFAULT, &DIN1451_m_cond_28);
 
+    log_i("maintile add objects");
     clock_cont = mainbar_obj_create( main_cont );
     lv_obj_set_size( clock_cont, lv_disp_get_hor_res( NULL ) , lv_disp_get_ver_res( NULL ));
     lv_obj_add_style( clock_cont, LV_OBJ_PART_MAIN, style );
@@ -100,6 +103,7 @@ void main_tile_setup( void ) {
     lv_obj_add_style( battlabel, LV_OBJ_PART_MAIN, &battstyle );
     lv_obj_align( battlabel, clock_cont, LV_ALIGN_IN_BOTTOM_MID, 0, -5 );
 
+    log_i("maintile setup time");
     struct tm  info;
     char buf[64];
 
@@ -109,10 +113,13 @@ void main_tile_setup( void ) {
     lv_label_set_text( datelabel, buf );
     lv_obj_align( datelabel, timelabel, LV_ALIGN_CENTER, 0, 47 );
 
+    log_i("maintile setup task");
     main_tile_task = lv_task_create( main_tile_update_task, 5000, LV_TASK_PRIO_MID, NULL );
     lv_task_ready(main_tile_task);
 
+    log_i("maintile register powermgm cb");
     powermgm_register_cb( POWERMGM_WAKEUP , main_tile_powermgm_event_cb, "main tile time update" );
+    log_i("maintile setup done");
 }
 
 bool main_tile_powermgm_event_cb( EventBits_t event, void *arg ) {

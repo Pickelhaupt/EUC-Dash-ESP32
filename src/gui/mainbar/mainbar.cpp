@@ -50,6 +50,7 @@ static lv_obj_t *mainbar = NULL;
 
 static lv_tile_t *tile = NULL;
 static lv_point_t *tile_pos_table = NULL;
+//static lv_point_t *tile_pos_table;
 static uint32_t current_tile = 0;
 static uint32_t tile_entrys = 0;
 static uint32_t app_tile_pos = MAINBAR_APP_TILE_X_START;
@@ -57,6 +58,7 @@ uint32_t main_tile_nr = 0;
 bool fulldash_default = true;
 
 void mainbar_setup( void ) {
+    log_i("mainbar setup style");
     lv_style_init( &mainbar_style );
     lv_style_set_radius( &mainbar_style, LV_OBJ_PART_MAIN, 0 );
     lv_style_set_bg_color( &mainbar_style, LV_OBJ_PART_MAIN, LV_COLOR_BLACK );
@@ -66,15 +68,19 @@ void mainbar_setup( void ) {
     lv_style_set_text_color( &mainbar_style, LV_OBJ_PART_MAIN, mainbar_text_colour );
     lv_style_set_image_recolor( &mainbar_style, LV_OBJ_PART_MAIN, LV_COLOR_WHITE );
 
+    log_i("mainbar setup switch style");
     lv_style_init( &mainbar_switch_style );
     lv_style_set_bg_color( &mainbar_switch_style, LV_STATE_CHECKED, mainbar_switch_colour );
 
+    log_i("mainbar setup slider style");
     lv_style_init( &mainbar_slider_style );
     lv_style_set_bg_color( &mainbar_slider_style, LV_STATE_DEFAULT, mainbar_switch_colour );
 
+    log_i("mainbar setup knob style");
     lv_style_init( &mainbar_knob_style );
     lv_style_set_bg_color( &mainbar_knob_style, LV_STATE_DEFAULT, mainbar_text_colour );
-
+    
+    log_i("mainbar setup button style");
     lv_style_init( &mainbar_button_style );
     lv_style_set_radius( &mainbar_button_style, LV_STATE_DEFAULT, 25 );
     lv_style_set_border_color( &mainbar_button_style, LV_STATE_DEFAULT, LV_COLOR_GRAY );
@@ -89,19 +95,25 @@ void mainbar_setup( void ) {
     lv_style_set_border_opa( &mainbar_button_style, LV_STATE_DEFAULT, LV_OPA_70 );
     lv_style_set_border_width( &mainbar_button_style, LV_STATE_DEFAULT, 0 );
 
+    log_i("mainbar setup tileview object");
     mainbar = lv_tileview_create( lv_scr_act(), NULL);
-    lv_tileview_set_valid_positions( mainbar, tile_pos_table, tile_entrys );
+    log_i("mainbar tileview created");
+    //lv_tileview_set_valid_positions( mainbar, tile_pos_table, tile_entrys );
+    log_i("mainbar tileview positions set");
     lv_tileview_set_edge_flash( mainbar, false);
     lv_obj_add_style( mainbar, LV_OBJ_PART_MAIN, &mainbar_style );
     lv_page_set_scrlbar_mode( mainbar, LV_SCRLBAR_MODE_OFF);
 
+    log_i("mainbar setup event");
     lv_obj_set_event_cb( mainbar, mainbar_event_cb );
+    log_i("mainbar setup done");
 
 }
 
 uint32_t mainbar_add_tile( uint16_t x, uint16_t y, const char *id ) {
     
     tile_entrys++;
+    log_i("mainbar setup tile %d", tile_entrys);
 
     if ( tile_pos_table == NULL ) {
         tile_pos_table = ( lv_point_t * )ps_malloc( sizeof( lv_point_t ) * tile_entrys );

@@ -56,17 +56,26 @@ bool gui_powermgm_loop_event_cb( EventBits_t event, void *arg );
 void gui_setup( void )
 {
     /* Setup the tile view*/
+    log_i("setting up mainbar");
     mainbar_setup();
 
     /* add the six mainbar screens */
+    log_i("setting up main tile");
     main_tile_setup();
+    log_i("setting up full dash");
     fulldash_tile_setup();
+    log_i("setting up simple dash");
     simpledash_tile_setup();
+    log_i("setting up setup tile");
     setup_tile_setup();
+    log_i("setting up trip info");
     tripinfo_tile_setup();
+    log_i("setting up wheel info");
     wheelinfo_tile_setup();
+    
 
     /* add setup screens */
+    log_i("adding setup screens");
     battery_settings_tile_setup();
     display_settings_tile_setup();
     wheel_settings_tile_setup();
@@ -78,7 +87,7 @@ void gui_setup( void )
     dashboard_settings_tile_setup();
 
     lv_disp_trig_activity( NULL );
-
+     log_i("setting up keyboard");
     keyboard_setup();
 
     powermgm_register_cb( POWERMGM_STANDBY | POWERMGM_WAKEUP | POWERMGM_SILENCE_WAKEUP, gui_powermgm_event_cb, "gui" );
