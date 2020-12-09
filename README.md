@@ -1,6 +1,6 @@
 # EUC-Dash-ESP32
 
-**Updated ttgo t-watch library to latest version with lvgl 7.7.1**
+**2020-12-09 Updated ttgo t-watch library to latest version(master branch) with lvgl 7.7.1**
 
 **2020-12-08 Trip info now persistent, long press on trip display to reset**
 
