@@ -506,9 +506,10 @@ void lv_overlay(void)
 
 static void overlay_event_cb(lv_obj_t * obj, lv_event_t event) {
     switch( event ) {
-        case( LV_EVENT_LONG_PRESSED ):  Serial.println("long press on overlay");
-        motor_vibe(5, true);
-        wheelctl_toggle_lights();
+        case( LV_EVENT_LONG_PRESSED ):  
+            log_e("long press on overlay");
+            motor_vibe(5, true);
+            wheelctl_toggle_lights();
     }
 }
 
@@ -529,30 +530,16 @@ int value2angle(int arcstart, int arcstop, float minvalue, float maxvalue, float
 {
     int rAngle;
     int arcdegrees;
-    if (arcstop < arcstart)
-    {
-        arcdegrees = (arcstop + 360) - arcstart;
-    }
-    else
-    {
-        arcdegrees = arcstop - arcstart;
-    }
-    if (reverse)
-    {
-        rAngle = arcstop - (arcvalue * arcdegrees / (maxvalue - minvalue));
-    }
-    else
-    {
-        rAngle = arcstart + (arcvalue * arcdegrees / (maxvalue - minvalue));
-    }
-    if (rAngle >= 360)
-    {
-        rAngle = rAngle - 360;
-    }
-    else if (rAngle < 0)
-    {
-        rAngle = rAngle + 360;
-    }
+
+    if (arcstop < arcstart) arcdegrees = (arcstop + 360) - arcstart;
+    else arcdegrees = arcstop - arcstart;
+
+    if (reverse) rAngle = arcstop - (arcvalue * arcdegrees / (maxvalue - minvalue));
+    else rAngle = arcstart + (arcvalue * arcdegrees / (maxvalue - minvalue));
+
+    if (rAngle >= 360) rAngle = rAngle - 360;
+    else if (rAngle < 0) rAngle = rAngle + 360;
+
     return rAngle;
 }
 
@@ -840,10 +827,12 @@ uint32_t fulldash_get_tile(void)
 
 void fulldash_activate_cb(void)
 {
-    time_task = lv_task_create(lv_time_task, 2000, LV_TASK_PRIO_LOWEST, NULL);
-    lv_task_ready(time_task);
-    fulldash_active = true;
-    wheelctl_update_values();
+    if (!fulldash_active){
+        time_task = lv_task_create(lv_time_task, 2000, LV_TASK_PRIO_LOWEST, NULL);
+        lv_task_ready(time_task);
+        fulldash_active = true;
+        wheelctl_update_values();
+    }
 }
 
 void fulldash_hibernate_cb(void)
@@ -863,7 +852,7 @@ void fulldash_tile_setup(void)
     fulldash_tile_num = mainbar_add_tile(1, 0, "fd tile");
     fulldash_cont = mainbar_get_tile_obj(fulldash_tile_num);
     style = mainbar_get_style();
-    Serial.println("setting up dashboard");
+    log_i("setting up dashboard");
     lv_define_styles_1();
     lv_alerts();
     lv_speed_arc_1();

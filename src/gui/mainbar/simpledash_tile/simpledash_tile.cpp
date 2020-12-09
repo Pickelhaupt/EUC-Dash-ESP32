@@ -48,7 +48,7 @@ LV_FONT_DECLARE(DIN1451_m_cond_36);
 LV_FONT_DECLARE(DIN1451_m_cond_180);
 
 static lv_obj_t *simpledash_cont = NULL;
-static lv_style_t *style;
+static lv_style_t *sd_style;
 static lv_style_t sd_arc_style;
 
 // Arc gauges and labels
@@ -113,7 +113,7 @@ uint32_t simpledash_tile_num;
 void lv_sd_define_styles_1(void)
 {
     //style template
-    lv_style_copy(&sd_arc_style, style);
+    lv_style_copy(&sd_arc_style, sd_style);
     lv_style_set_line_rounded(&sd_arc_style, LV_STATE_DEFAULT, false);
     lv_style_set_line_width(&sd_arc_style, LV_STATE_DEFAULT, sd_arclinew);
     lv_style_set_bg_opa(&sd_arc_style, LV_STATE_DEFAULT, LV_OPA_TRANSP);
@@ -149,10 +149,10 @@ void lv_sd_define_styles_1(void)
     lv_style_set_line_color(&sd_regen_bar_indic_style, LV_STATE_DEFAULT, sd_regen_bar_clr);
     
     //alerts
-    lv_style_copy(&sd_alert_style, style);
+    lv_style_copy(&sd_alert_style, sd_style);
     lv_style_set_bg_opa(&sd_alert_style, LV_STATE_DEFAULT, LV_OPA_TRANSP);
     //overlay
-    lv_style_copy(&sd_overlay_style, style);
+    lv_style_copy(&sd_overlay_style, sd_style);
     lv_style_set_bg_color(&sd_overlay_style, LV_STATE_DEFAULT, LV_COLOR_BLACK);
     lv_style_set_bg_opa(&sd_overlay_style, LV_STATE_DEFAULT, LV_OPA_30);
 
@@ -328,12 +328,11 @@ void lv_sd_overlay(void)
 
 static void sd_overlay_event_cb(lv_obj_t *obj, lv_event_t event)
 {
-    switch (event)
-    {
-    case (LV_EVENT_LONG_PRESSED):
-        Serial.println("long press on overlay");
-        motor_vibe(5, true);
-        wheelctl_toggle_lights();
+    switch (event) {
+        case (LV_EVENT_LONG_PRESSED):
+            log_e("long press on overlay");
+            motor_vibe(5, true);
+            wheelctl_toggle_lights();
     }
 }
 
@@ -542,8 +541,8 @@ void simpledash_tile_setup(void)
 {
     simpledash_tile_num = mainbar_add_tile(2, 0, "sd tile");
     simpledash_cont = mainbar_get_tile_obj(simpledash_tile_num);
-    style = mainbar_get_style();
-    Serial.println("setting up dashboard");
+    sd_style = mainbar_get_style();
+    log_i("setting up dashboard");
     lv_sd_define_styles_1();
     lv_sd_alerts();
     lv_sd_speed_arc_1();
