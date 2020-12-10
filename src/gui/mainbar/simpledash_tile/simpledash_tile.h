@@ -67,9 +67,8 @@ void simpledash_tile_reload ( void );
 * @param current_speed current speed as reported by the wheel
 * @param warn_speed the speed when the last speed alarm is triggered (alarm3)
 * @param tiltback_speed The speed when the wheels tiltback feature is activated
-* @param top_speed highest speed attained during the session
 */
-void simpledash_speed_update(float current_speed, float warn_speed, float tiltback_speed, float top_speed);
+void simpledash_speed_update(float current_speed, float warn_speed, float tiltback_speed);
 /**
 * @brief update battery arc and label
 */
