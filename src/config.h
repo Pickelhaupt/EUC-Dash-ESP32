@@ -30,10 +30,6 @@
     //#define TWATCH_LVGL_DOUBLE_BUFFER
     //#define LVGL_BUFFER_SIZE        (240*240)
     #define LVGL_BUFFER_SIZE        (240*60)
-    //#define LV_DISP_DEF_REFR_PERIOD   5
-    #define LV_VDB_ADR      0
-    #define LV_VDB_SIZE     (240*60)
-    #define LV_VDB_DOUBLE   1
     #define ENABLE_LVGL_FLUSH_DMA
 
     #include <LilyGoWatch.h>
@@ -41,6 +37,6 @@
     /*
     * firmware version string
     */
-    #define __FIRMWARE__            "2020121001"
+    #define __FIRMWARE__            "2020121501"
 
 #endif // _CONFIG_H

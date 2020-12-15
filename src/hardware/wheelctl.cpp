@@ -23,7 +23,7 @@
 #include "wheelctl.h"
 #include "blectl.h"
 #include "motor.h"
-//#include "callback.h"
+#include "callback.h"
 #include "json_psram_allocator.h"
 //#include "alloc.h"
 #include "Kingsong.h"
@@ -231,7 +231,7 @@ void wheelctl_update_watch_trip(float value)
 {
     static bool last_value_set = false;
     static float last_value;
-    if (!last_value_set || value < last_value || sync_trip) { 
+    if (!last_value_set || value < last_value || sync_trip || wheelctl_data[WHEELCTL_SPEED].value < MIN_RIDE_SPEED) { 
         last_value = value; 
         last_value_set = true;
     }
@@ -547,6 +547,21 @@ void wheelctl_toggle_lights(void)
     }
 }
 
+bool wheelctl_get_config( int config ) {
+    if ( config < WHEELCTL_CONFIG_NUM ) {
+        return( wheelctl_config[ config ].enable );
+    }
+    return false;
+}
+
+void wheelctl_set_config( int config, bool enable ) {
+    if ( config < WHEELCTL_CONFIG_NUM ) {
+        wheelctl_config[ config ].enable = enable;
+        wheelctl_save_config();
+        simpledash_tile_reload();
+    }
+}
+
 void wheelctl_save_config( void ) {
     fs::File file = SPIFFS.open( WHEELCTL_JSON_CONFIG_FILE, FILE_WRITE );
 
@@ -707,19 +722,5 @@ void wheelctl_reset_trip( void ) {
     wheelctl_data[WHEELCTL_TEMP].max_value = current_trip.max_temperature;
     wheelctl_data[WHEELCTL_POWERCONS].value = current_trip.consumed_energy;
     wheelctl_data[WHEELCTL_ECONOMY].value = current_trip.trip_economy;
-}
-
-bool wheelctl_get_config( int config ) {
-    if ( config < WHEELCTL_CONFIG_NUM ) {
-        return( wheelctl_config[ config ].enable );
-    }
-    return false;
-}
-
-void wheelctl_set_config( int config, bool enable ) {
-    if ( config < WHEELCTL_CONFIG_NUM ) {
-        wheelctl_config[ config ].enable = enable;
-        wheelctl_save_config();
-        simpledash_tile_reload();
-    }
+    current_trip_save_data();
 }
