@@ -36,7 +36,7 @@
     typedef struct {
         long timestamp = 0;
         float trip = 0.0;
-        int ride_time = 0;
+        float ride_time = 0;
         float avg_speed = 0;
         float max_speed = 0;
         float max_current = 0;

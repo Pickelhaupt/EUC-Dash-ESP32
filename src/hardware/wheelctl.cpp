@@ -65,7 +65,6 @@ bool shakeoff[3] = {true, true, true};
 bool lightsoff = true;
 bool firstrun[WHEELCTL_DATA_NUM];
 float old_uptime = 0;
-bool newtrip = true;
 bool sync_trip = true;
 
 wheelctl_data_t wheelctl_data[WHEELCTL_DATA_NUM];
@@ -100,7 +99,7 @@ void wheelctl_setup(void)
     wheelctl_update_values();
     wheelctl_read_config();
     current_trip_read_data();
-    
+    sync_trip = true;
     motor_vibe(5, true);
 }
 
@@ -211,10 +210,16 @@ void wheelctl_set_data(int entry, float value)
 
 void wheelctl_minute_update(lv_task_t *ride_tick)
 {
-    if (wheelctl_data[WHEELCTL_SPEED].value >= MIN_RIDE_SPEED) {
-        wheelctl_data[WHEELCTL_RIDETIME].value++;
-        current_trip.ride_time++;
+    static unsigned long oldmillis = 0;
+
+    if ( oldmillis == 0 || oldmillis > millis()) {
+        oldmillis = millis();
     }
+    if (wheelctl_data[WHEELCTL_SPEED].value >= MIN_RIDE_SPEED) {
+        wheelctl_data[WHEELCTL_RIDETIME].value += ((millis() - oldmillis) / 1000.0);
+        current_trip.ride_time += ((millis() - oldmillis) / 1000.0);
+    }
+    oldmillis = millis();
     
     wheelctl_update_powercons();
     current_trip.max_speed = wheelctl_data[WHEELCTL_SPEED].max_value;
@@ -229,11 +234,9 @@ void wheelctl_save_trip_task(lv_task_t *save_trip_task) {
 
 void wheelctl_update_watch_trip(float value)
 {
-    static bool last_value_set = false;
     static float last_value;
-    if (!last_value_set || value < last_value || sync_trip || wheelctl_data[WHEELCTL_SPEED].value < MIN_RIDE_SPEED) { 
+    if (value < last_value || sync_trip || wheelctl_data[WHEELCTL_SPEED].value < MIN_RIDE_SPEED) { 
         last_value = value; 
-        last_value_set = true;
     }
     wheelctl_data[WHEELCTL_TRIP].max_value += (value - last_value);
     current_trip.trip += (value - last_value);
