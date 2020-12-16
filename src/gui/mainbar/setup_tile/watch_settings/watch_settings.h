@@ -17,11 +17,23 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
-#ifndef _WHEEL_SETTINGS_H
-    #define _WHEEL_SETTINGS_H
+#ifndef _WATCH_SETTINGS_H
+    #define _WATCH_SETTINGS_H
 
     #include <TTGO.h>
 
-    void wheel_settings_tile_setup( void );
+    #define MAX_MENU_ITEMS      20
 
-#endif // _WHEEL_SETTINGS_TILE_H
+    typedef struct {
+        lv_obj_t *cont;
+        lv_event_cb_t item_event_cb;
+        uint16_t item_number;
+        const char *id;
+        lv_obj_t *label;
+    } watch_settings_item_t;
+
+    void watch_settings_tile_setup( void );
+
+    uint32_t watch_settings_register_menu_item(const char *item_name, const lv_img_dsc_t *icon, lv_event_cb_t event_cb, const char *item_label);
+
+#endif // _WATCH_SETTINGS_TILE_H

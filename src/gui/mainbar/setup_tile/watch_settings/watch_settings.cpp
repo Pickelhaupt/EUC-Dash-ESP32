@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 #include "config.h"
-#include "wheel_settings.h"
+#include "watch_settings.h"
 
 #include "gui/mainbar/mainbar.h"
 #include "gui/mainbar/setup_tile/setup_tile.h"
@@ -46,6 +46,10 @@ lv_obj_t *five_onoff=NULL;
 lv_obj_t *six_onoff=NULL;
 lv_obj_t *seven_onoff=NULL;
 lv_obj_t *eight_onoff=NULL;
+lv_obj_t *watch_settings_page = NULL;
+
+
+watch_settings_item_t *menu_item[MAX_MENU_ITEMS];
 
 LV_IMG_DECLARE(exit_32px);
 LV_IMG_DECLARE(wheel_64px);
@@ -56,10 +60,13 @@ static void disable_startuplights_onoff_event_handler(lv_obj_t * obj, lv_event_t
 static void toggle_leds_onoff_event_handler(lv_obj_t * obj, lv_event_t event);
 static void toggle_horn_onoff_event_handler(lv_obj_t * obj, lv_event_t event);
 static void toggle_autoconnect_onoff_event_handler(lv_obj_t * obj, lv_event_t event);
+static void item_1_event_cb(lv_obj_t * obj, lv_event_t event);
+static void item_2_event_cb(lv_obj_t * obj, lv_event_t event);
 
-void wheel_settings_tile_setup( void ) {
+
+void watch_settings_tile_setup( void ) {
     // get an app tile and copy mainstyle
-    wheel_tile_num = mainbar_add_app_tile( 1, 1, "wheel settings" );
+    wheel_tile_num = mainbar_add_app_tile( 1, 1, "watch settings" );
     wheel_settings_tile = mainbar_get_tile_obj( wheel_tile_num );
     lv_style_copy( &wheel_settings_style, mainbar_get_style() );
     lv_style_set_bg_color( &wheel_settings_style, LV_OBJ_PART_MAIN, LV_COLOR_BLACK);
@@ -85,7 +92,7 @@ void wheel_settings_tile_setup( void ) {
     
     lv_obj_t *exit_label = lv_label_create( wheel_settings_tile, NULL);
     lv_obj_add_style( exit_label, LV_OBJ_PART_MAIN, &wheel_settings_heading_style  );
-    lv_label_set_text( exit_label, "wheel settings");
+    lv_label_set_text( exit_label, "watch settings");
     lv_obj_align( exit_label, wheel_settings_tile, LV_ALIGN_IN_TOP_MID, 0, 15 );
 
     lv_style_copy( &wheel_page_style, &wheel_settings_style );
@@ -101,89 +108,50 @@ void wheel_settings_tile_setup( void ) {
     lv_obj_add_style(wheel_page, LV_PAGE_PART_EDGE_FLASH, &wheel_page_edge_style );
     lv_obj_align( wheel_page, wheel_settings_tile, LV_ALIGN_IN_TOP_MID, 0, 45 );
 
-    lv_obj_t *disable_startuplights_cont = lv_obj_create( wheel_page, NULL );
-    lv_page_glue_obj(disable_startuplights_cont, true);
-    lv_obj_set_size(disable_startuplights_cont, lv_disp_get_hor_res( NULL ) - 10, 60);
-    lv_obj_add_style( disable_startuplights_cont, LV_OBJ_PART_MAIN, &wheel_settings_style  );
-    lv_obj_align( disable_startuplights_cont, wheel_page, LV_ALIGN_IN_TOP_LEFT, 0, 0 );
-    disable_startuplights_onoff = lv_switch_create( disable_startuplights_cont, NULL );
-    lv_obj_add_protect( disable_startuplights_onoff, LV_PROTECT_CLICK_FOCUS);
-    lv_obj_add_style( disable_startuplights_onoff, LV_SWITCH_PART_INDIC, mainbar_get_switch_style() );
-    lv_switch_off( disable_startuplights_onoff, LV_ANIM_ON );
-    lv_obj_align( disable_startuplights_onoff, disable_startuplights_cont, LV_ALIGN_IN_RIGHT_MID, -5, 0 );
-    lv_obj_set_event_cb( disable_startuplights_onoff, disable_startuplights_onoff_event_handler );
-    lv_obj_t *disable_startuplights_label = lv_label_create( disable_startuplights_cont, NULL);
-    lv_obj_add_style( disable_startuplights_label, LV_OBJ_PART_MAIN, &wheel_settings_style  );
-    lv_label_set_text( disable_startuplights_label, "Disable lights\non connect");
-    lv_obj_align( disable_startuplights_label, disable_startuplights_cont, LV_ALIGN_IN_LEFT_MID, 5, 0 );
+    watch_settings_menu_item_setup();
+}
 
-    lv_obj_t *toggle_leds_cont = lv_obj_create( wheel_page, NULL );
-    lv_page_glue_obj(toggle_leds_cont, true);
-    lv_obj_set_size(toggle_leds_cont, lv_disp_get_hor_res( NULL ) - 10, 60);
-    lv_obj_add_style( toggle_leds_cont, LV_OBJ_PART_MAIN, &wheel_settings_style  );
-    lv_obj_align( toggle_leds_cont, disable_startuplights_cont, LV_ALIGN_OUT_BOTTOM_MID, 0, 0 );
-    toggle_leds_onoff = lv_switch_create( toggle_leds_cont, NULL );
-    lv_obj_add_protect( toggle_leds_onoff, LV_PROTECT_CLICK_FOCUS);
-    lv_obj_add_style( toggle_leds_onoff, LV_SWITCH_PART_INDIC, mainbar_get_switch_style() );
-    lv_switch_off( toggle_leds_onoff, LV_ANIM_ON );
-    lv_obj_align( toggle_leds_onoff, toggle_leds_cont, LV_ALIGN_IN_RIGHT_MID, -5, 0 );
-    lv_obj_set_event_cb( toggle_leds_onoff, toggle_leds_onoff_event_handler );
-    lv_obj_t *toggle_leds_label = lv_label_create( toggle_leds_cont, NULL);
-    lv_obj_add_style( toggle_leds_label, LV_OBJ_PART_MAIN, &wheel_settings_style  );
-    lv_label_set_text( toggle_leds_label, "toggle leds when\ntoggling lights");
-    lv_obj_align( toggle_leds_label, toggle_leds_cont, LV_ALIGN_IN_LEFT_MID, 5, 0 );
+uint32_t watch_settings_register_menu_item(const char *item_name, const lv_img_dsc_t *icon, lv_event_cb_t event_cb, const char *item_label) {
+    int item_entries = 0;
+    item_entries++;
 
-    lv_obj_t *autoconnect_cont = lv_obj_create( wheel_page, NULL );
-    lv_page_glue_obj(autoconnect_cont, true);
-    lv_obj_set_size(autoconnect_cont, lv_disp_get_hor_res( NULL ) - 10, 60);
-    lv_obj_add_style( autoconnect_cont, LV_OBJ_PART_MAIN, &wheel_settings_style  );
-    lv_obj_align( autoconnect_cont, toggle_leds_cont, LV_ALIGN_OUT_BOTTOM_MID, 0, 0 );
-    autoconnect_onoff = lv_switch_create( autoconnect_cont, NULL );
-    lv_obj_add_protect( autoconnect_onoff, LV_PROTECT_CLICK_FOCUS);
-    lv_obj_add_style( autoconnect_onoff, LV_SWITCH_PART_INDIC, mainbar_get_switch_style() );
-    lv_switch_off( autoconnect_onoff, LV_ANIM_ON );
-    lv_obj_align( autoconnect_onoff, autoconnect_cont, LV_ALIGN_IN_RIGHT_MID, -5, 0 );
-    lv_obj_set_event_cb( autoconnect_onoff, toggle_autoconnect_onoff_event_handler );
-    lv_obj_t *autoconnect_label = lv_label_create( autoconnect_cont, NULL);
-    lv_obj_add_style( autoconnect_label, LV_OBJ_PART_MAIN, &wheel_settings_style  );
-    lv_label_set_text( autoconnect_label, "connect to wheel\nautomatically");
-    lv_obj_align( autoconnect_label, autoconnect_cont, LV_ALIGN_IN_LEFT_MID, 5, 0 );
+    watch_settings_item_t menu_item[ item_entries - 1 ];
+    menu_item[ item_entries - 1 ].id = item_name;
+    menu_item[ item_entries - 1 ].item_event_cb = event_cb;
 
-    lv_obj_t *horn_press_cont = lv_obj_create( wheel_page, NULL );
-    lv_page_glue_obj(autoconnect_cont, true);
-    lv_obj_set_size(horn_press_cont, lv_disp_get_hor_res( NULL ) - 10, 60);
-    lv_obj_add_style( horn_press_cont, LV_OBJ_PART_MAIN, &wheel_settings_style  );
-    lv_obj_align( horn_press_cont, autoconnect_cont, LV_ALIGN_OUT_BOTTOM_MID, 0, 0 );
-    horn_press_onoff = lv_switch_create( horn_press_cont, NULL );
-    lv_obj_add_protect( horn_press_onoff, LV_PROTECT_CLICK_FOCUS);
-    lv_obj_add_style( horn_press_onoff, LV_SWITCH_PART_INDIC, mainbar_get_switch_style() );
-    lv_switch_off( horn_press_onoff, LV_ANIM_ON );
-    lv_obj_align( horn_press_onoff, horn_press_cont, LV_ALIGN_IN_RIGHT_MID, -5, 0 );
-    lv_obj_set_event_cb( horn_press_onoff, toggle_horn_onoff_event_handler );
-    lv_obj_t *horn_press_label = lv_label_create( horn_press_cont, NULL);
-    lv_obj_add_style( horn_press_label, LV_OBJ_PART_MAIN, &wheel_settings_style  );
-    lv_label_set_text( horn_press_label, "sound horn on\npress at > 3kmh");
-    lv_obj_align( horn_press_label, horn_press_cont, LV_ALIGN_IN_LEFT_MID, 5, 0 );
+    menu_item[ item_entries - 1 ].cont = lv_cont_create( watch_settings_page, NULL);
+    lv_obj_set_size(menu_item[item_entries - 1].cont, lv_disp_get_hor_res( NULL ) - 10, 60);
+    if( item_entries == 1) {
+        lv_obj_align( menu_item[ item_entries - 1 ].cont, watch_settings_page, LV_ALIGN_IN_TOP_LEFT, 0, 0 );
+    }
+    else {
+        lv_obj_align( menu_item[ item_entries - 1 ].cont, menu_item[ item_entries - 2 ].cont, LV_ALIGN_OUT_BOTTOM_MID, 0, 0 );
+    }
+    lv_obj_set_event_cb( menu_item[ item_entries - 1 ].cont, event_cb );
+    menu_item[ item_entries - 1 ].label = lv_label_create( menu_item[ item_entries - 1 ].cont, NULL);
+    lv_obj_add_style( menu_item[ item_entries - 1 ].label, LV_OBJ_PART_MAIN, &wheel_settings_style  );
+    lv_label_set_text( menu_item[ item_entries - 1 ].label, item_label);
+    lv_obj_align( menu_item[ item_entries - 1 ].label, menu_item[ item_entries - 1 ].cont, LV_ALIGN_IN_LEFT_MID, 5, 0 );
+}
 
-    if ( wheelctl_get_config( WHEELCTL_CONFIG_LIGHTS_OFF ) )
-        lv_switch_on( disable_startuplights_onoff, LV_ANIM_OFF );
-    else
-        lv_switch_off( disable_startuplights_onoff, LV_ANIM_OFF );
 
-    if ( wheelctl_get_config( WHEELCTL_CONFIG_LED ) )
-        lv_switch_on( toggle_leds_onoff, LV_ANIM_OFF );
-    else
-        lv_switch_off( toggle_leds_onoff, LV_ANIM_OFF );
+void watch_settings_menu_item_setup() {
+    watch_settings_register_menu_item("item 1", &exit_32px, item_1_event_cb, "menu item 1");
+    watch_settings_register_menu_item("item 2", &exit_32px, item_2_event_cb, "menu item 2");
+}
 
-    if ( wheelctl_get_config( WHEELCTL_CONFIG_HORN ) )
-        lv_switch_on( horn_press_onoff, LV_ANIM_OFF );
-    else
-        lv_switch_off( horn_press_onoff, LV_ANIM_OFF );
+static void item_1_event_cb( lv_obj_t * obj, lv_event_t event ) {
+    switch( event ) {
+        case( LV_EVENT_CLICKED ):      log_i("item 1 clicked");
+                                        break;
+    }
+}
 
-    if ( blectl_get_autoconnect() )
-        lv_switch_on( autoconnect_onoff, LV_ANIM_OFF );
-    else
-        lv_switch_off( autoconnect_onoff, LV_ANIM_OFF );
+static void item_2_event_cb( lv_obj_t * obj, lv_event_t event ) {
+    switch( event ) {
+        case( LV_EVENT_CLICKED ):      log_i("item 2 clicked");
+                                        break;
+    }
 }
 
 static void enter_wheel_setup_event_cb( lv_obj_t * obj, lv_event_t event ) {

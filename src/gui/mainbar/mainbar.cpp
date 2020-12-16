@@ -163,7 +163,6 @@ uint32_t mainbar_add_tile( uint16_t x, uint16_t y, const char *id ) {
     lv_tileview_add_element( mainbar, tile[ tile_entrys - 1 ].tile );
     lv_tileview_set_valid_positions( mainbar, tile_pos_table, tile_entrys );
     log_i("add tile: x=%d, y=%d, id=%s", tile_pos_table[ tile_entrys - 1 ].x, tile_pos_table[ tile_entrys - 1 ].y, tile[ tile_entrys - 1 ].id );
-
     return( tile_entrys - 1 );
 }
 
