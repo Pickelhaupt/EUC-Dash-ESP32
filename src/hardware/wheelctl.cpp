@@ -51,7 +51,7 @@ void wheelctl_update_regen_current(int entry, float value);
 void wheelctl_update_battpct_max_min(int entry, float value);
 void update_calc_battery(float value);
 void wheelctl_calc_power(float value);
-void wheelctl_minute_update(lv_task_t *ride_tick);
+void wheelctl_tick_update(lv_task_t *ride_tick);
 void wheelctl_save_trip_task(lv_task_t *save_trip_task);
 void wheelctl_update_powercons( void );
 void wheelctl_update_avgspeed(float value);
@@ -66,6 +66,7 @@ bool lightsoff = true;
 bool firstrun[WHEELCTL_DATA_NUM];
 float old_uptime = 0;
 bool sync_trip = true;
+bool sync_millis = true;
 
 wheelctl_data_t wheelctl_data[WHEELCTL_DATA_NUM];
 wheelctl_constants_t wheelctl_constants[WHEELCTL_CONST_NUM];
@@ -110,7 +111,8 @@ void wheelctl_connect_actions(void)
         wheelctl_toggle_lights();
     }
     sync_trip = true;
-    ride_tick = lv_task_create( wheelctl_minute_update, 1000, LV_TASK_PRIO_LOW, NULL );
+    sync_millis = true;
+    ride_tick = lv_task_create( wheelctl_tick_update, 1000, LV_TASK_PRIO_LOW, NULL );
     save_trip_task = lv_task_create( wheelctl_save_trip_task, 20000, LV_TASK_PRIO_LOW, NULL );
 }
 
@@ -208,12 +210,13 @@ void wheelctl_set_data(int entry, float value)
     }
 }
 
-void wheelctl_minute_update(lv_task_t *ride_tick)
+void wheelctl_tick_update(lv_task_t *ride_tick)
 {
     static unsigned long oldmillis = 0;
 
-    if ( oldmillis == 0 || oldmillis > millis()) {
+    if ( oldmillis == 0 || oldmillis > millis() || sync_millis ) {
         oldmillis = millis();
+        sync_millis = false;
     }
     if (wheelctl_data[WHEELCTL_SPEED].value >= MIN_RIDE_SPEED) {
         wheelctl_data[WHEELCTL_RIDETIME].value += ((millis() - oldmillis) / 1000.0);
