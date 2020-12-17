@@ -24,6 +24,15 @@
 
     #define MAX_MENU_ITEMS      20
 
+    /**
+     * @brief structure to hold menu item data
+     * 
+     * @param   cont (lv_obj_t) the lvgl container object for the menu item
+     * @param   item_event_cb (lv_event_cb_t) the function called when item is clicked
+     * @param   item_number (uint16_t) the designated menu item number
+     * @param   id (const char) identification string
+     * @param   label (lv_obj_t) the lvgl label object for the menu item
+     */
     typedef struct {
         lv_obj_t *cont;
         lv_event_cb_t item_event_cb;
@@ -32,8 +41,19 @@
         lv_obj_t *label;
     } watch_settings_item_t;
 
+    /**
+     * @brief set up the watch settings tile
+     */
     void watch_settings_tile_setup( void );
-
+    /**
+     * @brief register a menu item to the watch settings menu
+     * 
+     * @param   item_name Arbitrary string setting the name of the menu item
+     * @param   icon the icon representing the menu item, should be 32x32 px
+     * @param   event_cb the callback function to be called when the item is clicked
+     * @param   item_label the label text to be shown on the menu item, 2 lines of approx. 16 chars
+     * @return  menu entry number
+     */
     uint32_t watch_settings_register_menu_item(const char *item_name, const lv_img_dsc_t *icon, lv_event_cb_t event_cb, const char *item_label);
 
 #endif // _WATCH_SETTINGS_TILE_H
