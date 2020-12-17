@@ -49,6 +49,7 @@ static void enter_watch_setup_event_cb( lv_obj_t * obj, lv_event_t event );
 static void exit_watch_setup_event_cb( lv_obj_t * obj, lv_event_t event );
 static void item_1_event_cb(lv_obj_t * obj, lv_event_t event);
 static void item_2_event_cb(lv_obj_t * obj, lv_event_t event);
+void watch_settings_menu_item_setup();
 
 void watch_settings_tile_setup( void ) {
     // set up watch settings tile

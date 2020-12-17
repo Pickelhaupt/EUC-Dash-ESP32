@@ -115,7 +115,7 @@ class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks
     {
         //Serial.print("BLE Advertised Device found: ");
         //Serial.println(advertisedDevice.toString().c_str());
-        log_i("BLE Advertised Device found: %s", advertisedDevice.toString().c_str())
+        log_i("BLE Advertised Device found: %s", advertisedDevice.toString().c_str());
         // We have found a device, let us now see if it contains the service we are looking for.
         
         if (advertisedDevice.haveServiceUUID() && advertisedDevice.isAdvertisingService(KS_SERVICE_UUID_1))
