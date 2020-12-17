@@ -53,7 +53,7 @@ void update_calc_battery(float value);
 void wheelctl_calc_power(float value);
 void wheelctl_tick_update(lv_task_t *ride_tick);
 void wheelctl_save_trip_task(lv_task_t *save_trip_task);
-void wheelctl_update_powercons( void );
+void wheelctl_update_powercons( float seconds );
 void wheelctl_update_avgspeed(float value);
 void wheelctl_update_watch_trip(float value);
 void wheelctl_read_config( void );
@@ -213,18 +213,20 @@ void wheelctl_set_data(int entry, float value)
 void wheelctl_tick_update(lv_task_t *ride_tick)
 {
     static unsigned long oldmillis = 0;
+    static float delta_seconds = 0.0;
 
     if ( oldmillis == 0 || oldmillis > millis() || sync_millis ) {
         oldmillis = millis();
         sync_millis = false;
     }
+    delta_seconds = (millis() - oldmillis) / 1000.0;
     if (wheelctl_data[WHEELCTL_SPEED].value >= MIN_RIDE_SPEED) {
-        wheelctl_data[WHEELCTL_RIDETIME].value += ((millis() - oldmillis) / 1000.0);
-        current_trip.ride_time += ((millis() - oldmillis) / 1000.0);
+        wheelctl_data[WHEELCTL_RIDETIME].value += delta_seconds;
+        current_trip.ride_time += delta_seconds;
     }
+    wheelctl_update_powercons(delta_seconds);
     oldmillis = millis();
     
-    wheelctl_update_powercons();
     current_trip.max_speed = wheelctl_data[WHEELCTL_SPEED].max_value;
     current_trip.max_current = wheelctl_data[WHEELCTL_CURRENT].max_value;
     current_trip.max_power = wheelctl_data[WHEELCTL_POWER].max_value;
@@ -256,12 +258,12 @@ void wheelctl_update_avgspeed(float value)
     current_trip.avg_speed = wheelctl_data[WHEELCTL_SPEED].min_value;
 }
 
-void wheelctl_update_powercons() {
+void wheelctl_update_powercons( float seconds ) {
     float trip_distance = wheelctl_data[WHEELCTL_TRIP].max_value;
-    wheelctl_data[WHEELCTL_POWERCONS].value = wheelctl_data[WHEELCTL_POWERCONS].value + (wheelctl_data[WHEELCTL_POWER].value / 3600);
+    if( seconds != 0 ) wheelctl_data[WHEELCTL_POWERCONS].value = wheelctl_data[WHEELCTL_POWERCONS].value + (wheelctl_data[WHEELCTL_POWER].value / (seconds * 3600));
     if (trip_distance !=0) wheelctl_data[WHEELCTL_ECONOMY].value = wheelctl_data[WHEELCTL_POWERCONS].value / trip_distance;
     
-    current_trip.consumed_energy = current_trip.consumed_energy + (wheelctl_data[WHEELCTL_POWER].value / 3600);
+    if( seconds != 0 ) current_trip.consumed_energy = current_trip.consumed_energy + (wheelctl_data[WHEELCTL_POWER].value / (seconds * 3600));
     if (current_trip.trip != 0) current_trip.trip_economy = current_trip.consumed_energy / current_trip.trip;
 }
 
