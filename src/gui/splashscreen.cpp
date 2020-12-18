@@ -31,7 +31,8 @@ lv_obj_t *preload = NULL;
 lv_obj_t *preload_label = NULL;
 lv_obj_t *preload_fw_label = NULL;
 lv_style_t style;
-lv_style_t bar_style;
+lv_style_t bar_fg_style;
+lv_style_t bar_bg_style;
 
 //LV_FONT_DECLARE(DIN1451_m_cond_24);
 LV_FONT_DECLARE(DIN1451_m_cond_28);
@@ -52,9 +53,11 @@ void splash_screen_stage_one( void ) {
     lv_style_set_text_font( &style, LV_STATE_DEFAULT, &DIN1451_m_cond_28 );
     lv_style_set_text_color( &style, LV_OBJ_PART_MAIN, LV_COLOR_RED );
 
-    lv_style_copy(&bar_style, &style);
-    lv_style_set_bg_color( &bar_style, LV_OBJ_PART_MAIN, LV_COLOR_RED );
-    lv_style_set_radius(&bar_style, LV_STATE_DEFAULT, 0);
+    lv_style_copy(&bar_fg_style, &style);
+    lv_style_set_bg_color( &bar_fg_style, LV_OBJ_PART_MAIN, LV_COLOR_RED );
+
+    lv_style_copy(&bar_bg_style, &style);
+    lv_style_set_bg_color( &bar_bg_style, LV_OBJ_PART_MAIN, LV_COLOR_MAROON );
 
     lv_obj_t *background = lv_bar_create(lv_scr_act(), NULL);
     lv_obj_set_size( background, lv_disp_get_hor_res( NULL ), lv_disp_get_ver_res( NULL ) );
@@ -87,10 +90,11 @@ void splash_screen_stage_one( void ) {
     preload = lv_bar_create( lv_scr_act(), NULL );
     lv_obj_set_size( preload, lv_disp_get_hor_res( NULL ) - 40, 20 );
     lv_obj_add_style( preload, LV_OBJ_PART_MAIN, &style );
-    lv_obj_add_style( preload, LV_BAR_PART_INDIC, &bar_style );
+    lv_obj_add_style( preload, LV_BAR_PART_BG, &bar_bg_style );
+    lv_obj_add_style( preload, LV_BAR_PART_INDIC, &bar_fg_style );
     lv_obj_align( preload, background, LV_ALIGN_CENTER, 0, 0 );
-    lv_bar_set_range(preload, 0, 100);
-    lv_bar_set_anim_time( preload, 200);
+    lv_bar_set_range(preload, 0, 95);
+    lv_bar_set_anim_time( preload, 50);
     lv_bar_set_value( preload, 0, LV_ANIM_ON);
 
     preload_fw_label = lv_label_create( lv_scr_act(), NULL );

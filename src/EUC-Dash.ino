@@ -47,26 +47,31 @@ void setup()
     Serial.begin(115200);
     Serial.printf("starting t-watch V1, version: " __FIRMWARE__ " core: %d\r\n", xPortGetCoreID() );
     Serial.printf("Configure watchdog to 30s: %d\r\n", esp_task_wdt_init( 30, true ) );
-
+    
+    Serial.printf("init t-watch\r\n");
     ttgo->begin();
 
+    Serial.printf("init LVGL\r\n");
     //ttgo->tft->initDMA();
     ttgo->lvgl_begin();
-
+    Serial.printf("init SPIFFS\r\n");
     SPIFFS.begin();
+
+    Serial.printf("starting display\r\n");
+    display_setup();
+    splash_screen_stage_one();
+    splash_screen_stage_update( "booting....", 0 );
+
+    splash_screen_stage_update( "init haptic", 10 );
     motor_setup();
 
     // force to store all new heap allocations in psram to get more internal ram
     //heap_caps_malloc_extmem_enable( 1 );
 
+    splash_screen_stage_update( "init dashboard", 20 );
     dashboard_setup();
     
-    display_setup();
-
-    splash_screen_stage_one();
-    splash_screen_stage_update( "init serial", 10 );
-
-    splash_screen_stage_update( "init spiff", 20 );
+    splash_screen_stage_update( "init spiff", 30 );
     if ( !SPIFFS.begin() ) {
         splash_screen_stage_update( "format spiff", 30 );
         SPIFFS.format();
@@ -91,9 +96,9 @@ void setup()
     splash_screen_stage_update( "alloc heap", 75 );
     //heap_caps_malloc_extmem_enable( 32*1024 );
 
-    splash_screen_stage_update( "init wheel data", 85 );
+    splash_screen_stage_update( "init wheel data", 90 );
     wheelctl_setup();
-    splash_screen_stage_update( "init gui", 95 );
+    splash_screen_stage_update( "init gui", 100 );
     splash_screen_stage_update( "init gui", 100 );
     gui_setup();
 
