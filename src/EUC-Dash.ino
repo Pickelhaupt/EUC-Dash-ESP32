@@ -51,8 +51,14 @@ void setup()
     Serial.printf("init t-watch\r\n");
     ttgo->begin();
 
-    Serial.printf("init LVGL\r\n");
+    
     //ttgo->tft->initDMA();
+    
+    // force to store all new heap allocations in psram to get more internal ram
+    heap_caps_malloc_extmem_enable( 1 );
+    heap_caps_malloc_extmem_enable( 16*1024 );
+    
+    Serial.printf("init LVGL\r\n");
     ttgo->lvgl_begin();
     Serial.printf("init SPIFFS\r\n");
     SPIFFS.begin();
@@ -65,21 +71,18 @@ void setup()
     splash_screen_stage_update( "init haptic", 10 );
     motor_setup();
 
-    // force to store all new heap allocations in psram to get more internal ram
-    //heap_caps_malloc_extmem_enable( 1 );
-
     splash_screen_stage_update( "init dashboard", 20 );
     dashboard_setup();
     
-    splash_screen_stage_update( "init spiff", 30 );
+    splash_screen_stage_update( "init spiffs", 30 );
     if ( !SPIFFS.begin() ) {
-        splash_screen_stage_update( "format spiff", 30 );
+        splash_screen_stage_update( "format spiffs", 30 );
         SPIFFS.format();
-        splash_screen_stage_update( "format spiff done", 40 );
+        splash_screen_stage_update( "format spiffs done", 40 );
         delay(500);
         bool remount_attempt = SPIFFS.begin();
         if (!remount_attempt){
-            splash_screen_stage_update( "Err: SPIFF Failed", 40 );
+            splash_screen_stage_update( "Err: SPIFFS Failed", 40 );
             delay(3000);
             ESP.restart();
         }
@@ -94,7 +97,7 @@ void setup()
 
     // enable to store data in normal heap
     splash_screen_stage_update( "alloc heap", 75 );
-    //heap_caps_malloc_extmem_enable( 32*1024 );
+    
 
     splash_screen_stage_update( "init wheel data", 90 );
     wheelctl_setup();
@@ -109,7 +112,7 @@ void setup()
 
     display_set_brightness( display_get_brightness() );
 
-    delay(500);
+    delay(300);
 
     Serial.printf("Total heap: %d\r\n", ESP.getHeapSize());
     Serial.printf("Free heap: %d\r\n", ESP.getFreeHeap());
