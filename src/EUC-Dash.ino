@@ -57,7 +57,7 @@ void setup()
     motor_setup();
 
     // force to store all new heap allocations in psram to get more internal ram
-    heap_caps_malloc_extmem_enable( 1 );
+    //heap_caps_malloc_extmem_enable( 1 );
 
     dashboard_setup();
     
@@ -74,28 +74,28 @@ void setup()
         delay(500);
         bool remount_attempt = SPIFFS.begin();
         if (!remount_attempt){
-            splash_screen_stage_update( "Err: SPIFF Failed", 0 );
+            splash_screen_stage_update( "Err: SPIFF Failed", 40 );
             delay(3000);
             ESP.restart();
         }
     }
 
-    splash_screen_stage_update( "init powermgm", 60 );
+    splash_screen_stage_update( "init powermgm", 50 );
     powermgm_setup();
     
-    splash_screen_stage_update( "init wifi", 70 );
+    splash_screen_stage_update( "init wifi", 60 );
     if ( wifictl_get_autoon() && ( pmu_is_charging() || pmu_is_vbus_plug() || ( pmu_get_battery_voltage() > 3400) ) )
         wifictl_on();
 
     // enable to store data in normal heap
-    splash_screen_stage_update( "alloc heap", 80 );
-    heap_caps_malloc_extmem_enable( 16*1024 );
+    splash_screen_stage_update( "alloc heap", 75 );
+    //heap_caps_malloc_extmem_enable( 32*1024 );
 
-    splash_screen_stage_update( "init wheel data", 90 );
+    splash_screen_stage_update( "init wheel data", 85 );
     wheelctl_setup();
+    splash_screen_stage_update( "init gui", 95 );
     splash_screen_stage_update( "init gui", 100 );
     gui_setup();
-   
 
     //blectl_setup();
     blectl_scan_setup();

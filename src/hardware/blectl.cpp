@@ -115,7 +115,7 @@ class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks
     {
         //Serial.print("BLE Advertised Device found: ");
         //Serial.println(advertisedDevice.toString().c_str());
-        log_i("BLE Advertised Device found: %s", advertisedDevice.toString().c_str())
+        log_i("BLE Advertised Device found: %s", advertisedDevice.toString().c_str());
         // We have found a device, let us now see if it contains the service we are looking for.
         
         if (advertisedDevice.haveServiceUUID() && advertisedDevice.isAdvertisingService(KS_SERVICE_UUID_1))
@@ -243,6 +243,7 @@ bool blectl_register_cb(EventBits_t event, CALLBACK_FUNC callback_func, const ch
 
 bool blectl_send_event_cb(EventBits_t event, void *arg)
 {
+    log_i("blectl send callback");
     return (callback_send(blectl_callback, event, arg));
 }
 
@@ -388,8 +389,8 @@ void blectl_read_config(void)
 
 
 static void scanCompleteCB(BLEScanResults scanResults) {
-	Serial.printf("Scan complete!\n");
-	Serial.printf("We found %d devices\n", scanResults.getCount());
+	log_i("Scan complete!\n");
+	log_i("We found %d devices\n", scanResults.getCount());
 	scanResults.dump();
 } // scanCompleteCB
 
@@ -458,10 +459,10 @@ bool connectToServer()
     cli_ondisconnect = false;
     log_i("Forming a connection to ");
 
-    Serial.println(myDevice->getAddress().toString().c_str());
-    Serial.println(myDevice->getName().c_str());
-    Serial.println(myDevice->getManufacturerData().c_str());
-    Serial.println(myDevice->getServiceUUID().toString().c_str());
+    log_i("%s", myDevice->getAddress().toString().c_str());
+    log_i("%s",myDevice->getName().c_str());
+    log_i("%s",myDevice->getManufacturerData().c_str());
+    log_i("%s",myDevice->getServiceUUID().toString().c_str());
 
     blename = myDevice->getName().c_str();
     blemfg = myDevice->getManufacturerData().c_str();
@@ -537,7 +538,7 @@ void blectl_scan_once(int scantime)
 
 void blectl_scan_setup()
 {
-    Serial.println("Starting Arduino BLE Client application...");
+    log_i("Starting Arduino BLE Client application...");
     blectl_read_config();
     BLEDevice::init("");
     // Retrieve a Scanner and set the callback we want to use to be informed when we

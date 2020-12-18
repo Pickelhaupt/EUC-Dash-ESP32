@@ -57,7 +57,7 @@ void wheelinfo_tile_setup(void)
     wheelinfo_cont = mainbar_get_tile_obj(wheelinfo_tile_num);
     //fulldash_cont = mainbar_get_tile_obj( mainbar_add_tile( 1, 0, "fulldash tile" ) );
     style = mainbar_get_style();
-    Serial.println("setting up wheelinfo_tile");
+    log_i("setting up wheelinfo_tile");
     wheelinfo_setup_styles();
     wheelinfo_setup_obj();
 

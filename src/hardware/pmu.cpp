@@ -157,11 +157,11 @@ void pmu_loop( void ) {
         snprintf( msg, sizeof(msg), "\r\n{t:\"status\", bat:%d}\r\n", percent );
         //blectl_send_msg( msg );
 
-        bool plug = ttgo->power->isVBUSPlug();
-        bool charging = ttgo->power->isChargeing();
-        pmu_send_cb( PMUCTL_BATTERY_PERCENT, (void*)&percent );
-        pmu_send_cb( PMUCTL_CHARGING, (void*)&charging );
-        pmu_send_cb( PMUCTL_VBUS_PLUG, (void*)&plug );
+        //bool plug = ttgo->power->isVBUSPlug();
+        //bool charging = ttgo->power->isChargeing();
+        //pmu_send_cb( PMUCTL_BATTERY_PERCENT, (void*)&percent );
+        //pmu_send_cb( PMUCTL_CHARGING, (void*)&charging );
+        //pmu_send_cb( PMUCTL_VBUS_PLUG, (void*)&plug );
         pmu_update = false;
     }
 }
@@ -178,6 +178,7 @@ bool pmu_register_cb( EventBits_t event, CALLBACK_FUNC callback_func, const char
 }
 
 bool pmu_send_cb( EventBits_t event, void *arg ) {
+    log_i("pmu send callback");
     return( callback_send( pmu_callback, event, arg ) );
 }
 
