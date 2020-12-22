@@ -31,8 +31,8 @@
 
 lv_obj_t *watch_settings_tile=NULL;
 lv_style_t watch_settings_style;
-lv_style_t watch_page_style;
-lv_style_t watch_page_edge_style;
+lv_style_t watch_settings_page_style;
+lv_style_t watch_settings_page_edge_style;
 lv_style_t watch_settings_heading_style;
 lv_style_t watch_settings_data_style;
 uint32_t watch_tile_num;
@@ -53,9 +53,11 @@ void watch_settings_menu_item_setup();
 
 void watch_settings_tile_setup( void ) {
     // set up watch settings tile
+    log_i("add app tile");
     watch_tile_num = mainbar_add_app_tile( 1, 1, "watch settings" );
     watch_settings_tile = mainbar_get_tile_obj( watch_tile_num );
     // set up styles
+    log_i("set up watch settings styles");
     lv_style_copy( &watch_settings_style, mainbar_get_style() );
     lv_style_set_bg_color( &watch_settings_style, LV_OBJ_PART_MAIN, LV_COLOR_BLACK);
     lv_style_set_bg_opa( &watch_settings_style, LV_OBJ_PART_MAIN, LV_OPA_100);
@@ -71,8 +73,9 @@ void watch_settings_tile_setup( void ) {
     //add icon to setup screen
     icon_t *watch_setup_icon = setup_register( "watch", &wheel_64px, enter_watch_setup_event_cb );
     setup_hide_indicator( watch_setup_icon );
-
+    log_i("set up watch settings objects");
     //create top bar objects on tile
+    log_i("set up watch settings top button");
     lv_obj_t *exit_btn = lv_imgbtn_create( watch_settings_tile, NULL);
     lv_imgbtn_set_src( exit_btn, LV_BTN_STATE_RELEASED, &exit_32px);
     lv_imgbtn_set_src( exit_btn, LV_BTN_STATE_PRESSED, &exit_32px);
@@ -82,54 +85,73 @@ void watch_settings_tile_setup( void ) {
     lv_obj_align( exit_btn, watch_settings_tile, LV_ALIGN_IN_TOP_LEFT, 10, 10 );
     lv_obj_set_event_cb( exit_btn, exit_watch_setup_event_cb );
     
+    log_i("set up watch settings setup icon");
     lv_obj_t *exit_label = lv_label_create( watch_settings_tile, NULL);
     lv_obj_add_style( exit_label, LV_OBJ_PART_MAIN, &watch_settings_heading_style  );
     lv_label_set_text( exit_label, "watch settings");
     lv_obj_align( exit_label, watch_settings_tile, LV_ALIGN_IN_TOP_MID, 0, 15 );
 
+    log_i("set up page");
     //create scrollable page for watch settings menu
-    lv_style_copy( &watch_page_style, &watch_settings_style );
-    lv_style_set_pad_all(&watch_page_style, LV_STATE_DEFAULT, 0);
-    lv_style_copy( &watch_page_edge_style, &watch_page_style );
-    lv_style_set_bg_color(&watch_page_edge_style, LV_STATE_DEFAULT, LV_COLOR_GRAY);
-    lv_style_set_bg_opa(&watch_page_edge_style, LV_STATE_DEFAULT, 30);
-    lv_obj_t *watch_page = lv_page_create( watch_settings_tile, NULL);
-    lv_obj_set_size(watch_page, lv_disp_get_hor_res( NULL ), 195);
-    lv_page_set_edge_flash(watch_page, true);
-    lv_obj_add_style(watch_page, LV_OBJ_PART_MAIN, &watch_page_style );
-    lv_obj_add_style(watch_page, LV_PAGE_PART_EDGE_FLASH, &watch_page_edge_style );
-    lv_obj_align( watch_page, watch_settings_tile, LV_ALIGN_IN_TOP_MID, 0, 45 );
-
+    lv_style_copy( &watch_settings_page_style, &watch_settings_style );
+    lv_style_set_pad_all(&watch_settings_page_style, LV_STATE_DEFAULT, 0);
+    lv_style_copy( &watch_settings_page_edge_style, &watch_settings_page_style );
+    lv_style_set_bg_color(&watch_settings_page_edge_style, LV_STATE_DEFAULT, LV_COLOR_GRAY);
+    lv_style_set_bg_opa(&watch_settings_page_edge_style, LV_STATE_DEFAULT, 30);
+    watch_settings_page = lv_page_create( watch_settings_tile, NULL);
+    lv_obj_set_size(watch_settings_page, lv_disp_get_hor_res( NULL ), 195);
+    lv_page_set_edge_flash(watch_settings_page, true);
+    lv_obj_add_style(watch_settings_page, LV_OBJ_PART_MAIN, &watch_settings_page_style );
+    lv_obj_add_style(watch_settings_page, LV_PAGE_PART_EDGE_FLASH, &watch_settings_page_edge_style );
+    lv_obj_align( watch_settings_page, watch_settings_tile, LV_ALIGN_IN_TOP_MID, 0, 45 );
+    log_i("set up menu items");
     watch_settings_menu_item_setup();
 }
 
 uint32_t watch_settings_register_menu_item(const char *item_name, const lv_img_dsc_t *icon, lv_event_cb_t event_cb, const char *item_label) {
+    
     static int item_entries = 0;
     item_entries++;
 
+    log_i("add item");
     watch_settings_item_t menu_item[ item_entries - 1 ];
     menu_item[ item_entries - 1 ].id = item_name;
+    log_i("store event cb");
     menu_item[ item_entries - 1 ].item_event_cb = event_cb;
-
+    log_i("create menu cont");
     menu_item[ item_entries - 1 ].cont = lv_cont_create( watch_settings_page, NULL);
-    lv_obj_set_size(menu_item[item_entries - 1].cont, lv_disp_get_hor_res( NULL ) - 10, 60);
+    lv_page_glue_obj(menu_item[ item_entries - 1 ].cont, true);
+    lv_obj_set_size(menu_item[ item_entries - 1 ].cont, lv_disp_get_hor_res( NULL ) - 10, 60);
+    lv_obj_add_style( menu_item[ item_entries - 1 ].cont, LV_OBJ_PART_MAIN, &watch_settings_style  );
+    log_i("align menu cont");
     if( item_entries == 1) {
-        lv_obj_align( menu_item[ item_entries - 1 ].cont, watch_settings_page, LV_ALIGN_IN_TOP_LEFT, 0, 0 );
+        log_i("align to page");
+        lv_obj_align( menu_item[ item_entries - 1 ].cont, watch_settings_page, LV_ALIGN_IN_TOP_MID, 0, 0 );
     }
-    else {
-        lv_obj_align( menu_item[ item_entries - 1 ].cont, menu_item[ item_entries - 2 ].cont, LV_ALIGN_OUT_BOTTOM_MID, 0, 0 );
+    else if ( item_entries > 1) {
+        log_i("align to above cont");
+        //lv_obj_align( menu_item[ item_entries - 1 ].cont, menu_item[ item_entries - 2 ].cont, LV_ALIGN_OUT_BOTTOM_MID, 0, 0 );
+        lv_obj_align( menu_item[ item_entries - 1 ].cont, menu_item[ item_entries - 2 ].cont, LV_ALIGN_IN_TOP_MID, 0, 60 );
+        
     }
+    log_i("set event cb");
     lv_obj_set_event_cb( menu_item[ item_entries - 1 ].cont, event_cb );
-
+    log_i("create menu label");
+    menu_item[ item_entries - 1 ].icon = lv_img_create(menu_item[ item_entries - 1 ].cont, NULL);
+    lv_img_set_src(menu_item[ item_entries - 1 ].icon, icon);
+    lv_obj_align( menu_item[ item_entries - 1 ].icon, menu_item[ item_entries - 1 ].cont, LV_ALIGN_IN_LEFT_MID, 0, 0 );
     menu_item[ item_entries - 1 ].label = lv_label_create( menu_item[ item_entries - 1 ].cont, NULL);
     lv_obj_add_style( menu_item[ item_entries - 1 ].label, LV_OBJ_PART_MAIN, &watch_settings_style  );
     lv_label_set_text( menu_item[ item_entries - 1 ].label, item_label);
-    lv_obj_align( menu_item[ item_entries - 1 ].label, menu_item[ item_entries - 1 ].cont, LV_ALIGN_CENTER, 0, 0 );
+    lv_obj_align( menu_item[ item_entries - 1 ].label, menu_item[ item_entries - 1 ].cont, LV_ALIGN_IN_LEFT_MID, 40, 0 );
+    lv_obj_add_protect( menu_item[ item_entries - 1 ].label, LV_PROTECT_CLICK_FOCUS);
     return item_entries - 1;
 }
 
 void watch_settings_menu_item_setup() { //just for testing
+    log_i("set up menu item1");
     watch_settings_register_menu_item("item 1", &exit_32px, item_1_event_cb, "menu item 1");
+    log_i("set up menu item2");
     watch_settings_register_menu_item("item 2", &exit_32px, item_2_event_cb, "menu item 2");
 }
 

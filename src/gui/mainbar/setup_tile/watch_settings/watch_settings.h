@@ -38,6 +38,7 @@
         lv_event_cb_t item_event_cb;
         uint16_t item_number;
         const char *id;
+        lv_obj_t *icon;
         lv_obj_t *label;
     } watch_settings_item_t;
 
