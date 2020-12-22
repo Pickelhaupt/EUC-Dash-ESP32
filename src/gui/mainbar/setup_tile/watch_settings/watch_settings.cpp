@@ -36,6 +36,7 @@ lv_style_t watch_settings_page_edge_style;
 lv_style_t watch_settings_heading_style;
 lv_style_t watch_settings_data_style;
 uint32_t watch_tile_num;
+int cont_height = 50;
 
 lv_obj_t *watch_settings_page = NULL;
 
@@ -43,6 +44,10 @@ lv_obj_t *watch_settings_page = NULL;
 watch_settings_item_t *menu_item[MAX_MENU_ITEMS];
 
 LV_IMG_DECLARE(exit_32px);
+LV_IMG_DECLARE(time_32px);
+LV_IMG_DECLARE(brightness_32px);
+LV_IMG_DECLARE(setup_32px);
+LV_IMG_DECLARE(right_32px);
 LV_IMG_DECLARE(wheel_64px);
 
 static void enter_watch_setup_event_cb( lv_obj_t * obj, lv_event_t event );
@@ -108,51 +113,50 @@ void watch_settings_tile_setup( void ) {
     watch_settings_menu_item_setup();
 }
 
-uint32_t watch_settings_register_menu_item(const char *item_name, const lv_img_dsc_t *icon, lv_event_cb_t event_cb, const char *item_label) {
+uint32_t watch_settings_register_menu_item(const lv_img_dsc_t *icon, lv_event_cb_t event_cb, const char *item_label) {
     
     static int item_entries = 0;
     item_entries++;
 
     log_i("add item");
     watch_settings_item_t menu_item[ item_entries - 1 ];
-    menu_item[ item_entries - 1 ].id = item_name;
-    log_i("store event cb");
-    menu_item[ item_entries - 1 ].item_event_cb = event_cb;
     log_i("create menu cont");
     menu_item[ item_entries - 1 ].cont = lv_cont_create( watch_settings_page, NULL);
     lv_page_glue_obj(menu_item[ item_entries - 1 ].cont, true);
-    lv_obj_set_size(menu_item[ item_entries - 1 ].cont, lv_disp_get_hor_res( NULL ) - 10, 60);
+    lv_obj_set_size(menu_item[ item_entries - 1 ].cont, lv_disp_get_hor_res( NULL ) - 10, cont_height);
     lv_obj_add_style( menu_item[ item_entries - 1 ].cont, LV_OBJ_PART_MAIN, &watch_settings_style  );
     log_i("align menu cont");
-    if( item_entries == 1) {
-        log_i("align to page");
-        lv_obj_align( menu_item[ item_entries - 1 ].cont, watch_settings_page, LV_ALIGN_IN_TOP_MID, 0, 0 );
-    }
-    else if ( item_entries > 1) {
-        log_i("align to above cont");
-        //lv_obj_align( menu_item[ item_entries - 1 ].cont, menu_item[ item_entries - 2 ].cont, LV_ALIGN_OUT_BOTTOM_MID, 0, 0 );
-        lv_obj_align( menu_item[ item_entries - 1 ].cont, menu_item[ item_entries - 2 ].cont, LV_ALIGN_IN_TOP_MID, 0, 60 );
-        
-    }
+    lv_obj_align( menu_item[ item_entries - 1 ].cont, NULL, LV_ALIGN_IN_TOP_MID, 0, cont_height * (item_entries - 1) );
     log_i("set event cb");
     lv_obj_set_event_cb( menu_item[ item_entries - 1 ].cont, event_cb );
-    log_i("create menu label");
+    
     menu_item[ item_entries - 1 ].icon = lv_img_create(menu_item[ item_entries - 1 ].cont, NULL);
     lv_img_set_src(menu_item[ item_entries - 1 ].icon, icon);
-    lv_obj_align( menu_item[ item_entries - 1 ].icon, menu_item[ item_entries - 1 ].cont, LV_ALIGN_IN_LEFT_MID, 0, 0 );
+    lv_obj_align( menu_item[ item_entries - 1 ].icon, NULL, LV_ALIGN_IN_LEFT_MID, 0, 0 );
+    
+    menu_item[ item_entries - 1 ].arrow = lv_img_create(menu_item[ item_entries - 1 ].cont, NULL);
+    lv_img_set_src(menu_item[ item_entries - 1 ].arrow, &right_32px);
+    lv_obj_align( menu_item[ item_entries - 1 ].arrow, NULL, LV_ALIGN_IN_RIGHT_MID, 0, 0 );
+    
+    log_i("create menu label");
     menu_item[ item_entries - 1 ].label = lv_label_create( menu_item[ item_entries - 1 ].cont, NULL);
-    lv_obj_add_style( menu_item[ item_entries - 1 ].label, LV_OBJ_PART_MAIN, &watch_settings_style  );
+    lv_obj_add_style( menu_item[ item_entries - 1 ].label, LV_OBJ_PART_MAIN, &watch_settings_heading_style );
     lv_label_set_text( menu_item[ item_entries - 1 ].label, item_label);
-    lv_obj_align( menu_item[ item_entries - 1 ].label, menu_item[ item_entries - 1 ].cont, LV_ALIGN_IN_LEFT_MID, 40, 0 );
+    lv_obj_align( menu_item[ item_entries - 1 ].label, NULL, LV_ALIGN_IN_LEFT_MID, 50, 0 );
     lv_obj_add_protect( menu_item[ item_entries - 1 ].label, LV_PROTECT_CLICK_FOCUS);
     return item_entries - 1;
 }
 
 void watch_settings_menu_item_setup() { //just for testing
     log_i("set up menu item1");
-    watch_settings_register_menu_item("item 1", &exit_32px, item_1_event_cb, "menu item 1");
+    watch_settings_register_menu_item(&time_32px, item_1_event_cb, "menu item 1\nline2");
     log_i("set up menu item2");
-    watch_settings_register_menu_item("item 2", &exit_32px, item_2_event_cb, "menu item 2");
+    watch_settings_register_menu_item(&setup_32px, item_2_event_cb, "menu item 2");
+    watch_settings_register_menu_item(&brightness_32px, item_2_event_cb, "menu item 3");
+    watch_settings_register_menu_item(&exit_32px, item_2_event_cb, "menu item 4");
+    watch_settings_register_menu_item(&time_32px, item_2_event_cb, "menu item 5");
+    watch_settings_register_menu_item(&exit_32px, item_2_event_cb, "menu item 6");
+    watch_settings_register_menu_item(&exit_32px, item_2_event_cb, "menu item 7");  
 }
 
 static void enter_watch_setup_event_cb( lv_obj_t * obj, lv_event_t event ) {
