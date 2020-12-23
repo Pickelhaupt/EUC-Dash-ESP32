@@ -249,6 +249,10 @@ uint32_t mainbar_add_app_tile( uint16_t x, uint16_t y, const char *id ) {
     return( retval );
 }
 
+void mainbar_clear_tile(uint32_t tile_num) {
+    lv_obj_clean( tile[ tile_num ].tile );
+}
+
 lv_obj_t *mainbar_get_tile_obj( uint32_t tile_number ) {
     if ( tile_number < tile_entrys ) {
         return( tile[ tile_number ].tile );

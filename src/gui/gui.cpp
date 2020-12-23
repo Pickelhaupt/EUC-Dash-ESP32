@@ -81,8 +81,10 @@ void gui_setup( void )
     battery_settings_tile_setup();
     log_i("display settings");
     display_settings_tile_setup();
+    log_i("watch settings");
+    watch_settings_tile_setup();
     log_i("wheel settings");
-    wheel_settings_tile_setup();
+    wheel_settings_tile_pre_setup();
     log_i("wlan settings");
     wlan_settings_tile_setup();
     log_i("ble settings");
@@ -90,8 +92,7 @@ void gui_setup( void )
     log_i("time settings");
     time_settings_tile_setup();
     //update_tile_setup();
-    log_i("watch settings");
-    watch_settings_tile_setup();
+    
     log_i("utilities settings");
     utilities_tile_setup();
     log_i("dashboard settings");

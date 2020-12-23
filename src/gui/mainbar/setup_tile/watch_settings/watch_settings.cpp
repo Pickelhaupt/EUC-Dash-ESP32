@@ -30,12 +30,14 @@
 #include "hardware/wheelctl.h"
 
 lv_obj_t *watch_settings_tile=NULL;
+lv_obj_t *watch_submenu_tile=NULL;
 lv_style_t watch_settings_style;
 lv_style_t watch_settings_page_style;
 lv_style_t watch_settings_page_edge_style;
 lv_style_t watch_settings_heading_style;
 lv_style_t watch_settings_data_style;
 uint32_t watch_tile_num;
+uint32_t watch_submenu_tile_num;
 int cont_height = 50;
 
 lv_obj_t *watch_settings_page = NULL;
@@ -110,7 +112,15 @@ void watch_settings_tile_setup( void ) {
     lv_obj_add_style(watch_settings_page, LV_PAGE_PART_EDGE_FLASH, &watch_settings_page_edge_style );
     lv_obj_align( watch_settings_page, watch_settings_tile, LV_ALIGN_IN_TOP_MID, 0, 45 );
     log_i("set up menu items");
+
+    watch_submenu_tile_num = mainbar_add_app_tile( 1, 1, "watch submenu" );
+    watch_submenu_tile = mainbar_get_tile_obj( watch_submenu_tile_num );
+
     watch_settings_menu_item_setup();
+}
+
+uint32_t watch_get_submenu_tile_num(){
+    return watch_submenu_tile_num;
 }
 
 uint32_t watch_settings_register_menu_item(const lv_img_dsc_t *icon, lv_event_cb_t event_cb, const char *item_label) {

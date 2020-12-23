@@ -23,5 +23,7 @@
     #include <TTGO.h>
 
     void wheel_settings_tile_setup( void );
+    void wheel_settings_tile_pre_setup( void );
+    uint32_t wheel_settings_get_tile_num( void );
 
 #endif // _WHEEL_SETTINGS_TILE_H

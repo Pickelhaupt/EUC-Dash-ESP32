@@ -91,6 +91,9 @@
      * @return  tile number, if get more than 1 tile it is the first tile number
      */
     uint32_t mainbar_add_app_tile( uint16_t x, uint16_t y, const char *id );
+
+    void mainbar_clear_submenu_tile(uint32_t tile_num);
+
     /**
      * @brief get the lv_obj_t for a specific tile number
      *

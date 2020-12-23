@@ -53,4 +53,6 @@
      */
     uint32_t watch_settings_register_menu_item(const lv_img_dsc_t *icon, lv_event_cb_t event_cb, const char *item_label);
 
+    uint32_t watch_get_submenu_tile_num();
+
 #endif // _WATCH_SETTINGS_TILE_H
