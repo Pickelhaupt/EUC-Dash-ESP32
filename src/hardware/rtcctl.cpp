@@ -71,6 +71,7 @@ void rtcctl_setup( void ) {
 }
 
 bool rtcctl_send_event_cb( EventBits_t event ) {
+    log_i("rtcctl send callback");
     return( callback_send( rtcctl_callback, event, (void*)NULL ) );
 }
 

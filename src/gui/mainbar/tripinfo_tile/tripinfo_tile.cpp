@@ -61,7 +61,7 @@ void tripinfo_tile_setup(void)
     tripinfo_cont = mainbar_get_tile_obj(tripinfo_tile_num);
     //fulldash_cont = mainbar_get_tile_obj( mainbar_add_tile( 1, 0, "fulldash tile" ) );
     style = mainbar_get_style();
-    Serial.println("setting up tripinfo_tile");
+    log_i("setting up tripinfo_tile");
     tripinfo_setup_styles();
     tripinfo_setup_obj();
 
@@ -176,7 +176,7 @@ void tripinfo_setup_obj( void ) {
 
 static void tripinfo_overlay_event_cb(lv_obj_t * obj, lv_event_t event) {
     switch( event ) {
-        case( LV_EVENT_LONG_PRESSED ):  Serial.println("long press on trip");
+        case( LV_EVENT_LONG_PRESSED ):  log_i("long press on trip");
         //motor_vibe(5, true);
         wheelctl_reset_trip();
     }

@@ -303,6 +303,7 @@ bool wifictl_register_cb( EventBits_t event, CALLBACK_FUNC callback_func, const 
 }
 
 bool wifictl_send_event_cb( EventBits_t event, void *arg ) {
+  log_i("wifictl send callback");
     return( callback_send( wifictl_callback, event, arg ) );
 }
 

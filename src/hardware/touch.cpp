@@ -71,7 +71,7 @@ static bool touch_getXY(int16_t &x, int16_t &y)
     // disable touch when we are in standby or silence wakeup
     if (powermgm_get_event(POWERMGM_STANDBY | POWERMGM_SILENCE_WAKEUP))
     {
-        Serial.println("touch disabled");
+        log_i("touch disabled");
         return (false);
     }
 

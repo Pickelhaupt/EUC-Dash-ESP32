@@ -66,6 +66,7 @@ bool timesync_register_cb( EventBits_t event, CALLBACK_FUNC callback_func, const
 }
 
 bool timesync_send_event_cb( EventBits_t event, void *arg ) {
+    log_i("timesync send callback");
     return( callback_send( timesync_callback, event, (void*)NULL ) );
 }
 

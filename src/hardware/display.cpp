@@ -108,6 +108,7 @@ bool display_register_cb( EventBits_t event, CALLBACK_FUNC callback_func, const 
 }
 
 bool display_send_event_cb( EventBits_t event, void *arg ) {
+  log_i("display send callback");
     return( callback_send( display_callback, event, arg ) );
 }
 

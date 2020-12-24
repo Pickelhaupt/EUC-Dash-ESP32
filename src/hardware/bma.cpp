@@ -183,7 +183,7 @@ void bma_loop( void ) {
             stepcounter_before_reset = ttgo->bma->getCounter();
             char msg[16]="";
             snprintf( msg, sizeof( msg ),"%d", stepcounter + stepcounter_before_reset );
-            bma_send_event_cb( BMACTL_STEPCOUNTER, (void *)msg );
+            //bma_send_event_cb( BMACTL_STEPCOUNTER, (void *)msg );
         }
     }
 
@@ -193,7 +193,7 @@ void bma_loop( void ) {
         stepcounter_before_reset = ttgo->bma->getCounter();
         char msg[16]="";
         snprintf( msg, sizeof( msg ),"%d", stepcounter + stepcounter_before_reset );
-        bma_send_event_cb( BMACTL_STEPCOUNTER, msg );
+        //bma_send_event_cb( BMACTL_STEPCOUNTER, msg );
     }
 }
 
@@ -209,6 +209,7 @@ bool bma_register_cb( EventBits_t event, CALLBACK_FUNC callback_func, const char
 }
 
 bool bma_send_event_cb( EventBits_t event, void *arg ) {
+    log_i("bma send callback");
     return( callback_send( bma_callback, event, arg ) );
 }
 

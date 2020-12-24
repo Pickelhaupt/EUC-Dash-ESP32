@@ -197,6 +197,7 @@ bool powermgm_register_loop_cb( EventBits_t event, CALLBACK_FUNC callback_func, 
 }
 
 bool powermgm_send_event_cb( EventBits_t event ) {
+    log_i("powermgm send callback");
     return( callback_send( powermgm_callback, event, (void*)NULL ) );
 }
 
