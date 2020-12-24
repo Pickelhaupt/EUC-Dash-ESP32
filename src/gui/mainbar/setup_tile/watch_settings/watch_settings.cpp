@@ -50,7 +50,7 @@ LV_IMG_DECLARE(time_32px);
 LV_IMG_DECLARE(brightness_32px);
 LV_IMG_DECLARE(setup_32px);
 LV_IMG_DECLARE(right_32px);
-LV_IMG_DECLARE(wheel_64px);
+LV_IMG_DECLARE(watch_64px);
 
 static void enter_watch_setup_event_cb( lv_obj_t * obj, lv_event_t event );
 static void exit_watch_setup_event_cb( lv_obj_t * obj, lv_event_t event );
@@ -78,7 +78,7 @@ void watch_settings_tile_setup( void ) {
 
     lv_obj_add_style( watch_settings_tile, LV_OBJ_PART_MAIN, &watch_settings_style );
     //add icon to setup screen
-    icon_t *watch_setup_icon = setup_register( "watch", &wheel_64px, enter_watch_setup_event_cb );
+    icon_t *watch_setup_icon = setup_register( "watch", &watch_64px, enter_watch_setup_event_cb );
     setup_hide_indicator( watch_setup_icon );
     log_i("set up watch settings objects");
     //create top bar objects on tile
@@ -113,10 +113,14 @@ void watch_settings_tile_setup( void ) {
     lv_obj_align( watch_settings_page, watch_settings_tile, LV_ALIGN_IN_TOP_MID, 0, 45 );
     log_i("set up menu items");
 
-    watch_submenu_tile_num = mainbar_add_app_tile( 1, 1, "watch submenu" );
-    watch_submenu_tile = mainbar_get_tile_obj( watch_submenu_tile_num );
+    //watch_submenu_tile_num = mainbar_add_app_tile( 1, 1, "watch submenu" );
+    //watch_submenu_tile = mainbar_get_tile_obj( watch_submenu_tile_num );
 
-    watch_settings_menu_item_setup();
+    //watch_settings_menu_item_setup();
+}
+
+uint32_t watch_get_tile_num(){
+    return watch_tile_num;
 }
 
 uint32_t watch_get_submenu_tile_num(){
@@ -160,13 +164,6 @@ uint32_t watch_settings_register_menu_item(const lv_img_dsc_t *icon, lv_event_cb
 void watch_settings_menu_item_setup() { //just for testing
     log_i("set up menu item1");
     watch_settings_register_menu_item(&time_32px, item_1_event_cb, "menu item 1\nline2");
-    log_i("set up menu item2");
-    watch_settings_register_menu_item(&setup_32px, item_2_event_cb, "menu item 2");
-    watch_settings_register_menu_item(&brightness_32px, item_2_event_cb, "menu item 3");
-    watch_settings_register_menu_item(&exit_32px, item_2_event_cb, "menu item 4");
-    watch_settings_register_menu_item(&time_32px, item_2_event_cb, "menu item 5");
-    watch_settings_register_menu_item(&exit_32px, item_2_event_cb, "menu item 6");
-    watch_settings_register_menu_item(&exit_32px, item_2_event_cb, "menu item 7");  
 }
 
 static void enter_watch_setup_event_cb( lv_obj_t * obj, lv_event_t event ) {

@@ -26,6 +26,8 @@
 #include "gui/mainbar/setup_tile/setup_tile.h"
 
 #include "setup.h"
+lv_obj_t *submenu_tile=NULL;
+uint32_t submenu_tile_num;
 
 icon_t *setup_register( const char* setupname, const lv_img_dsc_t *icon, lv_event_cb_t event_cb ) {
 
@@ -63,6 +65,15 @@ icon_t *setup_register( const char* setupname, const lv_img_dsc_t *icon, lv_even
     lv_obj_invalidate( lv_scr_act() );
 
     return( setup );
+}
+
+void setup_add_submenu_tile(void){
+    submenu_tile_num = mainbar_add_app_tile( 1, 1, "eucdash submenu" );
+    submenu_tile = mainbar_get_tile_obj( submenu_tile_num );
+}
+
+uint32_t setup_get_submenu_tile_num(){
+    return submenu_tile_num;
 }
 
 void setup_set_indicator( icon_t *setup, icon_indicator_t indicator ) {

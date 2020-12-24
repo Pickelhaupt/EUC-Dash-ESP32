@@ -25,6 +25,7 @@
 
 #include "gui.h"
 #include "keyboard.h"
+#include "setup.h"
 
 #include "mainbar/mainbar.h"
 
@@ -44,6 +45,7 @@
 #include "mainbar/setup_tile/bluetooth_settings/bluetooth_settings.h"
 #include "mainbar/setup_tile/dashboard_settings/dashboard_settings.h"
 #include "mainbar/setup_tile/watch_settings/watch_settings.h"
+#include "mainbar/setup_tile/eucdash_settings/eucdash_settings.h"
 #include "mainbar/setup_tile/utilities/utilities.h"
 
 #include "hardware/powermgm.h"
@@ -77,12 +79,15 @@ void gui_setup( void )
 
     /* add setup screens */
     log_i("adding setup screens");
+    setup_add_submenu_tile();
     log_i("battery settings");
     battery_settings_tile_setup();
     log_i("display settings");
     display_settings_tile_setup();
     log_i("watch settings");
     watch_settings_tile_setup();
+    log_i("eucdash settings");
+    eucdash_settings_tile_setup();
     log_i("wheel settings");
     wheel_settings_tile_pre_setup();
     log_i("wlan settings");
@@ -90,7 +95,7 @@ void gui_setup( void )
     log_i("ble settings");
     bluetooth_settings_tile_setup();
     log_i("time settings");
-    time_settings_tile_setup();
+    time_settings_tile_pre_setup();
     //update_tile_setup();
     
     log_i("utilities settings");

@@ -53,4 +53,9 @@
      */
     void setup_set_icon( icon_t *setup, lv_obj_t *icon );
 
+    uint32_t setup_get_submenu_tile_num();
+
+    void setup_add_submenu_tile(void);
+
+
 #endif // _SETUP_H

@@ -26,4 +26,6 @@
 
     void time_settings_tile_setup( void );
 
+    void time_settings_tile_pre_setup( void );
+
 #endif // _TIME_SETTINGS_H

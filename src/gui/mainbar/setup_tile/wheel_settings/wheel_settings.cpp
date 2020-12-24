@@ -22,7 +22,7 @@
 
 #include "gui/mainbar/mainbar.h"
 #include "gui/mainbar/setup_tile/setup_tile.h"
-#include "gui/mainbar/setup_tile/watch_settings/watch_settings.h"
+#include "gui/mainbar/setup_tile/eucdash_settings/eucdash_settings.h"
 #include "gui/setup.h"
 
 #include "hardware/bma.h"
@@ -50,6 +50,7 @@ lv_obj_t *eight_onoff=NULL;
 
 LV_IMG_DECLARE(exit_32px);
 LV_IMG_DECLARE(wheel_64px);
+LV_IMG_DECLARE(wheel_32px);
 
 static void enter_wheel_setup_event_cb( lv_obj_t * obj, lv_event_t event );
 static void exit_wheel_setup_event_cb( lv_obj_t * obj, lv_event_t event );
@@ -59,7 +60,7 @@ static void toggle_horn_onoff_event_handler(lv_obj_t * obj, lv_event_t event);
 static void toggle_autoconnect_onoff_event_handler(lv_obj_t * obj, lv_event_t event);
 
 void wheel_settings_tile_pre_setup( void ) {
-    watch_settings_register_menu_item(&exit_32px, enter_wheel_setup_event_cb, "wheel settings");
+    eucdash_settings_register_menu_item(&wheel_32px, enter_wheel_setup_event_cb, "wheel settings");
 }
 
 uint32_t wheel_settings_get_tile_num( void ) {
@@ -68,7 +69,7 @@ uint32_t wheel_settings_get_tile_num( void ) {
 
 void wheel_settings_tile_setup() {
     // get an app tile and copy mainstyle
-    wheel_tile_num = watch_get_submenu_tile_num();
+    wheel_tile_num = setup_get_submenu_tile_num();
     wheel_settings_tile = mainbar_get_tile_obj( wheel_tile_num );
     lv_obj_clean(wheel_settings_tile);
     log_i("wheel tile num: %d", wheel_tile_num);
@@ -199,8 +200,7 @@ void wheel_settings_tile_setup() {
 
 static void enter_wheel_setup_event_cb( lv_obj_t * obj, lv_event_t event ) {
     switch( event ) {
-        case( LV_EVENT_CLICKED ):       //mainbar_clear_submenu_tile(watch_get_submenu_tile_num());
-                                        wheel_settings_tile_setup();
+        case( LV_EVENT_CLICKED ):       wheel_settings_tile_setup();
                                         mainbar_jump_to_tilenumber( wheel_tile_num, LV_ANIM_OFF );
                                         break;
     }
@@ -208,7 +208,7 @@ static void enter_wheel_setup_event_cb( lv_obj_t * obj, lv_event_t event ) {
 
 static void exit_wheel_setup_event_cb( lv_obj_t * obj, lv_event_t event ) {
     switch( event ) {
-        case( LV_EVENT_CLICKED ):       mainbar_jump_to_tilenumber( setup_get_tile_num(), LV_ANIM_OFF );
+        case( LV_EVENT_CLICKED ):       mainbar_jump_to_tilenumber( eucdash_get_tile_num(), LV_ANIM_OFF );
                                         wheelctl_save_config();
                                         break;
     }

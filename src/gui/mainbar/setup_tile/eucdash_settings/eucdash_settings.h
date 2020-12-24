@@ -1,6 +1,5 @@
 /****************************************************************************
  *   Copyright  2020  Jesper Ortlund
- *   based on work by Dirk Brosswick 2020
  ****************************************************************************/
 /*
  *  This program is free software; you can redistribute it and/or modify
@@ -17,8 +16,8 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
-#ifndef _WATCH_SETTINGS_H
-    #define _WATCH_SETTINGS_H
+#ifndef _EUCDASH_SETTINGS_H
+    #define _EUCDASH_SETTINGS_H
 
     #include <TTGO.h>
 
@@ -37,24 +36,24 @@
         lv_obj_t *label;
         lv_obj_t *icon;
         lv_obj_t *arrow;
-    } watch_settings_item_t;
+    } eucdash_settings_item_t;
 
     /**
-     * @brief set up the watch settings tile
+     * @brief set up the eucdash settings tile
      */
-    void watch_settings_tile_setup( void );
+    void eucdash_settings_tile_setup( void );
     /**
-     * @brief register a menu item to the watch settings menu
+     * @brief register a menu item to the eucdash settings menu
      * 
      * @param   icon the icon representing the menu item, should be 32x32 px
      * @param   event_cb the callback function to be called when the item is clicked
      * @param   item_label the label text to be shown on the menu item, 2 lines of approx. 16 chars
      * @return  menu entry number
      */
-    uint32_t watch_settings_register_menu_item(const lv_img_dsc_t *icon, lv_event_cb_t event_cb, const char *item_label);
+    uint32_t eucdash_settings_register_menu_item(const lv_img_dsc_t *icon, lv_event_cb_t event_cb, const char *item_label);
 
-    uint32_t watch_get_submenu_tile_num();
+    uint32_t eucdash_get_tile_num();
 
-    uint32_t watch_get_tile_num();
+    uint32_t eucdash_get_submenu_tile_num();
 
-#endif // _WATCH_SETTINGS_TILE_H
+#endif // _EUCDASH_SETTINGS_TILE_H
