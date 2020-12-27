@@ -25,6 +25,7 @@
 #include "gui/mainbar/mainbar.h"
 #include "gui/mainbar/setup_tile/setup_tile.h"
 #include "gui/setup.h"
+#include "gui/mainbar/setup_tile/watch_settings/watch_settings.h"
 
 #include "hardware/blectl.h"
 
@@ -41,7 +42,8 @@ lv_obj_t *bluetooth_advertising_onoff = NULL;
 lv_obj_t *txpower_list = NULL;
 
 LV_IMG_DECLARE(exit_32px);
-LV_IMG_DECLARE(bluetooth_64px);
+//LV_IMG_DECLARE(bluetooth_64px);
+LV_IMG_DECLARE(bluetooth_32px);
 LV_IMG_DECLARE(info_fail_16px);
 
 static void enter_bluetooth_setup_event_cb( lv_obj_t * obj, lv_event_t event );
@@ -51,11 +53,15 @@ static void bluetooth_enable_onoff_event_handler(lv_obj_t * obj, lv_event_t even
 static void bluetooth_standby_onoff_event_handler(lv_obj_t * obj, lv_event_t event);
 static void bluetooth_txpower_event_handler(lv_obj_t * obj, lv_event_t event);
 
+void bluetooth_settings_tile_pre_setup( void ){
+    watch_settings_register_menu_item(&bluetooth_32px, enter_bluetooth_setup_event_cb, "bluetooth settings");
+}
+
 void bluetooth_settings_tile_setup( void ) {
     // get an app tile and copy mainstyle
-    bluetooth_tile_num = mainbar_add_app_tile( 1, 1, "bluetooth setup" );
+    bluetooth_tile_num = setup_get_submenu_tile_num();
     bluetooth_settings_tile = mainbar_get_tile_obj( bluetooth_tile_num );
-
+    lv_obj_clean(bluetooth_settings_tile);
     lv_style_copy( &bluetooth_settings_style, mainbar_get_style() );
     lv_style_set_bg_color( &bluetooth_settings_style, LV_OBJ_PART_MAIN, LV_COLOR_BLACK);
     lv_style_set_bg_opa( &bluetooth_settings_style, LV_OBJ_PART_MAIN, LV_OPA_100);
@@ -66,8 +72,8 @@ void bluetooth_settings_tile_setup( void ) {
 
     lv_obj_add_style( bluetooth_settings_tile, LV_OBJ_PART_MAIN, &bluetooth_settings_style );
 
-    bluettoth_setup_icon = setup_register( "bluetooth", &bluetooth_64px, enter_bluetooth_setup_event_cb );
-    setup_hide_indicator( bluettoth_setup_icon );
+    //bluettoth_setup_icon = setup_register( "bluetooth", &bluetooth_64px, enter_bluetooth_setup_event_cb );
+    //setup_hide_indicator( bluettoth_setup_icon );
 
     lv_obj_t *exit_btn = lv_imgbtn_create( bluetooth_settings_tile, NULL);
     lv_imgbtn_set_src( exit_btn, LV_BTN_STATE_RELEASED, &exit_32px);
@@ -164,14 +170,15 @@ bool blectl_onoff_event_cb( EventBits_t event, void *arg ) {
 
 static void enter_bluetooth_setup_event_cb( lv_obj_t * obj, lv_event_t event ) {
     switch( event ) {
-        case( LV_EVENT_CLICKED ):       mainbar_jump_to_tilenumber( bluetooth_tile_num, LV_ANIM_OFF );
+        case( LV_EVENT_CLICKED ):       bluetooth_settings_tile_setup();
+                                        mainbar_jump_to_tilenumber( bluetooth_tile_num, LV_ANIM_OFF );
                                         break;
     }
 }
 
 static void exit_bluetooth_setup_event_cb( lv_obj_t * obj, lv_event_t event ) {
     switch( event ) {
-        case( LV_EVENT_CLICKED ):       mainbar_jump_to_tilenumber( setup_get_tile_num(), LV_ANIM_OFF );
+        case( LV_EVENT_CLICKED ):       mainbar_jump_to_tilenumber( watch_get_tile_num(), LV_ANIM_OFF );
                                         break;
     }
 }

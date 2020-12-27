@@ -29,6 +29,9 @@
 #include "hardware/motor.h"
 #include "hardware/wheelctl.h"
 
+#include "gui/mainbar/setup_tile/wheel_settings/wheel_settings.h"
+#include "gui/mainbar/setup_tile/dashboard_settings/dashboard_settings.h"
+
 lv_obj_t *eucdash_settings_tile=NULL;
 lv_obj_t *eucdash_submenu_tile=NULL;
 lv_style_t eucdash_settings_style;
@@ -54,7 +57,6 @@ LV_IMG_DECLARE(eucdash_64px);
 
 static void enter_eucdash_setup_event_cb( lv_obj_t * obj, lv_event_t event );
 static void exit_eucdash_setup_event_cb( lv_obj_t * obj, lv_event_t event );
-static void item_1_event_cb(lv_obj_t * obj, lv_event_t event);
 void eucdash_settings_menu_item_setup();
 
 void eucdash_settings_tile_setup( void ) {
@@ -115,7 +117,7 @@ void eucdash_settings_tile_setup( void ) {
     //eucdash_submenu_tile_num = mainbar_add_app_tile( 1, 1, "eucdash submenu" );
     //eucdash_submenu_tile = mainbar_get_tile_obj( eucdash_submenu_tile_num );
 
-    //eucdash_settings_menu_item_setup();
+    eucdash_settings_menu_item_setup();
 }
 
 uint32_t eucdash_get_tile_num(){
@@ -160,9 +162,10 @@ uint32_t eucdash_settings_register_menu_item(const lv_img_dsc_t *icon, lv_event_
     return item_entries - 1;
 }
 
-void eucdash_settings_menu_item_setup() { //just for testing
-    log_i("set up menu item1");
-    eucdash_settings_register_menu_item(&time_32px, item_1_event_cb, "menu item 1\nline2");
+void eucdash_settings_menu_item_setup() { 
+    log_i("wheel settings");
+    wheel_settings_tile_pre_setup();
+    dashboard_settings_tile_pre_setup();
 }
 
 static void enter_eucdash_setup_event_cb( lv_obj_t * obj, lv_event_t event ) {
@@ -175,13 +178,6 @@ static void enter_eucdash_setup_event_cb( lv_obj_t * obj, lv_event_t event ) {
 static void exit_eucdash_setup_event_cb( lv_obj_t * obj, lv_event_t event ) {
     switch( event ) {
         case( LV_EVENT_CLICKED ):       mainbar_jump_to_tilenumber( setup_get_tile_num(), LV_ANIM_OFF );
-                                        break;
-    }
-}
-
-static void item_1_event_cb( lv_obj_t * obj, lv_event_t event ) {
-    switch( event ) {
-        case( LV_EVENT_CLICKED ):      log_i("item 1 clicked");
                                         break;
     }
 }

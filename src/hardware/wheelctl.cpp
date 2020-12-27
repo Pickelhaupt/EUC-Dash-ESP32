@@ -60,7 +60,6 @@ void wheelctl_read_config( void );
 void current_trip_read_data(void);
 void current_trip_save_data(void);
 
-
 bool shakeoff[3] = {true, true, true};
 bool lightsoff = true;
 bool firstrun[WHEELCTL_DATA_NUM];

@@ -29,6 +29,14 @@
 #include "hardware/motor.h"
 #include "hardware/wheelctl.h"
 
+#include "gui/mainbar/setup_tile/bluetooth_settings/bluetooth_settings.h"
+#include "gui/mainbar/setup_tile/battery_settings/battery_settings.h"
+#include "gui/mainbar/setup_tile/battery_settings/battery_view.h"
+#include "gui/mainbar/setup_tile/time_settings/time_settings.h"
+#include "gui/mainbar/setup_tile/display_settings/display_settings.h"
+#include "gui/mainbar/setup_tile/utilities/utilities.h"
+
+
 lv_obj_t *watch_settings_tile=NULL;
 lv_obj_t *watch_submenu_tile=NULL;
 lv_style_t watch_settings_style;
@@ -54,8 +62,6 @@ LV_IMG_DECLARE(watch_64px);
 
 static void enter_watch_setup_event_cb( lv_obj_t * obj, lv_event_t event );
 static void exit_watch_setup_event_cb( lv_obj_t * obj, lv_event_t event );
-static void item_1_event_cb(lv_obj_t * obj, lv_event_t event);
-static void item_2_event_cb(lv_obj_t * obj, lv_event_t event);
 void watch_settings_menu_item_setup();
 
 void watch_settings_tile_setup( void ) {
@@ -116,7 +122,7 @@ void watch_settings_tile_setup( void ) {
     //watch_submenu_tile_num = mainbar_add_app_tile( 1, 1, "watch submenu" );
     //watch_submenu_tile = mainbar_get_tile_obj( watch_submenu_tile_num );
 
-    //watch_settings_menu_item_setup();
+    watch_settings_menu_item_setup();
 }
 
 uint32_t watch_get_tile_num(){
@@ -162,8 +168,15 @@ uint32_t watch_settings_register_menu_item(const lv_img_dsc_t *icon, lv_event_cb
 }
 
 void watch_settings_menu_item_setup() { //just for testing
-    log_i("set up menu item1");
-    watch_settings_register_menu_item(&time_32px, item_1_event_cb, "menu item 1\nline2");
+    display_settings_tile_pre_setup();
+    log_i("battery settings");
+    battery_view_tile_pre_setup();
+    battery_settings_tile_pre_setup();
+    log_i("time settings");
+    time_settings_tile_pre_setup();
+    log_i("ble settings");
+    bluetooth_settings_tile_pre_setup();
+    utilities_tile_pre_setup();
 }
 
 static void enter_watch_setup_event_cb( lv_obj_t * obj, lv_event_t event ) {
@@ -176,20 +189,6 @@ static void enter_watch_setup_event_cb( lv_obj_t * obj, lv_event_t event ) {
 static void exit_watch_setup_event_cb( lv_obj_t * obj, lv_event_t event ) {
     switch( event ) {
         case( LV_EVENT_CLICKED ):       mainbar_jump_to_tilenumber( setup_get_tile_num(), LV_ANIM_OFF );
-                                        break;
-    }
-}
-
-static void item_1_event_cb( lv_obj_t * obj, lv_event_t event ) {
-    switch( event ) {
-        case( LV_EVENT_CLICKED ):      log_i("item 1 clicked");
-                                        break;
-    }
-}
-
-static void item_2_event_cb( lv_obj_t * obj, lv_event_t event ) {
-    switch( event ) {
-        case( LV_EVENT_CLICKED ):      log_i("item 2 clicked");
                                         break;
     }
 }

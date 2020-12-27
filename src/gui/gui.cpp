@@ -37,6 +37,7 @@
 #include "mainbar/wheelinfo_tile/wheelinfo_tile.h"
 
 #include "mainbar/setup_tile/battery_settings/battery_settings.h"
+#include "mainbar/setup_tile/battery_settings/battery_view.h"
 #include "mainbar/setup_tile/display_settings/display_settings.h"
 #include "mainbar/setup_tile/wheel_settings/wheel_settings.h"
 #include "mainbar/setup_tile/time_settings/time_settings.h"
@@ -78,30 +79,23 @@ void gui_setup( void )
     
 
     /* add setup screens */
-    log_i("adding setup screens");
-    setup_add_submenu_tile();
-    log_i("battery settings");
-    battery_settings_tile_setup();
-    log_i("display settings");
-    display_settings_tile_setup();
     log_i("watch settings");
     watch_settings_tile_setup();
     log_i("eucdash settings");
     eucdash_settings_tile_setup();
-    log_i("wheel settings");
-    wheel_settings_tile_pre_setup();
+    log_i("adding setup screens");
+    setup_add_submenu_tile();
     log_i("wlan settings");
     wlan_settings_tile_setup();
-    log_i("ble settings");
-    bluetooth_settings_tile_setup();
-    log_i("time settings");
-    time_settings_tile_pre_setup();
+    
+    //log_i("display settings");
+    //display_settings_tile_setup();
+    //log_i("utilities settings");
+    //utilities_tile_setup();
     //update_tile_setup();
     
-    log_i("utilities settings");
-    utilities_tile_setup();
-    log_i("dashboard settings");
-    dashboard_settings_tile_setup();
+
+
 
     lv_disp_trig_activity( NULL );
      log_i("setting up keyboard");

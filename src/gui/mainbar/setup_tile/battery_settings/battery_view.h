@@ -24,6 +24,8 @@
 
     #include <TTGO.h>
 
-    void battery_view_tile_setup( uint32_t tile_num );
+    void battery_view_tile_setup( void );
+    void battery_view_tile_pre_setup( void );
+    uint32_t battery_view_get_tile_num( void );
 
 #endif // _BATTERY_VIEW_H

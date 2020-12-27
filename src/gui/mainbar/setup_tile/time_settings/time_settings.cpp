@@ -87,10 +87,11 @@ static void setup_timezone_data( char * selected_timezone ) {
 
 void time_settings_tile_pre_setup( void ) {
     watch_settings_register_menu_item(&time_32px, enter_time_setup_event_cb, "time settings");
+    setup_timezone_data( timesync_get_timezone_name() );
 }
 
 void time_settings_tile_setup( void ) {
-    setup_timezone_data( timesync_get_timezone_name() );
+    //setup_timezone_data( timesync_get_timezone_name() );
 
     // get an app tile and copy mainstyle
     time_tile_num = setup_get_submenu_tile_num();

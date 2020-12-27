@@ -22,11 +22,14 @@
 #include "config.h"
 #include <TTGO.h>
 #include "battery_settings.h"
+#include "battery_view.h"
 
 #include "gui/mainbar/mainbar.h"
 #include "gui/mainbar/setup_tile/setup_tile.h"
+#include "gui/setup.h"
 #include "hardware/pmu.h"
 #include "hardware/motor.h"
+#include "gui/mainbar/setup_tile/watch_settings/watch_settings.h"
 
 lv_obj_t *battery_view_tile=NULL;
 lv_style_t battery_view_style;
@@ -41,20 +44,32 @@ lv_obj_t *charge_view_current;
 lv_obj_t *discharge_view_current;
 lv_obj_t *vbus_view_voltage;
 lv_task_t *battery_view_task;
+bool battery_view_task_running = false;
+bool battery_view_active = false;
 
 LV_IMG_DECLARE(exit_32px);
 LV_IMG_DECLARE(setup_32px);
+LV_IMG_DECLARE(battery_32px);
 
-static void enter_battery_settings_event_cb( lv_obj_t * obj, lv_event_t event );
+static void enter_battery_view_event_cb( lv_obj_t * obj, lv_event_t event );
 static void exit_battery_view_event_cb( lv_obj_t * obj, lv_event_t event );
 void battery_view_update_task( lv_task_t *task );
 void battery_activate_cb( void );
 void battery_hibernate_cb( void );
 
-void battery_view_tile_setup( uint32_t tile_num ) {
+void battery_view_tile_pre_setup( void ) {
+    watch_settings_register_menu_item(&battery_32px, enter_battery_view_event_cb, "view battery info");
+}
+
+uint32_t battery_view_get_tile_num( void ) {
+    return battery_view_tile_num;
+}
+
+void battery_view_tile_setup( void ) {
     // get an app tile and copy mainstyle
-    battery_view_tile_num = tile_num;
+    battery_view_tile_num = setup_get_submenu_tile_num();
     battery_view_tile = mainbar_get_tile_obj( battery_view_tile_num );
+    lv_obj_clean(battery_view_tile);
 
     lv_style_copy( &battery_view_style, mainbar_get_style() );
     lv_style_set_bg_color( &battery_view_style, LV_OBJ_PART_MAIN, LV_COLOR_BLACK);
@@ -79,14 +94,6 @@ void battery_view_tile_setup( uint32_t tile_num ) {
     lv_obj_set_event_cb( exit_btn, exit_battery_view_event_cb );
     
     // create the battery settings */
-    lv_obj_t *setup_btn = lv_imgbtn_create( battery_view_tile, NULL);
-    lv_imgbtn_set_src( setup_btn, LV_BTN_STATE_RELEASED, &setup_32px);
-    lv_imgbtn_set_src( setup_btn, LV_BTN_STATE_PRESSED, &setup_32px);
-    lv_imgbtn_set_src( setup_btn, LV_BTN_STATE_CHECKED_RELEASED, &setup_32px);
-    lv_imgbtn_set_src( setup_btn, LV_BTN_STATE_CHECKED_PRESSED, &setup_32px);
-    lv_obj_add_style( setup_btn, LV_IMGBTN_PART_MAIN, &battery_view_style );
-    lv_obj_align( setup_btn, battery_view_tile, LV_ALIGN_IN_TOP_RIGHT, -10, 10 );
-    lv_obj_set_event_cb( setup_btn, enter_battery_settings_event_cb );
 
     lv_obj_t *exit_label = lv_label_create( battery_view_tile, NULL);
     lv_obj_add_style( exit_label, LV_OBJ_PART_MAIN, &battery_view_heading_style );
@@ -172,22 +179,28 @@ void battery_view_tile_setup( uint32_t tile_num ) {
     lv_obj_align( vbus_view_voltage, vbus_voltage_cont, LV_ALIGN_IN_RIGHT_MID, -5, 0 );
 
     mainbar_add_tile_activate_cb( battery_view_tile_num, battery_activate_cb );
-    mainbar_add_tile_activate_cb( battery_view_tile_num + 1, battery_activate_cb );
     mainbar_add_tile_hibernate_cb( battery_view_tile_num, battery_hibernate_cb );
-    mainbar_add_tile_hibernate_cb( battery_view_tile_num + 1, battery_hibernate_cb );
 }
 
 void battery_activate_cb( void ) {
-    battery_view_task = lv_task_create(battery_view_update_task, 1000,  LV_TASK_PRIO_LOWEST, NULL );
+    if( !battery_view_task_running && battery_view_active) {
+        battery_view_task = lv_task_create(battery_view_update_task, 1000,  LV_TASK_PRIO_LOWEST, NULL );
+        battery_view_task_running = true;
+    }
 }
 
 void battery_hibernate_cb( void ) {
-    lv_task_del( battery_view_task );
+    if( battery_view_task_running ) {
+        lv_task_del( battery_view_task );
+        battery_view_task_running = false;
+    }
 }
 
-static void enter_battery_settings_event_cb( lv_obj_t * obj, lv_event_t event ) {
+static void enter_battery_view_event_cb( lv_obj_t * obj, lv_event_t event ) {
     switch( event ) {
-        case( LV_EVENT_CLICKED ):       mainbar_jump_to_tilenumber( battery_view_tile_num + 1, LV_ANIM_OFF );
+        case( LV_EVENT_CLICKED ):       battery_view_tile_setup();
+                                        battery_view_active = true;
+                                        mainbar_jump_to_tilenumber( battery_view_tile_num, LV_ANIM_OFF );
                                         break;
     }
 
@@ -195,11 +208,11 @@ static void enter_battery_settings_event_cb( lv_obj_t * obj, lv_event_t event ) 
 
 static void exit_battery_view_event_cb( lv_obj_t * obj, lv_event_t event ) {
     switch( event ) {
-        case( LV_EVENT_CLICKED ):       mainbar_jump_to_tilenumber( setup_get_tile_num() , LV_ANIM_OFF );
+        case( LV_EVENT_CLICKED ):       mainbar_jump_to_tilenumber( watch_get_tile_num(), LV_ANIM_OFF );
+                                        battery_view_active = false;
                                         break;
     }
 }
-
 
 void battery_view_update_task( lv_task_t *task ) {
     char temp[16]="";

@@ -23,4 +23,7 @@
 
     void dashboard_settings_tile_setup( void );
 
+    void dashboard_settings_tile_pre_setup( void );
+    uint32_t dashboard_settings_get_tile_num( void );
+
 #endif // _DASH_SETTINGS_TILE_H
