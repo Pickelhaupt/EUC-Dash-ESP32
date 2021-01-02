@@ -28,14 +28,18 @@
 #include "gui/setup.h"
 #include "hardware/timesync.h"
 #include "hardware/motor.h"
+#include "gui/mainbar/setup_tile/watch_settings/watch_settings.h"
 
 #include "hardware/json_psram_allocator.h"
 // Source: https://raw.githubusercontent.com/nayarsystems/posix_tz_db/master/zones.json
 // 2020a-1
 extern const uint8_t timezones_json_start[] asm("_binary_src_gui_mainbar_setup_tile_time_settings_timezones_json_start");
 extern const uint8_t timezones_json_end[] asm("_binary_src_gui_mainbar_setup_tile_time_settings_timezones_json_end");
-const size_t capacity = JSON_OBJECT_SIZE(460) + 14920;
-const char * timezone_options;
+const size_t capacity = JSON_OBJECT_SIZE(84) + 3200;
+const size_t cap2 = JSON_OBJECT_SIZE(10) + 320;
+//const char * timezone_options;
+bool timezone_options = false;
+String zones = String("");
 uint16_t timezone_selected_index;
 
 lv_obj_t *time_settings_tile=NULL;
@@ -58,7 +62,7 @@ static void utczone_event_handler(lv_obj_t * obj, lv_event_t event);
 static void clock_fmt_onoff_event_handler(lv_obj_t * obj, lv_event_t event);
 
 static void setup_timezone_data( char * selected_timezone ) {
-    String zones = String("");
+    //String zones = String("");
     if (timezone_options) return;
     SpiRamJsonDocument doc( capacity );
     DeserializationError error = deserializeJson( doc, (const char *)timezones_json_start );
@@ -77,19 +81,28 @@ static void setup_timezone_data( char * selected_timezone ) {
             if (strcmp(k, selected_timezone) == 0) {
                 timezone_selected_index = current_index;
             }
-            current_index++;
+            //log_i("TZ: %s index: %d", k, current_index);
+            current_index++;      
         }
     }
     doc.clear();
-    timezone_options = zones.c_str();
+    //timezone_options = zones.c_str();
+    timezone_options = true;
+    //log_i("timezone_options:\n%s", timezone_options);
+}
+
+void time_settings_tile_pre_setup( void ) {
+    watch_settings_register_menu_item(&time_32px, enter_time_setup_event_cb, "time settings");
+    setup_timezone_data( timesync_get_timezone_name() );
 }
 
 void time_settings_tile_setup( void ) {
-    setup_timezone_data( timesync_get_timezone_name() );
+    //setup_timezone_data( timesync_get_timezone_name() );
 
     // get an app tile and copy mainstyle
-    time_tile_num = mainbar_add_app_tile( 1, 1, "time setup" );
+    time_tile_num = setup_get_submenu_tile_num();
     time_settings_tile = mainbar_get_tile_obj( time_tile_num );
+    lv_obj_clean(time_settings_tile);
     lv_style_copy( &time_settings_style, mainbar_get_style() );
     lv_style_set_bg_color( &time_settings_style, LV_OBJ_PART_MAIN, LV_COLOR_BLACK);
     lv_style_set_bg_opa( &time_settings_style, LV_OBJ_PART_MAIN, LV_OPA_100);
@@ -100,8 +113,8 @@ void time_settings_tile_setup( void ) {
     
     lv_obj_add_style( time_settings_tile, LV_OBJ_PART_MAIN, &time_settings_style );
 
-    icon_t *time_setup_icon = setup_register( "time", &time_64px, enter_time_setup_event_cb );
-    setup_hide_indicator( time_setup_icon );
+    //icon_t *time_setup_icon = setup_register( "time", &time_64px, enter_time_setup_event_cb );
+    //setup_hide_indicator( time_setup_icon );
 
     lv_obj_t *exit_btn = lv_imgbtn_create( time_settings_tile, NULL);
     lv_imgbtn_set_src( exit_btn, LV_BTN_STATE_RELEASED, &exit_32px);
@@ -159,7 +172,10 @@ void time_settings_tile_setup( void ) {
     lv_obj_align( timezone_label, timezone_cont, LV_ALIGN_CENTER, 0, -15 );
 
     utczone_list = lv_dropdown_create( timezone_cont, NULL);
-    lv_dropdown_set_options( utczone_list, timezone_options );
+    //log_i("timezone_options in dropdown:\n%s", zones.c_str());
+    lv_dropdown_set_options( utczone_list, zones.c_str() );
+    //log_i("timezone_options in dropdown:\n%s", timezone_options);
+    //lv_dropdown_set_options( utczone_list, timezone_options );
     lv_obj_set_size( utczone_list, lv_disp_get_hor_res( NULL )-20, 35 );
     lv_obj_align( utczone_list, timezone_cont, LV_ALIGN_IN_BOTTOM_MID, 0, 0 );
     lv_obj_set_event_cb(utczone_list, utczone_event_handler);
@@ -179,14 +195,15 @@ void time_settings_tile_setup( void ) {
 
 static void enter_time_setup_event_cb( lv_obj_t * obj, lv_event_t event ) {
     switch( event ) {
-        case( LV_EVENT_CLICKED ):       mainbar_jump_to_tilenumber( time_tile_num, LV_ANIM_OFF );
+        case( LV_EVENT_CLICKED ):       time_settings_tile_setup();
+                                        mainbar_jump_to_tilenumber( time_tile_num, LV_ANIM_OFF );
                                         break;
     }
 }
 
 static void exit_time_setup_event_cb( lv_obj_t * obj, lv_event_t event ) {
     switch( event ) {
-        case( LV_EVENT_CLICKED ):       mainbar_jump_to_tilenumber( setup_get_tile_num(), LV_ANIM_OFF );
+        case( LV_EVENT_CLICKED ):       mainbar_jump_to_tilenumber( watch_get_tile_num(), LV_ANIM_OFF );
                                         break;
     }
 }

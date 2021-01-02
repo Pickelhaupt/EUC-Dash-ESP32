@@ -1,9 +1,7 @@
 /****************************************************************************
- *   Tu May 22 21:23:51 2020
- *   Copyright  2020  Dirk Brosswick
- *   Email: dirk.brosswick@googlemail.com
+ *   Copyright  2020  Jesper Ortlund
+ *   based on work by Dirk Brosswick 2020
  ****************************************************************************/
- 
 /*
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -24,6 +22,7 @@
 
 #include "gui/mainbar/mainbar.h"
 #include "gui/mainbar/setup_tile/setup_tile.h"
+#include "gui/mainbar/setup_tile/eucdash_settings/eucdash_settings.h"
 #include "gui/setup.h"
 
 #include "hardware/bma.h"
@@ -51,6 +50,7 @@ lv_obj_t *eight_onoff=NULL;
 
 LV_IMG_DECLARE(exit_32px);
 LV_IMG_DECLARE(wheel_64px);
+LV_IMG_DECLARE(wheel_32px);
 
 static void enter_wheel_setup_event_cb( lv_obj_t * obj, lv_event_t event );
 static void exit_wheel_setup_event_cb( lv_obj_t * obj, lv_event_t event );
@@ -59,10 +59,20 @@ static void toggle_leds_onoff_event_handler(lv_obj_t * obj, lv_event_t event);
 static void toggle_horn_onoff_event_handler(lv_obj_t * obj, lv_event_t event);
 static void toggle_autoconnect_onoff_event_handler(lv_obj_t * obj, lv_event_t event);
 
-void wheel_settings_tile_setup( void ) {
+void wheel_settings_tile_pre_setup( void ) {
+    eucdash_settings_register_menu_item(&wheel_32px, enter_wheel_setup_event_cb, "wheel settings");
+}
+
+uint32_t wheel_settings_get_tile_num( void ) {
+    return wheel_tile_num;
+}
+
+void wheel_settings_tile_setup() {
     // get an app tile and copy mainstyle
-    wheel_tile_num = mainbar_add_app_tile( 1, 1, "wheel settings" );
+    wheel_tile_num = setup_get_submenu_tile_num();
     wheel_settings_tile = mainbar_get_tile_obj( wheel_tile_num );
+    lv_obj_clean(wheel_settings_tile);
+    log_i("wheel tile num: %d", wheel_tile_num);
     lv_style_copy( &wheel_settings_style, mainbar_get_style() );
     lv_style_set_bg_color( &wheel_settings_style, LV_OBJ_PART_MAIN, LV_COLOR_BLACK);
     lv_style_set_bg_opa( &wheel_settings_style, LV_OBJ_PART_MAIN, LV_OPA_100);
@@ -73,8 +83,8 @@ void wheel_settings_tile_setup( void ) {
 
     lv_obj_add_style( wheel_settings_tile, LV_OBJ_PART_MAIN, &wheel_settings_style );
 
-    icon_t *wheel_setup_icon = setup_register( "wheel", &wheel_64px, enter_wheel_setup_event_cb );
-    setup_hide_indicator( wheel_setup_icon );
+    //icon_t *wheel_setup_icon = setup_register( "wheel", &wheel_64px, enter_wheel_setup_event_cb );
+    //setup_hide_indicator( wheel_setup_icon );
 
     lv_obj_t *exit_btn = lv_imgbtn_create( wheel_settings_tile, NULL);
     lv_imgbtn_set_src( exit_btn, LV_BTN_STATE_RELEASED, &exit_32px);
@@ -190,14 +200,15 @@ void wheel_settings_tile_setup( void ) {
 
 static void enter_wheel_setup_event_cb( lv_obj_t * obj, lv_event_t event ) {
     switch( event ) {
-        case( LV_EVENT_CLICKED ):       mainbar_jump_to_tilenumber( wheel_tile_num, LV_ANIM_OFF );
+        case( LV_EVENT_CLICKED ):       wheel_settings_tile_setup();
+                                        mainbar_jump_to_tilenumber( wheel_tile_num, LV_ANIM_OFF );
                                         break;
     }
 }
 
 static void exit_wheel_setup_event_cb( lv_obj_t * obj, lv_event_t event ) {
     switch( event ) {
-        case( LV_EVENT_CLICKED ):       mainbar_jump_to_tilenumber( setup_get_tile_num(), LV_ANIM_OFF );
+        case( LV_EVENT_CLICKED ):       mainbar_jump_to_tilenumber( eucdash_get_tile_num(), LV_ANIM_OFF );
                                         wheelctl_save_config();
                                         break;
     }

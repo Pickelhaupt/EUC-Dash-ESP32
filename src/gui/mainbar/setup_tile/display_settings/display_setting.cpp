@@ -24,6 +24,7 @@
 
 #include "gui/mainbar/mainbar.h"
 #include "gui/mainbar/setup_tile/setup_tile.h"
+#include "gui/mainbar/setup_tile/watch_settings/watch_settings.h"
 
 #include "gui/setup.h"
 #include "gui/gui.h"
@@ -36,11 +37,13 @@
 icon_t *display_setup_icon = NULL;
 
 lv_obj_t *display_settings_tile_1 = NULL;
-lv_obj_t *display_settings_tile_2 = NULL;
+//lv_obj_t *display_settings_tile_2 = NULL;
 lv_style_t display_settings_style;
 lv_style_t display_settings_heading_style;
+lv_style_t display_page_style;
+lv_style_t display_page_edge_style;
 uint32_t display_tile_num_1;
-uint32_t display_tile_num_2;
+//uint32_t display_tile_num_2;
 
 lv_obj_t *display_brightness_slider = NULL;
 lv_obj_t *display_timeout_slider = NULL;
@@ -66,8 +69,6 @@ LV_FONT_DECLARE(DIN1451_m_cond_28);
 
 static void enter_display_setup_event_cb( lv_obj_t * obj, lv_event_t event );
 static void exit_display_setup_event_cb( lv_obj_t * obj, lv_event_t event );
-static void down_display_setup_event_cb( lv_obj_t * obj, lv_event_t event );
-static void up_display_setup_event_cb( lv_obj_t * obj, lv_event_t event );
 bool display_displayctl_brightness_event_cb( EventBits_t event, void *arg );
 static void display_brightness_setup_event_cb( lv_obj_t * obj, lv_event_t event );
 static void display_timeout_setup_event_cb( lv_obj_t * obj, lv_event_t event );
@@ -78,12 +79,19 @@ static void display_block_return_maintile_setup_event_cb( lv_obj_t * obj, lv_eve
 static void doubleclick_onoff_event_handler(lv_obj_t * obj, lv_event_t event);
 static void tilt_onoff_event_handler(lv_obj_t * obj, lv_event_t event);
 
+void display_settings_tile_pre_setup( void ){
+    watch_settings_register_menu_item(&brightness_32px, enter_display_setup_event_cb, "display settings");
+}
+
 void display_settings_tile_setup( void ) {
     // get an app tile and copy mainstyle
-    display_tile_num_1 = mainbar_add_app_tile( 1, 2, "display settings" );
-    display_tile_num_2 = display_tile_num_1 + 1;
+    display_tile_num_1 = setup_get_submenu_tile_num();
     display_settings_tile_1 = mainbar_get_tile_obj( display_tile_num_1 );
-    display_settings_tile_2 = mainbar_get_tile_obj( display_tile_num_2 );
+    lv_obj_clean(display_settings_tile_1);
+    //display_tile_num_1 = mainbar_add_app_tile( 1, 2, "display settings" );
+    //display_tile_num_2 = display_tile_num_1 + 1;
+    //display_settings_tile_1 = mainbar_get_tile_obj( display_tile_num_1 );
+    //display_settings_tile_2 = mainbar_get_tile_obj( display_tile_num_2 );
 
     lv_style_copy( &display_settings_style, mainbar_get_style() );
     lv_style_set_bg_color( &display_settings_style, LV_OBJ_PART_MAIN, LV_COLOR_BLACK);
@@ -95,10 +103,10 @@ void display_settings_tile_setup( void ) {
     lv_style_set_text_color( &display_settings_heading_style, LV_OBJ_PART_MAIN, LV_COLOR_WHITE );
 
     lv_obj_add_style( display_settings_tile_1, LV_OBJ_PART_MAIN, &display_settings_style );
-    lv_obj_add_style( display_settings_tile_2, LV_OBJ_PART_MAIN, &display_settings_style );
+    //lv_obj_add_style( display_settings_tile_2, LV_OBJ_PART_MAIN, &display_settings_style );
 
-    display_setup_icon = setup_register( "display", &brightness_64px, enter_display_setup_event_cb );
-    setup_hide_indicator( display_setup_icon );
+    //display_setup_icon = setup_register( "display", &brightness_64px, enter_display_setup_event_cb );
+    //setup_hide_indicator( display_setup_icon );
 
     lv_obj_t *exit_btn_1 = lv_imgbtn_create( display_settings_tile_1, NULL);
     lv_imgbtn_set_src( exit_btn_1, LV_BTN_STATE_RELEASED, &exit_32px);
@@ -108,7 +116,7 @@ void display_settings_tile_setup( void ) {
     lv_obj_add_style( exit_btn_1, LV_IMGBTN_PART_MAIN, &display_settings_style );
     lv_obj_align( exit_btn_1, display_settings_tile_1, LV_ALIGN_IN_TOP_LEFT, 10, 10 );
     lv_obj_set_event_cb( exit_btn_1, exit_display_setup_event_cb );
-    
+    /*
     lv_obj_t *down_btn_1 = lv_imgbtn_create( display_settings_tile_1, NULL);
     lv_imgbtn_set_src( down_btn_1, LV_BTN_STATE_RELEASED, &down_32px);
     lv_imgbtn_set_src( down_btn_1, LV_BTN_STATE_PRESSED, &down_32px);
@@ -117,12 +125,14 @@ void display_settings_tile_setup( void ) {
     lv_obj_add_style( down_btn_1, LV_IMGBTN_PART_MAIN, &display_settings_style );
     lv_obj_align( down_btn_1, display_settings_tile_1, LV_ALIGN_IN_TOP_RIGHT, -10, 10 );
     lv_obj_set_event_cb( down_btn_1, down_display_setup_event_cb );
+    */
 
     lv_obj_t *exit_label_1 = lv_label_create( display_settings_tile_1, NULL );
     lv_obj_add_style( exit_label_1, LV_OBJ_PART_MAIN, &display_settings_heading_style  );
     lv_label_set_text( exit_label_1, "display settings");
     lv_obj_align( exit_label_1, display_settings_tile_1, LV_ALIGN_IN_TOP_MID, 0, 15 );
 
+    /*
     lv_obj_t *up_btn_1 = lv_imgbtn_create( display_settings_tile_2, NULL);
     lv_imgbtn_set_src( up_btn_1, LV_BTN_STATE_RELEASED, &up_32px);
     lv_imgbtn_set_src( up_btn_1, LV_BTN_STATE_PRESSED, &up_32px);
@@ -131,9 +141,23 @@ void display_settings_tile_setup( void ) {
     lv_obj_add_style( up_btn_1, LV_IMGBTN_PART_MAIN, &display_settings_style );
     lv_obj_align( up_btn_1, display_settings_tile_2, LV_ALIGN_IN_TOP_RIGHT, -10, 10 );
     lv_obj_set_event_cb( up_btn_1, up_display_setup_event_cb );
+    */
+
+    lv_style_copy( &display_page_style, &display_settings_style );
+    lv_style_set_pad_all(&display_page_style, LV_STATE_DEFAULT, 0);
+    lv_style_copy( &display_page_edge_style, &display_page_style );
+    lv_style_set_bg_color(&display_page_edge_style, LV_STATE_DEFAULT, LV_COLOR_GRAY);
+    lv_style_set_bg_opa(&display_page_edge_style, LV_STATE_DEFAULT, 30);
+    lv_obj_t *display_page = lv_page_create( display_settings_tile_1, NULL);
+    lv_obj_set_size(display_page, lv_disp_get_hor_res( NULL ), 195);
+    //lv_page_set_scrl_width(display_page, 215);
+    lv_page_set_edge_flash(display_page, true);
+    lv_obj_add_style(display_page, LV_OBJ_PART_MAIN, &display_page_style );
+    lv_obj_add_style(display_page, LV_PAGE_PART_EDGE_FLASH, &display_page_edge_style );
+    lv_obj_align( display_page, display_settings_tile_1, LV_ALIGN_IN_TOP_MID, 0, 45 );
     
-    lv_obj_t *brightness_cont = lv_obj_create( display_settings_tile_1, NULL );
-    lv_obj_set_size( brightness_cont, lv_disp_get_hor_res( NULL ) , 48 );
+    lv_obj_t *brightness_cont = lv_obj_create( display_page, NULL );
+    lv_obj_set_size( brightness_cont, lv_disp_get_hor_res( NULL ) - 10, 48 );
     lv_obj_add_style( brightness_cont, LV_OBJ_PART_MAIN, &display_settings_style  );
     lv_obj_align( brightness_cont, display_settings_tile_1, LV_ALIGN_IN_TOP_RIGHT, 0, 55 );
     display_brightness_slider = lv_slider_create( brightness_cont, NULL );
@@ -148,8 +172,8 @@ void display_settings_tile_setup( void ) {
     lv_img_set_src( brightness_icon, &brightness_32px );
     lv_obj_align( brightness_icon, brightness_cont, LV_ALIGN_IN_LEFT_MID, 15, 0 );
 
-    lv_obj_t *timeout_cont = lv_obj_create( display_settings_tile_1, NULL );
-    lv_obj_set_size( timeout_cont, lv_disp_get_hor_res( NULL ) , 58 );
+    lv_obj_t *timeout_cont = lv_obj_create( display_page, NULL );
+    lv_obj_set_size( timeout_cont, lv_disp_get_hor_res( NULL ) - 10, 58 );
     lv_obj_add_style( timeout_cont, LV_OBJ_PART_MAIN, &display_settings_style  );
     lv_obj_align( timeout_cont, brightness_cont, LV_ALIGN_OUT_BOTTOM_MID, 0, 10 );
     display_timeout_slider = lv_slider_create( timeout_cont, NULL );
@@ -168,8 +192,8 @@ void display_settings_tile_setup( void ) {
     lv_img_set_src( timeout_icon, &time_32px );
     lv_obj_align( timeout_icon, timeout_cont, LV_ALIGN_IN_TOP_LEFT, 15, 0 );
 
-    lv_obj_t *rotation_cont = lv_obj_create( display_settings_tile_1, NULL );
-    lv_obj_set_size(rotation_cont, lv_disp_get_hor_res( NULL ) , 40 );
+    lv_obj_t *rotation_cont = lv_obj_create( display_page, NULL );
+    lv_obj_set_size(rotation_cont, lv_disp_get_hor_res( NULL ) - 10, 40 );
     lv_obj_add_style( rotation_cont, LV_OBJ_PART_MAIN, &display_settings_style  );
     lv_obj_align( rotation_cont, display_settings_tile_1, LV_ALIGN_IN_BOTTOM_MID, 0, -15 );
     lv_obj_t *display_rotation_label = lv_label_create( rotation_cont, NULL );
@@ -182,10 +206,10 @@ void display_settings_tile_setup( void ) {
     lv_obj_align( display_rotation_list, rotation_cont, LV_ALIGN_IN_RIGHT_MID, -5, 0 );
     lv_obj_set_event_cb(display_rotation_list, display_rotation_event_handler);
 
-    lv_obj_t *vibe_cont = lv_obj_create( display_settings_tile_2, NULL );
-    lv_obj_set_size(vibe_cont, lv_disp_get_hor_res( NULL ) , 40);
+    lv_obj_t *vibe_cont = lv_obj_create( display_page, NULL );
+    lv_obj_set_size(vibe_cont, lv_disp_get_hor_res( NULL ) - 10, 40);
     lv_obj_add_style( vibe_cont, LV_OBJ_PART_MAIN, &display_settings_style );
-    lv_obj_align( vibe_cont, display_settings_tile_2, LV_ALIGN_IN_TOP_RIGHT, 0, 50 );
+    lv_obj_align( vibe_cont, rotation_cont, LV_ALIGN_OUT_BOTTOM_MID, 0, 0 );
     display_vibe_onoff = lv_switch_create( vibe_cont, NULL );
     lv_obj_add_protect( display_vibe_onoff, LV_PROTECT_CLICK_FOCUS);
     lv_obj_add_style( display_vibe_onoff, LV_SWITCH_PART_INDIC, mainbar_get_switch_style() );
@@ -198,8 +222,8 @@ void display_settings_tile_setup( void ) {
     lv_label_set_text( display_vibe_label, "vibe feedback");
     lv_obj_align( display_vibe_label, vibe_cont, LV_ALIGN_IN_LEFT_MID, 5, 0 );
 
-    lv_obj_t *block_return_maintile_cont = lv_obj_create( display_settings_tile_2, NULL );
-    lv_obj_set_size(block_return_maintile_cont, lv_disp_get_hor_res( NULL ) , 40 );
+    lv_obj_t *block_return_maintile_cont = lv_obj_create( display_page, NULL );
+    lv_obj_set_size(block_return_maintile_cont, lv_disp_get_hor_res( NULL ) - 10, 40 );
     lv_obj_add_style( block_return_maintile_cont, LV_OBJ_PART_MAIN, &display_settings_style  );
     lv_obj_align( block_return_maintile_cont, vibe_cont, LV_ALIGN_OUT_BOTTOM_MID, 0, 0 );
     display_block_return_maintile_onoff = lv_switch_create( block_return_maintile_cont, NULL );
@@ -214,8 +238,8 @@ void display_settings_tile_setup( void ) {
     lv_label_set_text( display_block_return_maintile_label, "block return maintile" );
     lv_obj_align( display_block_return_maintile_label, block_return_maintile_cont, LV_ALIGN_IN_LEFT_MID, 5, 0 );
 
-    lv_obj_t *doubleclick_cont = lv_obj_create( display_settings_tile_2, NULL );
-    lv_obj_set_size(doubleclick_cont, lv_disp_get_hor_res( NULL ) , 40);
+    lv_obj_t *doubleclick_cont = lv_obj_create( display_page, NULL );
+    lv_obj_set_size(doubleclick_cont, lv_disp_get_hor_res( NULL ) - 10, 40);
     lv_obj_add_style( doubleclick_cont, LV_OBJ_PART_MAIN, &display_settings_style  );
     lv_obj_align( doubleclick_cont, block_return_maintile_cont, LV_ALIGN_OUT_BOTTOM_MID, 0, 0 );
     doubleclick_onoff = lv_switch_create( doubleclick_cont, NULL );
@@ -229,8 +253,8 @@ void display_settings_tile_setup( void ) {
     lv_label_set_text( doubleclick_label, "doubletap to wake");
     lv_obj_align( doubleclick_label, doubleclick_cont, LV_ALIGN_IN_LEFT_MID, 5, 0 );
 
-    lv_obj_t *tilt_cont = lv_obj_create( display_settings_tile_2, NULL );
-    lv_obj_set_size(tilt_cont, lv_disp_get_hor_res( NULL ) , 40);
+    lv_obj_t *tilt_cont = lv_obj_create( display_page, NULL );
+    lv_obj_set_size(tilt_cont, lv_disp_get_hor_res( NULL ) - 10, 40);
     lv_obj_add_style( tilt_cont, LV_OBJ_PART_MAIN, &display_settings_style  );
     lv_obj_align( tilt_cont, doubleclick_cont, LV_ALIGN_OUT_BOTTOM_MID, 0, 0 );
     tilt_onoff = lv_switch_create( tilt_cont, NULL );
@@ -295,13 +319,13 @@ void display_settings_tile_setup( void ) {
     else
         lv_switch_off( tilt_onoff, LV_ANIM_OFF );
     
-    lv_tileview_add_element( display_settings_tile_1, brightness_cont );
-    lv_tileview_add_element( display_settings_tile_1, timeout_cont );
-    lv_tileview_add_element( display_settings_tile_1, rotation_cont );
-    lv_tileview_add_element( display_settings_tile_2, vibe_cont );
-    lv_tileview_add_element( display_settings_tile_2, block_return_maintile_cont );
-    lv_tileview_add_element( display_settings_tile_2, tilt_cont );
-    lv_tileview_add_element( display_settings_tile_2, doubleclick_cont );
+    lv_tileview_add_element( display_page, brightness_cont );
+    lv_tileview_add_element( display_page, timeout_cont );
+    lv_tileview_add_element( display_page, rotation_cont );
+    lv_tileview_add_element( display_page, vibe_cont );
+    lv_tileview_add_element( display_page, block_return_maintile_cont );
+    lv_tileview_add_element( display_page, tilt_cont );
+    lv_tileview_add_element( display_page, doubleclick_cont );
 
     //lv_tileview_add_element( display_settings_tile_2, display_background_image_cont );
 
@@ -322,23 +346,8 @@ bool display_displayctl_brightness_event_cb( EventBits_t event, void *arg ) {
 
 static void enter_display_setup_event_cb( lv_obj_t * obj, lv_event_t event ) {
     switch( event ) {
-        case( LV_EVENT_CLICKED ):       mainbar_jump_to_tilenumber( display_tile_num_1, LV_ANIM_OFF );
-                                        break;
-    }
-
-}
-
-static void down_display_setup_event_cb( lv_obj_t * obj, lv_event_t event ) {
-    switch( event ) {
-        case( LV_EVENT_CLICKED ):       mainbar_jump_to_tilenumber( display_tile_num_2, LV_ANIM_ON );
-                                        break;
-    }
-
-}
-
-static void up_display_setup_event_cb( lv_obj_t * obj, lv_event_t event ) {
-    switch( event ) {
-        case( LV_EVENT_CLICKED ):       mainbar_jump_to_tilenumber( display_tile_num_1, LV_ANIM_ON );
+        case( LV_EVENT_CLICKED ):       display_settings_tile_setup();
+                                        mainbar_jump_to_tilenumber( display_tile_num_1, LV_ANIM_OFF );
                                         break;
     }
 
@@ -346,7 +355,7 @@ static void up_display_setup_event_cb( lv_obj_t * obj, lv_event_t event ) {
 
 static void exit_display_setup_event_cb( lv_obj_t * obj, lv_event_t event ) {
     switch( event ) {
-        case( LV_EVENT_CLICKED ):       mainbar_jump_to_tilenumber( setup_get_tile_num(), LV_ANIM_OFF );
+        case( LV_EVENT_CLICKED ):       mainbar_jump_to_tilenumber( watch_get_tile_num(), LV_ANIM_OFF );
                                         display_save_config();
                                         break;
     }

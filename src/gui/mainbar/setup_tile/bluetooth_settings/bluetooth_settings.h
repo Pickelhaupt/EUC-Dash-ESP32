@@ -26,4 +26,6 @@
 
     void bluetooth_settings_tile_setup( void );
 
+    void bluetooth_settings_tile_pre_setup( void );
+
 #endif // _BLUETOOTH_SETTINGS_H

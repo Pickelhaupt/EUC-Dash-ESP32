@@ -367,7 +367,7 @@ int sd_value2angle(int arcstart, int arcstop, float minvalue, float maxvalue, fl
 
 void simpledash_speed_update( float current_speed, float warn_speed, float tiltback_speed )
 {
-    log_i("update sd speed");
+    //log_i("update sd speed");
     if (sd_speed_label == NULL) return;
     if (current_speed >= tiltback_speed)
     {
@@ -379,11 +379,12 @@ void simpledash_speed_update( float current_speed, float warn_speed, float tiltb
     }
     else
     {
-        log_i("set sd speed label normal colour");
+        //log_i("set sd speed label normal colour");
         lv_style_set_text_color(&sd_speed_label_style, LV_STATE_DEFAULT, sd_speed_fg_clr);
     }
-    log_i("set sd speed label style");
-    lv_obj_add_style(sd_speed_label, LV_LABEL_PART_MAIN, &sd_speed_label_style);
+    //log_i("set sd speed label style");
+    //lv_obj_add_style(sd_speed_label, LV_LABEL_PART_MAIN, &sd_speed_label_style);
+    lv_obj_refresh_style(sd_speed_label, LV_LABEL_PART_MAIN, LV_STYLE_TEXT_COLOR);
 
     if (dashboard_get_config(DASHBOARD_IMPDIST)) current_speed = current_speed / 1.6;
     
@@ -397,18 +398,19 @@ void simpledash_speed_update( float current_speed, float warn_speed, float tiltb
     {
         dtostrf(current_speed, 1, 0, sd_speedstring);
     }
-    log_i("set sd speed label text");
+    //log_i("set sd speed label text");
     lv_label_set_text(sd_speed_label, sd_speedstring);
     //log_i("align sd speed label text");
     //lv_label_set_align(sd_speed_label, LV_LABEL_ALIGN_CENTER);
-    log_i("align sd speed label");
-    lv_obj_align(sd_speed_label, simpledash_cont, LV_ALIGN_CENTER, 0, 0);
-    log_i("sd speed label update done");
+    //log_i("align sd speed label");
+    lv_obj_realign(sd_speed_label);
+    //lv_obj_align(sd_speed_label, simpledash_cont, LV_ALIGN_CENTER, 0, 0);
+    //log_i("sd speed label update done");
 }
 
 void simpledash_batt_update(float current_battpct, float min_battpct, float max_battpct)
 {
-    log_i("update sd battery");
+    //log_i("update sd battery");
     if (sd_batt_arc == NULL) return;
     if (current_battpct < wheelctl_get_constant(WHEELCTL_CONST_BATTCRIT))
     {
@@ -422,7 +424,8 @@ void simpledash_batt_update(float current_battpct, float min_battpct, float max_
     {
         lv_style_set_line_color(&sd_batt_indic_style, LV_STATE_DEFAULT, sd_batt_fg_clr);
     }
-    lv_obj_add_style(sd_batt_arc, LV_ARC_PART_INDIC, &sd_batt_indic_style);
+    //lv_obj_add_style(sd_batt_arc, LV_ARC_PART_INDIC, &sd_batt_indic_style);
+    lv_obj_refresh_style(sd_batt_arc, LV_ARC_PART_INDIC, LV_STYLE_LINE_COLOR);
 
     // update batt arc
 
@@ -430,7 +433,7 @@ void simpledash_batt_update(float current_battpct, float min_battpct, float max_
 
     if (sd_display_bars)
     {
-        log_i("update sd battery bars");
+        //log_i("update sd battery bars");
         if (sd_batt_max_bar == NULL || sd_batt_min_bar == NULL) return;
         int ang_max = sd_value2angle(sd_batt_arc_start, sd_batt_arc_end, 0, 100, max_battpct, sd_rev_batt_arc);
         int ang_max2 = ang_max + 3;
@@ -455,7 +458,7 @@ void simpledash_current_update(float current_current, byte maxcurrent, float min
     
     if (sd_display_current)
     {
-        log_i("update sd current");
+        //log_i("update sd current");
         if (sd_current_arc == NULL) return;
         // Set warning and alert colour
         float amps = current_current;
@@ -477,12 +480,13 @@ void simpledash_current_update(float current_current, byte maxcurrent, float min
         {
             lv_style_set_line_color(&sd_current_indic_style, LV_STATE_DEFAULT, sd_current_fg_clr);
         }
-        lv_obj_add_style(sd_current_arc, LV_ARC_PART_INDIC, &sd_current_indic_style);
+        //lv_obj_add_style(sd_current_arc, LV_ARC_PART_INDIC, &sd_current_indic_style);
+        lv_obj_refresh_style(sd_current_arc, LV_ARC_PART_INDIC, LV_STYLE_LINE_COLOR);
         lv_arc_set_value(sd_current_arc, (maxcurrent - amps));
         
         if (sd_display_bars)
         {
-            log_i("update sd current bars");
+            //log_i("update sd current bars");
             if (sd_current_max_bar == NULL || sd_current_regen_bar == NULL) return;
             int ang_max = sd_value2angle(sd_current_arc_start, sd_current_arc_end, 0, maxcurrent, max_current, true);
             int ang_max2 = ang_max + 3;
@@ -505,18 +509,20 @@ void simpledash_current_update(float current_current, byte maxcurrent, float min
 
 void simpledash_overlay_update()
 {
-    log_i("update sd overlay");
+    //log_i("update sd overlay");
     if (sd_overlay_bar == NULL || sd_overlay_label == NULL) return;
     if (blectl_cli_getconnected())
     {
         lv_style_set_bg_opa(&sd_overlay_style, LV_STATE_DEFAULT, LV_OPA_TRANSP);
-        lv_obj_add_style(sd_overlay_bar, LV_OBJ_PART_MAIN, &sd_overlay_style);
+        //lv_obj_add_style(sd_overlay_bar, LV_OBJ_PART_MAIN, &sd_overlay_style);
+        lv_obj_refresh_style(sd_overlay_bar, LV_OBJ_PART_MAIN, LV_STYLE_BG_OPA);
         lv_obj_set_hidden(sd_overlay_label, true);
     }
     else
     {
         lv_style_set_bg_opa(&sd_overlay_style, LV_STATE_DEFAULT, LV_OPA_30);
-        lv_obj_add_style(sd_overlay_bar, LV_OBJ_PART_MAIN, &sd_overlay_style);
+        //lv_obj_add_style(sd_overlay_bar, LV_OBJ_PART_MAIN, &sd_overlay_style);
+        lv_obj_refresh_style(sd_overlay_bar, LV_OBJ_PART_MAIN, LV_STYLE_BG_OPA);
         lv_obj_set_hidden(sd_overlay_label, false);
     }
 }
@@ -553,22 +559,16 @@ void simpledash_hibernate_cb(void)
 
 void simpledash_tile_reload(void)
 {
-    lv_obj_del(simpledash_cont);
-    simpledash_tile_setup();
-}
-
-void simpledash_tile_setup(void)
-{
-    simpledash_tile_num = mainbar_add_tile(2, 0, "sd tile");
-    simpledash_cont = mainbar_get_tile_obj(simpledash_tile_num);
-    sd_style = mainbar_get_style();
-    log_i("setting up dashboard");
-    lv_sd_define_styles_1();
+    log_i("reloading simple dashboard");
+    lv_obj_clean(simpledash_cont);
+    log_i("adding sd alerts");
     lv_sd_alerts();
+    log_i("adding sd speed arc");
     lv_sd_speed_arc_1();
+    log_i("adding sd batt arc");
     lv_sd_batt_arc_1();
-
     if (dashboard_get_config(DASHBOARD_CURRENT)) {
+        log_i("adding sd current arc");
         lv_sd_current_arc_1();
         sd_display_current = true;
     } else { sd_display_current = false; }
@@ -576,8 +576,18 @@ void simpledash_tile_setup(void)
     if (dashboard_get_config(DASHBOARD_BARS)) {
         sd_display_bars = true;
     } else { sd_display_bars = false; }
-
+    log_i("adding sd overlay");
     lv_sd_overlay();
+}
+
+void simpledash_tile_setup(void)
+{
+    simpledash_tile_num = mainbar_add_tile(2, 0, "sd tile");
+    simpledash_cont = mainbar_get_tile_obj(simpledash_tile_num);
+    sd_style = mainbar_get_style();
+    lv_sd_define_styles_1();
+    log_i("setting up dashboard");
+    simpledash_tile_reload();
 
     mainbar_add_tile_activate_cb(simpledash_tile_num, simpledash_activate_cb);
     mainbar_add_tile_hibernate_cb(simpledash_tile_num, simpledash_hibernate_cb);

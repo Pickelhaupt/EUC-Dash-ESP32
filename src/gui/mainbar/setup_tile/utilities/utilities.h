@@ -26,4 +26,7 @@
 
     void utilities_tile_setup( void );
 
+    void utilities_tile_pre_setup( void );
+    uint32_t utilities_get_tile_num( void );
+
 #endif // _UTILITIES_H

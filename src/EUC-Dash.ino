@@ -20,7 +20,7 @@
  */
 #include "config.h"
 #include <Arduino.h>
-#include "esp_bt.h"
+//#include "esp_bt.h"
 #include "esp_task_wdt.h"
 #include <TTGO.h>
 
@@ -51,12 +51,9 @@ void setup()
     Serial.printf("init t-watch\r\n");
     ttgo->begin();
 
-    
-    //ttgo->tft->initDMA();
-    
     // force to store all new heap allocations in psram to get more internal ram
-    heap_caps_malloc_extmem_enable( 1 );
-    heap_caps_malloc_extmem_enable( 16*1024 );
+    //heap_caps_malloc_extmem_enable( 1 );
+    //heap_caps_malloc_extmem_enable( 16*1024 );
     
     Serial.printf("init LVGL\r\n");
     ttgo->lvgl_begin();
@@ -97,7 +94,7 @@ void setup()
 
     // enable to store data in normal heap
     splash_screen_stage_update( "alloc heap", 75 );
-    
+    //heap_caps_malloc_extmem_enable( 16*1024 );
 
     splash_screen_stage_update( "init wheel data", 90 );
     wheelctl_setup();

@@ -25,5 +25,8 @@
     #include <TTGO.h>
 
     void battery_settings_tile_setup( void );
+    void battery_settings_tile_pre_setup( void );
+    uint32_t battery_settings_get_tile_num( void );
+    //static void enter_battery_setup_event_cb( lv_obj_t * obj, lv_event_t event );
 
 #endif // _BATTERY_SETTINGS_H

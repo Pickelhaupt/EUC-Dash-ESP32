@@ -1,9 +1,7 @@
 /****************************************************************************
- *   Tu May 22 21:23:51 2020
- *   Copyright  2020  Dirk Brosswick
- *   Email: dirk.brosswick@googlemail.com
+ *   Copyright  2020  Jesper Ortlund
+ *   based on work by Dirk Brosswick 2020
  ****************************************************************************/
- 
 /*
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -19,11 +17,13 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
-#ifndef _MOVE_SETTINGS_H
-    #define _MOVE_SETTINGS_H
+#ifndef _WHEEL_SETTINGS_H
+    #define _WHEEL_SETTINGS_H
 
     #include <TTGO.h>
 
     void wheel_settings_tile_setup( void );
+    void wheel_settings_tile_pre_setup( void );
+    uint32_t wheel_settings_get_tile_num( void );
 
-#endif // _MOVE_SETTINGS_TILE_H
+#endif // _WHEEL_SETTINGS_TILE_H

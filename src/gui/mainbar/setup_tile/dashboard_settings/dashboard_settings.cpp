@@ -22,6 +22,7 @@
 
 #include "gui/mainbar/mainbar.h"
 #include "gui/mainbar/setup_tile/setup_tile.h"
+#include "gui/mainbar/setup_tile/eucdash_settings/eucdash_settings.h"
 #include "gui/setup.h"
 
 #include "hardware/bma.h"
@@ -42,6 +43,7 @@ lv_obj_t *tempunit_onoff=NULL;
 
 LV_IMG_DECLARE(exit_32px);
 LV_IMG_DECLARE(dashboard_64px);
+LV_IMG_DECLARE(dashboard_32px);
 
 static void enter_dashboard_setup_event_cb( lv_obj_t * obj, lv_event_t event );
 static void exit_dashboard_setup_event_cb( lv_obj_t * obj, lv_event_t event );
@@ -51,10 +53,19 @@ static void bars_onoff_event_handler(lv_obj_t * obj, lv_event_t event);
 static void distunit_onoff_event_handler(lv_obj_t * obj, lv_event_t event);
 static void tempunit_onoff_event_handler(lv_obj_t * obj, lv_event_t event);
 
+void dashboard_settings_tile_pre_setup( void ) {
+    eucdash_settings_register_menu_item(&dashboard_32px, enter_dashboard_setup_event_cb, "dashboard settings");
+}
+
+uint32_t dashboard_settings_get_tile_num( void ) {
+    return dashboard_tile_num;
+}
+
 void dashboard_settings_tile_setup( void ) {
     // get an app tile and copy mainstyle
-    dashboard_tile_num = mainbar_add_app_tile( 1, 1, "dashboard settings" );
+    dashboard_tile_num = setup_get_submenu_tile_num();
     dashboard_settings_tile = mainbar_get_tile_obj( dashboard_tile_num );
+    lv_obj_clean(dashboard_settings_tile);
     lv_style_copy( &dashboard_settings_style, mainbar_get_style() );
     lv_style_set_bg_color( &dashboard_settings_style, LV_OBJ_PART_MAIN, LV_COLOR_BLACK);
     lv_style_set_bg_opa( &dashboard_settings_style, LV_OBJ_PART_MAIN, LV_OPA_100);
@@ -68,8 +79,8 @@ void dashboard_settings_tile_setup( void ) {
     
     lv_obj_add_style( dashboard_settings_tile, LV_OBJ_PART_MAIN, &dashboard_settings_style );
 
-    icon_t *dashboard_setup_icon = setup_register( "dashboard", &dashboard_64px, enter_dashboard_setup_event_cb );
-    setup_hide_indicator( dashboard_setup_icon );
+    //icon_t *dashboard_setup_icon = setup_register( "dashboard", &dashboard_64px, enter_dashboard_setup_event_cb );
+    //setup_hide_indicator( dashboard_setup_icon );
 
     lv_obj_t *exit_btn = lv_imgbtn_create( dashboard_settings_tile, NULL);
     lv_imgbtn_set_src( exit_btn, LV_BTN_STATE_RELEASED, &exit_32px);
@@ -193,14 +204,15 @@ void dashboard_settings_tile_setup( void ) {
 
 static void enter_dashboard_setup_event_cb( lv_obj_t * obj, lv_event_t event ) {
     switch( event ) {
-        case( LV_EVENT_CLICKED ):       mainbar_jump_to_tilenumber( dashboard_tile_num, LV_ANIM_OFF );
+        case( LV_EVENT_CLICKED ):       dashboard_settings_tile_setup();
+                                        mainbar_jump_to_tilenumber( dashboard_tile_num, LV_ANIM_OFF );
                                         break;
     }
 }
 
 static void exit_dashboard_setup_event_cb( lv_obj_t * obj, lv_event_t event ) {
     switch( event ) {
-        case( LV_EVENT_CLICKED ):       mainbar_jump_to_tilenumber( setup_get_tile_num(), LV_ANIM_OFF );
+        case( LV_EVENT_CLICKED ):       mainbar_jump_to_tilenumber( eucdash_get_tile_num(), LV_ANIM_OFF );
                                         break;
     }
 }

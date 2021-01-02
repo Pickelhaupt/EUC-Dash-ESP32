@@ -35,6 +35,7 @@
 #include "setup_tile/wheel_settings/wheel_settings.h"
 #include "setup_tile/display_settings/display_settings.h"
 #include "setup_tile/time_settings/time_settings.h"
+#include "setup_tile/watch_settings/watch_settings.h"
 #include "setup_tile/update/update.h"
 
 LV_FONT_DECLARE(DIN1451_m_cond_24);
@@ -163,7 +164,6 @@ uint32_t mainbar_add_tile( uint16_t x, uint16_t y, const char *id ) {
     lv_tileview_add_element( mainbar, tile[ tile_entrys - 1 ].tile );
     lv_tileview_set_valid_positions( mainbar, tile_pos_table, tile_entrys );
     log_i("add tile: x=%d, y=%d, id=%s", tile_pos_table[ tile_entrys - 1 ].x, tile_pos_table[ tile_entrys - 1 ].y, tile[ tile_entrys - 1 ].id );
-
     return( tile_entrys - 1 );
 }
 
@@ -247,6 +247,10 @@ uint32_t mainbar_add_app_tile( uint16_t x, uint16_t y, const char *id ) {
     }
     app_tile_pos = app_tile_pos + x + 1;
     return( retval );
+}
+
+void mainbar_clear_tile(uint32_t tile_num) {
+    lv_obj_clean( tile[ tile_num ].tile );
 }
 
 lv_obj_t *mainbar_get_tile_obj( uint32_t tile_number ) {

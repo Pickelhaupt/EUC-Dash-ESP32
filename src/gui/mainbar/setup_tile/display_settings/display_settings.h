@@ -26,4 +26,6 @@
 
     void display_settings_tile_setup( void );
 
+    void display_settings_tile_pre_setup( void );
+
 #endif // _DISPLAY_SETTINGS_H
