@@ -28,4 +28,6 @@
 
     void time_settings_tile_pre_setup( void );
 
+   //char tz_json[] = "{\"kalle\":\"pelle\", \"olle\";\"kalle\"}";
+
 #endif // _TIME_SETTINGS_H

@@ -36,6 +36,7 @@
 extern const uint8_t timezones_json_start[] asm("_binary_src_gui_mainbar_setup_tile_time_settings_timezones_json_start");
 extern const uint8_t timezones_json_end[] asm("_binary_src_gui_mainbar_setup_tile_time_settings_timezones_json_end");
 const size_t capacity = JSON_OBJECT_SIZE(84) + 3200;
+const size_t cap2 = JSON_OBJECT_SIZE(10) + 320;
 //const char * timezone_options;
 bool timezone_options = false;
 String zones = String("");
@@ -80,7 +81,7 @@ static void setup_timezone_data( char * selected_timezone ) {
             if (strcmp(k, selected_timezone) == 0) {
                 timezone_selected_index = current_index;
             }
-            log_i("TZ: %s index: %d", k, current_index);
+            //log_i("TZ: %s index: %d", k, current_index);
             current_index++;      
         }
     }
@@ -171,7 +172,7 @@ void time_settings_tile_setup( void ) {
     lv_obj_align( timezone_label, timezone_cont, LV_ALIGN_CENTER, 0, -15 );
 
     utczone_list = lv_dropdown_create( timezone_cont, NULL);
-    log_i("timezone_options in dropdown:\n%s", zones.c_str());
+    //log_i("timezone_options in dropdown:\n%s", zones.c_str());
     lv_dropdown_set_options( utczone_list, zones.c_str() );
     //log_i("timezone_options in dropdown:\n%s", timezone_options);
     //lv_dropdown_set_options( utczone_list, timezone_options );

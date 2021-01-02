@@ -25,7 +25,7 @@
 #include "motor.h"
 #include "callback.h"
 #include "json_psram_allocator.h"
-//#include "alloc.h"
+#include "alloc.h"
 #include "Kingsong.h"
 #include "powermgm.h"
 #include "gui/mainbar/fulldash_tile/fulldash_tile.h"
@@ -66,6 +66,7 @@ bool firstrun[WHEELCTL_DATA_NUM];
 float old_uptime = 0;
 bool sync_trip = true;
 bool sync_millis = true;
+bool saving_trip_data = false; //for disabling dashboard updates while saving trip data
 
 wheelctl_data_t wheelctl_data[WHEELCTL_DATA_NUM];
 wheelctl_constants_t wheelctl_constants[WHEELCTL_CONST_NUM];
@@ -139,7 +140,7 @@ float wheelctl_get_data(int entry)
 
 void wheelctl_set_data(int entry, float value)
 {
-    if (entry < WHEELCTL_DATA_NUM)
+    if (entry < WHEELCTL_DATA_NUM && !saving_trip_data)
     {
         if (firstrun[entry]) wheelctl_data[entry].value = value;
         switch (entry)
@@ -565,7 +566,7 @@ void wheelctl_set_config( int config, bool enable ) {
     if ( config < WHEELCTL_CONFIG_NUM ) {
         wheelctl_config[ config ].enable = enable;
         wheelctl_save_config();
-        simpledash_tile_reload();
+        //simpledash_tile_reload();
     }
 }
 
@@ -616,6 +617,7 @@ void wheelctl_read_config( void ) {
 
 void current_trip_save_data(void)
 {
+    saving_trip_data = true;
     fs::File file = SPIFFS.open(CURRENT_TRIP_JSON_FILE, FILE_WRITE);
 
     if (!file)
@@ -648,6 +650,7 @@ void current_trip_save_data(void)
         doc.clear();
     }
     file.close();
+    saving_trip_data = false;
 }
 
 void current_trip_read_data(void)
