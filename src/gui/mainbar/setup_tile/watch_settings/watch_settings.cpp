@@ -85,7 +85,7 @@ void watch_settings_tile_setup( void ) {
 
     lv_obj_add_style( watch_settings_tile, LV_OBJ_PART_MAIN, &watch_settings_style );
     //add icon to setup screen
-    icon_t *watch_setup_icon = setup_register( "watch", &watch_64px, enter_watch_setup_event_cb );
+    icon_t *watch_setup_icon = setup_register( "watch setup", &watch_64px, enter_watch_setup_event_cb );
     setup_hide_indicator( watch_setup_icon );
     log_i("set up watch settings objects");
     //create top bar objects on tile

@@ -33,7 +33,7 @@
     #define SETUP_ICON_X_SIZE         64
     #define SETUP_ICON_Y_SIZE         64
     #define SETUP_ICON_X_CLEARENCE    64
-    #define SETUP_ICON_Y_CLEARENCE    30
+    #define SETUP_ICON_Y_CLEARENCE    25
     //#define SETUP_ICON_Y_CLEARENCE    36
     #define SETUP_LABEL_X_SIZE        SETUP_ICON_X_SIZE + SETUP_ICON_X_CLEARENCE
     #define SETUP_LABEL_Y_SIZE        SETUP_ICON_Y_CLEARENCE / 2
@@ -66,5 +66,7 @@
      * @return  pointer to the free setup_icon_t structure
      */
     icon_t *setup_tile_get_free_setup_icon( void );
+
+    void setup_tile_connect_update( void );
 
 #endif // _SETUP_TILE_H

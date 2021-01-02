@@ -28,6 +28,7 @@
 #include "alloc.h"
 #include "Kingsong.h"
 #include "powermgm.h"
+#include "gui/mainbar/setup_tile/setup_tile.h"
 #include "gui/mainbar/fulldash_tile/fulldash_tile.h"
 #include "gui/mainbar/simpledash_tile/simpledash_tile.h"
 
@@ -114,6 +115,7 @@ void wheelctl_connect_actions(void)
     sync_millis = true;
     ride_tick = lv_task_create( wheelctl_tick_update, 1000, LV_TASK_PRIO_LOW, NULL );
     save_trip_task = lv_task_create( wheelctl_save_trip_task, 20000, LV_TASK_PRIO_LOW, NULL );
+    setup_tile_connect_update();
 }
 
 void wheelctl_disconnect_actions(){

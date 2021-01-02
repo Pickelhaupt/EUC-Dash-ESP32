@@ -79,7 +79,7 @@ void eucdash_settings_tile_setup( void ) {
 
     lv_obj_add_style( eucdash_settings_tile, LV_OBJ_PART_MAIN, &eucdash_settings_style );
     //add icon to setup screen
-    icon_t *eucdash_setup_icon = setup_register( "eucdash", &eucdash_64px, enter_eucdash_setup_event_cb );
+    icon_t *eucdash_setup_icon = setup_register( "eucdash setup", &eucdash_64px, enter_eucdash_setup_event_cb );
     setup_hide_indicator( eucdash_setup_icon );
     log_i("set up eucdash settings objects");
     //create top bar objects on tile
