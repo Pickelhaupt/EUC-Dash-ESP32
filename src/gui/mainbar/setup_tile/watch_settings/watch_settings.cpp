@@ -35,6 +35,7 @@
 #include "gui/mainbar/setup_tile/time_settings/time_settings.h"
 #include "gui/mainbar/setup_tile/display_settings/display_settings.h"
 #include "gui/mainbar/setup_tile/utilities/utilities.h"
+#include "gui/mainbar/setup_tile/wlan_settings/wlan_settings.h"
 
 
 lv_obj_t *watch_settings_tile=NULL;
@@ -177,6 +178,8 @@ void watch_settings_menu_item_setup() { //just for testing
     log_i("ble settings");
     bluetooth_settings_tile_pre_setup();
     utilities_tile_pre_setup();
+    wlan_setup_tile_pre_setup();
+    wlan_connection_tile_pre_setup();
 }
 
 static void enter_watch_setup_event_cb( lv_obj_t * obj, lv_event_t event ) {

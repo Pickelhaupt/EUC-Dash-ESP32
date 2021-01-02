@@ -28,6 +28,8 @@
 #include "setup.h"
 lv_obj_t *submenu_tile=NULL;
 uint32_t submenu_tile_num;
+lv_obj_t *submenu2_tile=NULL;
+uint32_t submenu2_tile_num;
 
 icon_t *setup_register( const char* setupname, const lv_img_dsc_t *icon, lv_event_cb_t event_cb ) {
 
@@ -40,11 +42,11 @@ icon_t *setup_register( const char* setupname, const lv_img_dsc_t *icon, lv_even
 
     setup->active = true;
     // setup label
-    //lv_label_set_text( setup->label, setupname );
-    //lv_obj_align( setup->label , setup->icon_cont, LV_ALIGN_OUT_BOTTOM_MID, 0, 0 );
-    //lv_label_set_align( setup->label, LV_LABEL_ALIGN_CENTER );
+    lv_label_set_text( setup->label, setupname );
+    lv_obj_align( setup->label , setup->icon_cont, LV_ALIGN_OUT_BOTTOM_MID, 0, 0 );
+    lv_label_set_align( setup->label, LV_LABEL_ALIGN_CENTER );
     lv_obj_set_hidden( setup->icon_cont, false );
-    //lv_obj_set_hidden( setup->label, false );
+    lv_obj_set_hidden( setup->label, false );
     // setup icon and set event callback
     setup->icon_img = lv_imgbtn_create( setup->icon_cont , NULL );
     lv_imgbtn_set_src( setup->icon_img, LV_BTN_STATE_RELEASED, icon);
@@ -68,12 +70,21 @@ icon_t *setup_register( const char* setupname, const lv_img_dsc_t *icon, lv_even
 }
 
 void setup_add_submenu_tile(void){
-    submenu_tile_num = mainbar_add_app_tile( 1, 1, "eucdash submenu" );
+    submenu_tile_num = mainbar_add_app_tile( 1, 1, "settings submenu" );
     submenu_tile = mainbar_get_tile_obj( submenu_tile_num );
+}
+
+void setup_add_submenu2_tile(void){
+    submenu2_tile_num = mainbar_add_app_tile( 1, 1, "setings submenu2" );
+    submenu2_tile = mainbar_get_tile_obj( submenu2_tile_num );
 }
 
 uint32_t setup_get_submenu_tile_num(){
     return submenu_tile_num;
+}
+
+uint32_t setup_get_submenu2_tile_num(){
+    return submenu2_tile_num;
 }
 
 void setup_set_indicator( icon_t *setup, icon_indicator_t indicator ) {

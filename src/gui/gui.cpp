@@ -85,9 +85,10 @@ void gui_setup( void )
     eucdash_settings_tile_setup();
     log_i("adding setup screens");
     setup_add_submenu_tile();
-    log_i("wlan settings");
-    wlan_settings_tile_setup();
+    setup_add_submenu2_tile();
     
+    //log_i("wlan settings");
+    //wlan_settings_tile_setup();
     //log_i("display settings");
     //display_settings_tile_setup();
     //log_i("utilities settings");
