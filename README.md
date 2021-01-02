@@ -1,5 +1,7 @@
 # EUC-Dash-ESP32
 
+**2021-01-03 Updated all settings screens and fixed a lot of bugs**
+
 **2020-12-09 Updated ttgo t-watch library to latest version(master branch) with lvgl 7.7.1**
 
 **2020-12-08 Trip info now persistent, long press on trip display to reset**
@@ -101,9 +103,9 @@ Screen layout:
 <img src="https://github.com/Pickelhaupt/EUC-Dash-ESP32/raw/master/Images/maintile-s.png" width="80%" align="center"/>
 </div>
 
-Map of all settings screens:
+Map of all settings screens (new version, some things still missing):
 <div> 
-<img src="https://github.com/Pickelhaupt/EUC-Dash-ESP32/raw/master/Images/settingsmanual2s.png" width="100%" align="center"/>
+<img src="https://github.com/Pickelhaupt/EUC-Dash-ESP32/raw/master/Images/new_settings-small.png" width="100%" align="center"/>
 </div>
 
 ### Supported Models
