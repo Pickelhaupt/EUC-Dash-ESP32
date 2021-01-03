@@ -129,10 +129,9 @@ Some new screenshots, colours are a bit off though
 ## Dependencies
 ### Required libraries:
 Libraries are downloaded automatically by PlatformIO when compiling for the first time.
-- TTGO T-Watch Library; modified version with LVGL 7.6
+- TTGO T-Watch Library; v1.4.1+
 - AsyncTCP@>=1.1.1
 - ArduinoJson@>=6.15.2
-- PubSubClient@>=2.8
 
 ## Bugs and issues
 - I have not verified if the http upgrade feature works, also the published firmware is out of date.
