@@ -36,7 +36,7 @@ void wheelinfo_activate_cb(void);
 void wheelinfo_hibernate_cb(void);
 
 static lv_obj_t *wheelinfo_cont = NULL;
-static lv_style_t *style;
+//static lv_style_t *style;
 lv_style_t wheelinfo_style;
 lv_style_t wheelinfo_heading_style;
 lv_style_t wheelinfo_data_style;
@@ -55,8 +55,7 @@ void wheelinfo_tile_setup(void)
 {
     wheelinfo_tile_num = mainbar_add_tile(2, 1, "wheelinfo tile");
     wheelinfo_cont = mainbar_get_tile_obj(wheelinfo_tile_num);
-    //fulldash_cont = mainbar_get_tile_obj( mainbar_add_tile( 1, 0, "fulldash tile" ) );
-    style = mainbar_get_style();
+    //style = mainbar_get_style();
     log_i("setting up wheelinfo_tile");
     wheelinfo_setup_styles();
     wheelinfo_setup_obj();
@@ -92,7 +91,7 @@ void wheelinfo_setup_obj( void ) {
     lv_obj_align( serial_label, wheelinfo_cont, LV_ALIGN_IN_TOP_LEFT, 5, 30 );
     serial_data = lv_label_create( wheelinfo_cont, NULL);
     lv_obj_add_style( serial_data, LV_OBJ_PART_MAIN, &wheelinfo_data_style  );
-    lv_label_set_text( serial_data, "ABCDEFG");
+    lv_label_set_text( serial_data, "disconnected");
     lv_obj_align( serial_data, wheelinfo_cont, LV_ALIGN_IN_TOP_RIGHT, -5, 30 );
 
     lv_obj_t *model_label = lv_label_create( wheelinfo_cont, NULL);
@@ -101,7 +100,7 @@ void wheelinfo_setup_obj( void ) {
     lv_obj_align( model_label, serial_label, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0 );
     model_data = lv_label_create( wheelinfo_cont, NULL);
     lv_obj_add_style( model_data, LV_OBJ_PART_MAIN, &wheelinfo_data_style  );
-    lv_label_set_text( model_data, "KS99X");
+    lv_label_set_text( model_data, "n/a");
     lv_obj_align( model_data, serial_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
 
     lv_obj_t *odometer_label = lv_label_create( wheelinfo_cont, NULL);
@@ -110,7 +109,7 @@ void wheelinfo_setup_obj( void ) {
     lv_obj_align( odometer_label, model_label, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0 );
     odometer_data = lv_label_create( wheelinfo_cont, NULL);
     lv_obj_add_style( odometer_data, LV_OBJ_PART_MAIN, &wheelinfo_data_style  );
-    lv_label_set_text( odometer_data, "300 km");
+    lv_label_set_text( odometer_data, "n/a");
     lv_obj_align( odometer_data, model_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
 
     lv_obj_t *maxvolt_label = lv_label_create( wheelinfo_cont, NULL);
@@ -119,7 +118,7 @@ void wheelinfo_setup_obj( void ) {
     lv_obj_align( maxvolt_label, odometer_label, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0 );
     maxvolt_data = lv_label_create( wheelinfo_cont, NULL);
     lv_obj_add_style( maxvolt_data, LV_OBJ_PART_MAIN, &wheelinfo_data_style  );
-    lv_label_set_text( maxvolt_data, "67 V");
+    lv_label_set_text( maxvolt_data, "n/a");
     lv_obj_align( maxvolt_data, odometer_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
 
     lv_obj_t *voltage_label = lv_label_create( wheelinfo_cont, NULL);
@@ -128,7 +127,7 @@ void wheelinfo_setup_obj( void ) {
     lv_obj_align( voltage_label, maxvolt_label, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0 );
     voltage_data = lv_label_create( wheelinfo_cont, NULL);
     lv_obj_add_style( voltage_data, LV_OBJ_PART_MAIN, &wheelinfo_data_style  );
-    lv_label_set_text( voltage_data, "2.4 A");
+    lv_label_set_text( voltage_data, "n/a");
     lv_obj_align( voltage_data, maxvolt_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
 
     lv_obj_t *capacity_label = lv_label_create( wheelinfo_cont, NULL);
@@ -137,7 +136,7 @@ void wheelinfo_setup_obj( void ) {
     lv_obj_align( capacity_label, voltage_label, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0 );
     capacity_data = lv_label_create( wheelinfo_cont, NULL);
     lv_obj_add_style( capacity_data, LV_OBJ_PART_MAIN, &wheelinfo_data_style  );
-    lv_label_set_text( capacity_data, "2.4 A");
+    lv_label_set_text( capacity_data, "n/a");
     lv_obj_align( capacity_data, voltage_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
 
     lv_obj_t *colour_label = lv_label_create( wheelinfo_cont, NULL);
@@ -146,7 +145,7 @@ void wheelinfo_setup_obj( void ) {
     lv_obj_align( colour_label, capacity_label, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0 );
     colour_data = lv_label_create( wheelinfo_cont, NULL);
     lv_obj_add_style( colour_data, LV_OBJ_PART_MAIN, &wheelinfo_data_style  );
-    lv_label_set_text( colour_data, "2.4 A");
+    lv_label_set_text( colour_data, "n/a");
     lv_obj_align( colour_data, capacity_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
 
 /*
@@ -174,8 +173,8 @@ void wheelinfo_hibernate_cb(void)
 
 void wheelinfo_tile_reload(void)
 {
-    lv_obj_del(wheelinfo_cont);
-    wheelinfo_tile_setup();
+    lv_obj_clean(wheelinfo_cont);
+    wheelinfo_setup_obj();
 }
 
 uint32_t wheelinfo_get_tile(void)

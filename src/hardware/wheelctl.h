@@ -23,12 +23,17 @@
 
     #include <TTGO.h>
     #include "callback.h"
-
+    
+    // Below this speed no distance or ride time is recorded
     #define MIN_RIDE_SPEED  1
     #define WHEELCTL_JSON_CONFIG_FILE    "/wheelctl.json" /** @brief defines json config file name */
     #define CURRENT_TRIP_JSON_FILE    "/c-tripsave.json" /** @brief defines json config file name */
     #define LAST_TRIP_JSON_FILE    "/l-tripsave.json" /** @brief defines json config file name */
     #define TOTAL_TRIP_JSON_FILE    "/t-tripsave.json" /** @brief defines json config file name */
+
+    // POWER_CORRECT_CONST is used to tune the power consumption and economy values I have not 
+    // done enough tests to come up with an accurate value yet, it might also differ between wheel models
+    #define POWER_CORRECT_COST  1.3
 
     /**
      * @brief persistent tripdata structure

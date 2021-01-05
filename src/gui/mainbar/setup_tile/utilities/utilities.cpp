@@ -37,6 +37,8 @@
 
 lv_obj_t *utilities_tile=NULL;
 lv_style_t utilities_style;
+lv_style_t utilities_heading_style;
+lv_style_t utilities_data_style;
 uint32_t utilities_tile_num;
 
 lv_obj_t *reboot_btn = NULL;
@@ -83,6 +85,11 @@ void utilities_tile_setup( void ) {
     lv_style_set_border_width( &utilities_style, LV_OBJ_PART_MAIN, 0);
     lv_obj_add_style( utilities_tile, LV_OBJ_PART_MAIN, &utilities_style );
 
+    lv_style_copy( &utilities_heading_style, &utilities_style );
+    lv_style_set_text_color(&utilities_heading_style, LV_OBJ_PART_MAIN, LV_COLOR_WHITE);
+    lv_style_copy( &utilities_data_style, &utilities_style );
+    lv_style_set_text_color(&utilities_data_style, LV_OBJ_PART_MAIN, LV_COLOR_LIME);
+
     //icon_t *utilities_setup_icon = setup_register( "Utilities", &utilities_64px, enter_utilities_event_cb );
     //setup_hide_indicator( utilities_setup_icon );
 
@@ -96,9 +103,9 @@ void utilities_tile_setup( void ) {
     lv_obj_set_event_cb( exit_btn, exit_utilities_event_cb );
     
     lv_obj_t *exit_label = lv_label_create( utilities_tile, NULL);
-    lv_obj_add_style( exit_label, LV_OBJ_PART_MAIN, &utilities_style  );
+    lv_obj_add_style( exit_label, LV_OBJ_PART_MAIN, &utilities_heading_style  );
     lv_label_set_text( exit_label, "System Utilities");
-    lv_obj_align( exit_label, exit_btn, LV_ALIGN_OUT_RIGHT_MID, 5, 0 );
+    lv_obj_align( exit_label, exit_btn, LV_ALIGN_OUT_RIGHT_MID, 15, 0 );
 
     //Spiffs:
     //Add button for dump spiffs details to serial including config files
@@ -136,10 +143,10 @@ void utilities_tile_setup( void ) {
     lv_obj_t *last_reboot_label = lv_label_create( utilities_tile, NULL);
     lv_obj_add_style( last_reboot_label, LV_OBJ_PART_MAIN, &utilities_style  );
     lv_label_set_text( last_reboot_label, "Last Reboot Reason:");
-    lv_obj_align( last_reboot_label, format_spiffs_btn, LV_ALIGN_OUT_BOTTOM_LEFT, 5, 5 );
+    lv_obj_align( last_reboot_label, format_spiffs_btn, LV_ALIGN_OUT_BOTTOM_MID, 0, 15 );
     
     lv_obj_t *last_reason_label = lv_label_create( utilities_tile, NULL);
-    lv_obj_add_style( last_reason_label, LV_OBJ_PART_MAIN, &utilities_style  );
+    lv_obj_add_style( last_reason_label, LV_OBJ_PART_MAIN, &utilities_data_style  );
     lv_label_set_text( last_reason_label, "");  
     
     //Get the reason for the last reset, this could be moved into a dedicated function....
@@ -183,7 +190,7 @@ void utilities_tile_setup( void ) {
                                         break;
     }
     lv_label_set_align( last_reason_label, LV_LABEL_ALIGN_CENTER );
-    lv_obj_align( last_reason_label, last_reboot_label, LV_ALIGN_OUT_BOTTOM_LEFT, 5, 5 );//Now that the text has changed, align it.
+    lv_obj_align( last_reason_label, last_reboot_label, LV_ALIGN_OUT_BOTTOM_MID, 0, 0 );//Now that the text has changed, align it.
 }
 
 static void enter_utilities_event_cb( lv_obj_t * obj, lv_event_t event ) {

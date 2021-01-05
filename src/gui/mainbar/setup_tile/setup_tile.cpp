@@ -175,6 +175,8 @@ static void brightness_setup_event_cb( lv_obj_t * obj, lv_event_t event ) {
 static void toggle_wheel_connect_onoff_event_handler(lv_obj_t * obj, lv_event_t event) {
     switch( event ) {
         case( LV_EVENT_VALUE_CHANGED):  blectl_set_autoconnect(lv_switch_get_state( obj ));
+                                        blectl_scan_once(2);
+                                        break;
     }
 }
 
@@ -204,7 +206,7 @@ uint32_t setup_get_tile_num( void ) {
     return( setup_tile_num[ 0 ] );
 }
 
-void setup_tile_connect_update( void ){
-    lv_label_set_text( connect_data, wheelctl_get_info(WHEELCTL_INFO_MODEL).c_str());
+void setup_tile_connect_update( String connect_string){
+    lv_label_set_text( connect_data, connect_string.c_str());
     lv_obj_realign(connect_data);
 }

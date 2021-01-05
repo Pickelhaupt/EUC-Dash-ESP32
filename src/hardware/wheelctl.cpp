@@ -115,12 +115,13 @@ void wheelctl_connect_actions(void)
     sync_millis = true;
     ride_tick = lv_task_create( wheelctl_tick_update, 1000, LV_TASK_PRIO_LOW, NULL );
     save_trip_task = lv_task_create( wheelctl_save_trip_task, 20000, LV_TASK_PRIO_LOW, NULL );
-    setup_tile_connect_update();
+    setup_tile_connect_update(wheelctl_get_info(WHEELCTL_INFO_MODEL));
 }
 
 void wheelctl_disconnect_actions(){
     if (ride_tick != nullptr) lv_task_del(ride_tick);
     if (save_trip_task != nullptr) lv_task_del(save_trip_task);
+    setup_tile_connect_update("disconnected");
 }
 
 void wheelctl_update_values(void)
@@ -262,7 +263,7 @@ void wheelctl_update_avgspeed(float value)
 
 void wheelctl_update_powercons( float seconds ) {
     float trip_distance = wheelctl_data[WHEELCTL_TRIP].max_value;
-    if( seconds != 0 ) wheelctl_data[WHEELCTL_POWERCONS].value = wheelctl_data[WHEELCTL_POWERCONS].value + (wheelctl_data[WHEELCTL_POWER].value / (seconds * 3600));
+    if( seconds != 0 ) wheelctl_data[WHEELCTL_POWERCONS].value = wheelctl_data[WHEELCTL_POWERCONS].value + (POWER_CORRECT_COST * wheelctl_data[WHEELCTL_POWER].value / (seconds * 3600));
     if (trip_distance !=0) wheelctl_data[WHEELCTL_ECONOMY].value = wheelctl_data[WHEELCTL_POWERCONS].value / trip_distance;
     
     if( seconds != 0 ) current_trip.consumed_energy = current_trip.consumed_energy + (wheelctl_data[WHEELCTL_POWER].value / (seconds * 3600));

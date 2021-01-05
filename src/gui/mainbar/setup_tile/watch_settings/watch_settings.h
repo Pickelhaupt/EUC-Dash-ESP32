@@ -35,6 +35,7 @@
     typedef struct {
         lv_obj_t *cont;
         lv_obj_t *label;
+        lv_obj_t *icon_cont;
         lv_obj_t *icon;
         lv_obj_t *arrow;
     } watch_settings_item_t;

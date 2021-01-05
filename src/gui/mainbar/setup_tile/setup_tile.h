@@ -67,6 +67,6 @@
      */
     icon_t *setup_tile_get_free_setup_icon( void );
 
-    void setup_tile_connect_update( void );
+    void setup_tile_connect_update( String connect_string );
 
 #endif // _SETUP_TILE_H

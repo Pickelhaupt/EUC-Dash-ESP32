@@ -276,4 +276,6 @@
      */
     bool blectl_cli_getconnected( void );
 
+    void blectl_scan_once(int scantime);
+
 #endif // _BLECTL_H

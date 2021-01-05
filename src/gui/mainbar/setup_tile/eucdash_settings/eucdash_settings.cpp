@@ -111,6 +111,7 @@ void eucdash_settings_tile_setup( void ) {
     lv_page_set_edge_flash(eucdash_settings_page, true);
     lv_obj_add_style(eucdash_settings_page, LV_OBJ_PART_MAIN, &eucdash_settings_page_style );
     lv_obj_add_style(eucdash_settings_page, LV_PAGE_PART_EDGE_FLASH, &eucdash_settings_page_edge_style );
+    lv_obj_add_style(eucdash_settings_page, LV_PAGE_PART_SCROLLBAR, &eucdash_settings_page_edge_style );
     lv_obj_align( eucdash_settings_page, eucdash_settings_tile, LV_ALIGN_IN_TOP_MID, 0, 45 );
     log_i("set up menu items");
 
