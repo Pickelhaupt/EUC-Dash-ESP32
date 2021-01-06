@@ -44,21 +44,21 @@
 #define KS_14S_WARNTEMP     50
 #define KS_14S_BATTVOLT     67
 #define KS_14S_BATTWARN     25
-#define KS_14S_BATT_IR      15
+#define KS_14S_BATT_IR      11
 
 #define KS_16S_MAXCURRENT   40
 #define KS_16S_CRITTEMP     65
 #define KS_16S_WARNTEMP     50
 #define KS_16S_BATTVOLT     67
 #define KS_16S_BATTWARN     25
-#define KS_16S_BATT_IR      15
+#define KS_16S_BATT_IR      11
 
 #define KS_16X_MAXCURRENT   45
 #define KS_16X_CRITTEMP     65
 #define KS_16X_WARNTEMP     50
 #define KS_16X_BATTVOLT     84
 #define KS_16X_BATTWARN     25
-#define KS_16X_BATT_IR      15
+#define KS_16X_BATT_IR      10
 
 
 #include <TTGO.h>

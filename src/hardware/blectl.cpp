@@ -71,6 +71,7 @@ bool cli_ondisconnect = false;
 int scandelay = 0;
 
 BLEServer *pServer = NULL;
+BLEScan *pBLEScan = BLEDevice::getScan();
 BLECharacteristic *pTxCharacteristic;
 BLECharacteristic *pRxCharacteristic;
 uint8_t txValue = 0;
@@ -533,7 +534,12 @@ bool blectl_cli_getconnected( void )
 
 void blectl_scan_once(int scantime)
 { 
-    BLEDevice::getScan()->start(scantime);
+    if (!cliconnected && blectl_config.autoconnect)
+    {
+        log_i("Disconnected... starting scan");
+        pBLEScan->start(scantime, scanCompleteCB, false);
+        //BLEDevice::getScan()->start(scantime, scanCompleteCB);
+    }
 }
 
 void blectl_scan_setup()
@@ -546,10 +552,10 @@ void blectl_scan_setup()
     // scan to run for 2 seconds.
     powermgm_register_cb(POWERMGM_SILENCE_WAKEUP | POWERMGM_STANDBY | POWERMGM_WAKEUP, blectl_cli_powermgm_event_cb, "blectl_cli");
     powermgm_register_loop_cb(POWERMGM_SILENCE_WAKEUP | POWERMGM_STANDBY | POWERMGM_WAKEUP, blectl_cli_powermgm_loop_cb, "blectl_cli loop");
-    BLEScan *pBLEScan = BLEDevice::getScan();
+    //BLEScan *pBLEScan = BLEDevice::getScan();
     pBLEScan->setAdvertisedDeviceCallbacks(new MyAdvertisedDeviceCallbacks());
     pBLEScan->setInterval(1349);
     pBLEScan->setWindow(449);
     pBLEScan->setActiveScan(true);
-    pBLEScan->start(2, scanCompleteCB, false);
+    //pBLEScan->start(2, scanCompleteCB, false);
 }
