@@ -120,6 +120,8 @@
     #define BLECTL_CHUNKDELAY       20      /** @brief chunk delay in ms for each msg chunk */
     #define BLECTL_MSG_MTU          256     /** @brief max msg size */
 
+    #define BLECTL_MAX_ADVERTISED   5      /** @brief max number of wheels to simultaniously show */
+
     /**
      * @brief blectl config structure
      */
@@ -139,6 +141,17 @@
         int32_t msglen;                 /** @brief msg lenght */
         int32_t msgpos;                 /** @brief msg postition for next send */
     } blectl_msg_t;
+
+    
+    enum { 
+        WHEELTYPE_KS,
+        WHEELTYPE_GW,
+        WHEELTYPE_IM,
+        WHEELTYPE_NB,
+        WHEELTYPE_NBZ,
+        WHEELTYPE_NUM
+    };
+
 
     /**
      * @brief ble setup function
