@@ -124,6 +124,7 @@ class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks
         if(blectl_new_scan) wheel_num = 0;
         blectl_new_scan = false;
         Serial.print("BLE Advertised Device found: ");
+        Serial.println(advertisedDevice.toString().c_str());
         log_i("BLE Advertised Device found: %s", advertisedDevice.toString().c_str());
         
         for (int i = 0; i < MAX_STORED_WHEELS; i++) { //connect now if wheel is already stored
@@ -132,7 +133,8 @@ class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks
             String adv_addr = advertisedDevice.getAddress().toString().c_str();
             if ( adv_addr == stored_wheel[i].address ) {
                 log_i("stored wheel detected");
-                Serial.printf("Stored wheel detected wheel num: %d address %s\n", i, stored_wheel[i].address);
+                wheel_num++;
+                Serial.printf("Stored wheel detected wheel num: %d address %s\n", i, stored_wheel[i].address.c_str());
                 myTempDevice[0] = new BLEAdvertisedDevice(advertisedDevice);
                 wheel_type[0] = stored_wheel[i].type;
                 wheel_found = true;
