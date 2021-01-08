@@ -50,6 +50,8 @@ EventGroupHandle_t blectl_status = NULL;
 portMUX_TYPE DRAM_ATTR blectlMux = portMUX_INITIALIZER_UNLOCKED;
 
 blectl_config_t blectl_config;
+stored_wheel_t stored_wheel[MAX_STORED_WHEELS];
+
 blectl_msg_t blectl_msg;
 callback_t *blectl_callback = NULL;
 
@@ -64,6 +66,7 @@ void blectl_loop(void);
 void blectl_cli_loop(void);
 void blectl_scan_once(int scantime);
 bool connectToServer(void);
+static void scanCompleteCB(BLEScanResults scanResults);
 
 bool clidoConnect = false;
 bool cliconnected = false;
@@ -77,7 +80,6 @@ BLEServer *pServer = NULL;
 BLECharacteristic *pTxCharacteristic;
 BLECharacteristic *pRxCharacteristic;
 uint8_t txValue = 0;
-String EUC_Brand = "unknown";
 String blename;
 String blemfg;
 byte wheel_type[BLECTL_MAX_ADVERTISED];
@@ -122,22 +124,33 @@ class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks
         if(blectl_new_scan) wheel_num = 0;
         blectl_new_scan = false;
         Serial.print("BLE Advertised Device found: ");
-        Serial.println(advertisedDevice.toString().c_str());
         log_i("BLE Advertised Device found: %s", advertisedDevice.toString().c_str());
-        // We have found a device, let us now see if it contains the service we are looking for.
         
+        for (int i = 0; i < MAX_STORED_WHEELS; i++) { //connect now if wheel is already stored
+            Serial.printf("stored wheel: %d wheeltype %d address: ", i, stored_wheel[i].type);
+            Serial.println(stored_wheel[i].address);
+            String adv_addr = advertisedDevice.getAddress().toString().c_str();
+            if ( adv_addr == stored_wheel[i].address ) {
+                log_i("stored wheel detected");
+                Serial.printf("Stored wheel detected wheel num: %d address %s\n", i, stored_wheel[i].address);
+                myTempDevice[0] = new BLEAdvertisedDevice(advertisedDevice);
+                wheel_type[0] = stored_wheel[i].type;
+                wheel_found = true;
+                pBLEScan->stop();
+                scanCompleteCB( pBLEScan->getResults() );
+            }
+        }
+        // We have found a device, let us now see if it contains the service we are looking for.
         if (advertisedDevice.haveServiceUUID() && advertisedDevice.isAdvertisingService(KS_SERVICE_UUID_1))
         {
             log_i("Kingsong wheel detected");
             myTempDevice[wheel_num] = new BLEAdvertisedDevice(advertisedDevice);
             wheel_num++;
             wheel_type[wheel_num] = WHEELTYPE_KS;
+            stored_wheel[WHEEL_1].address = advertisedDevice.getAddress().toString().c_str();
+            stored_wheel[WHEEL_1].type = WHEELTYPE_KS;
+            blectl_save_stored_wheels();
             wheel_found = true;
-            //pBLEScan->stop();
-
-            //clidoConnect = true;
-            //EUC_Brand = "KingSong";
-            //wheelctl_set_info(WHEELCTL_INFO_MANUFACTURER, "KS");
         } // Found our server
         else if (advertisedDevice.haveServiceUUID() && advertisedDevice.isAdvertisingService(IM_SERVICE_UUID))
         {
@@ -147,10 +160,6 @@ class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks
             wheel_num++;
             wheel_type[wheel_num] = WHEELTYPE_IM;
             wheel_found = true;
-
-            //clidoConnect = true;
-            //EUC_Brand = "Inmotion";
-            //wheelctl_set_info(WHEELCTL_INFO_MANUFACTURER, "IM");
         } // Found our server
             else if (advertisedDevice.haveServiceUUID() && advertisedDevice.isAdvertisingService(NB_SERVICE_UUID))
         {
@@ -160,10 +169,6 @@ class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks
             wheel_num++;
             wheel_type[wheel_num] = WHEELTYPE_NB;
             wheel_found = true;
-
-            //clidoConnect = true;
-            //EUC_Brand = "NineBot";
-            //wheelctl_set_info(WHEELCTL_INFO_MANUFACTURER, "NB");
         } // Found our server
         else if (advertisedDevice.haveServiceUUID() && advertisedDevice.isAdvertisingService(NBZ_SERVICE_UUID))
         {
@@ -173,10 +178,6 @@ class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks
             wheel_num++;
             wheel_type[wheel_num] = WHEELTYPE_NBZ;
             wheel_found = true;
-
-            //clidoConnect = true;
-            //EUC_Brand = "NineBot-Z";
-            //wheelctl_set_info(WHEELCTL_INFO_MANUFACTURER, "NBZ");
         } // Found our server
     } // onResult
 };    // MyAdvertisedDeviceCallbacks
@@ -191,9 +192,7 @@ bool blectl_cli_powermgm_event_cb(EventBits_t event, void *arg)
         if (cliconnected)
         {
             retval = false;
-            //fulldash_active = false;
-            //simpledash_active = false;
-            log_w("standby blocked by wheel being connected");
+            log_i("standby blocked by wheel being connected");
         }
         else
         {
@@ -371,6 +370,8 @@ void blectl_save_config(void)
         doc["enable_on_standby"] = blectl_config.enable_on_standby;
         doc["tx_power"] = blectl_config.txpower;
         doc["autoconnect"] = blectl_config.autoconnect;
+        doc["default_wheel"] = blectl_config.default_wheel;
+        doc["default_wheel_type"] = blectl_config.default_wheel_type;
 
         if (serializeJsonPretty(doc, file) == 0)
         {
@@ -405,12 +406,62 @@ void blectl_read_config(void)
             blectl_config.enable_on_standby = doc["enable_on_standby"] | false;
             blectl_config.txpower = doc["tx_power"] | 1;
             blectl_config.autoconnect = doc["autoconnect"] | true;
+            blectl_config.default_wheel = doc["default_wheel"] | "00:00:00:00:00:00";
+            blectl_config.default_wheel_type = doc["default_wheel_type"] | 0;
         }
         doc.clear();
     }
     file.close();
 }
 
+void blectl_save_stored_wheels (void) {
+   fs::File file = SPIFFS.open( BLECTL_JSON_WHEEL_FILE, FILE_WRITE );
+
+    if (!file) {
+        log_e("Can't open file: %s!", BLECTL_JSON_WHEEL_FILE );
+    }
+    else {
+        SpiRamJsonDocument doc( 300 ); 
+
+        doc["wheel1_address"] = stored_wheel[ WHEEL_1 ].address;
+        doc["wheel1_type"] = stored_wheel[ WHEEL_1 ].type;
+        doc["wheel2_address"] = stored_wheel[ WHEEL_2 ].address;
+        doc["wheel2_type"] = stored_wheel[ WHEEL_2 ].type;
+        doc["wheel3_address"] = stored_wheel[ WHEEL_3 ].address;
+        doc["wheel3_type"] = stored_wheel[ WHEEL_3 ].type;
+        if ( serializeJsonPretty( doc, file ) == 0) {
+            log_e("Failed to write config file");
+        }
+        doc.clear();
+    }
+    file.close();  
+}
+
+void blectl_read_stored_wheels (void) {
+    fs::File file = SPIFFS.open( BLECTL_JSON_WHEEL_FILE, FILE_READ );
+    if (!file) {
+        log_e("Can't open file: %s!", BLECTL_JSON_WHEEL_FILE );
+    }
+    else {
+        int filesize = file.size();
+        SpiRamJsonDocument doc( filesize * 2 );
+
+        DeserializationError error = deserializeJson( doc, file );
+        if ( error ) {
+            log_e("update check deserializeJson() failed: %s", error.c_str() );
+        }
+        else {
+            stored_wheel[ WHEEL_1 ].address = doc["wheel1_address"] | "00:00:00:00:00:00";
+            stored_wheel[ WHEEL_1 ].type = doc["wheel1_type"] | 0;
+            stored_wheel[ WHEEL_2 ].address = doc["wheel3_address"] | "00:00:00:00:00:00";
+            stored_wheel[ WHEEL_2 ].type = doc["wheel2_type"] | 0;
+            stored_wheel[ WHEEL_3 ].address = doc["wheel3_address"] | "00:00:00:00:00:00";
+            stored_wheel[ WHEEL_3 ].type = doc["wheel3_type"] | 0;
+        }        
+        doc.clear();
+    }
+    file.close();
+}
 
 static void scanCompleteCB(BLEScanResults scanResults) {
 	log_i("Scan complete!\n");
@@ -419,33 +470,49 @@ static void scanCompleteCB(BLEScanResults scanResults) {
 	scanResults.dump();
     if(wheel_found){
         if (wheel_type[0] == WHEELTYPE_KS) {
-            EUC_Brand = "KingSong";
             wheelctl_set_info(WHEELCTL_INFO_MANUFACTURER, "KS");
         }
         if (wheel_type[0] == WHEELTYPE_IM) {
-            EUC_Brand = "Inmotion";
             wheelctl_set_info(WHEELCTL_INFO_MANUFACTURER, "IM");
         }
         if (wheel_type[0] == WHEELTYPE_NB) {
-            EUC_Brand = "NineBot";
             wheelctl_set_info(WHEELCTL_INFO_MANUFACTURER, "NB");
         }
         if (wheel_type[0] == WHEELTYPE_NBZ) {
-            EUC_Brand = "NineBotZ";
             wheelctl_set_info(WHEELCTL_INFO_MANUFACTURER, "NBZ");
         }
         myDevice = myTempDevice[0];
         clidoConnect = true;
-        Serial.printf("We found %d wheels\n", wheel_found);
+        Serial.printf("We found %d wheels\n", wheel_num);
+        /*
+        if (connectToServer())
+        {
+            log_i("We are now connected to the BLE Server.");
+            
+            if ( wheelctl_get_info(WHEELCTL_INFO_MANUFACTURER) == "KS" ) initks();
+            //if ( wheelctl_get_info(WHEELCTL_INFO_MANUFACTURER) == "GW" ) initgw();
+            //if ( wheelctl_get_info(WHEELCTL_INFO_MANUFACTURER) == "IM" ) initim();
+            //if ( wheelctl_get_info(WHEELCTL_INFO_MANUFACTURER) == "NB" ) initnb();
+            //if ( wheelctl_get_info(WHEELCTL_INFO_MANUFACTURER) == "NBZ" ) initnbz();
+
+            fulldash_tile_reload();
+            simpledash_tile_reload();
+            mainbar_jump_to_maintile(LV_ANIM_OFF);
+        }
+        else
+        {
+            log_w("We have failed to connect to the server;");
+        }
+        clidoConnect = false;
+        */
     }  
 } // scanCompleteCB
 
 void blectl_cli_loop(void)
 {
     static int scandelay = 15000;
-    String EUC_Type = wheelctl_get_info(WHEELCTL_INFO_MANUFACTURER);
     if(!blectl_get_autoconnect() && pClient != NULL) pClient->disconnect();
-
+    
     if (clidoConnect)
     {
         if (connectToServer())
@@ -453,7 +520,7 @@ void blectl_cli_loop(void)
             log_i("We are now connected to the BLE Server.");
             if (wheelctl_get_info(WHEELCTL_INFO_BLENAME) == "KS-14SMD4735") log_i("Found KS Wheel");
 
-            if (EUC_Type = "KS")
+            if ( wheelctl_get_info(WHEELCTL_INFO_MANUFACTURER) == "KS" )
             {
                 log_i("initialising KingSong");
                 initks();
@@ -468,15 +535,17 @@ void blectl_cli_loop(void)
         }
         clidoConnect = false;
     }
+    
     if (millis() - NextMillis > scandelay)
     {
         NextMillis += scandelay;
-        if (!cliconnected && blectl_config.autoconnect)
-        {
-            blectl_new_scan = true;
-            log_i("Disconnected... starting scan");
-            BLEDevice::getScan()->start(2, scanCompleteCB);
-        }
+        if (blectl_config.autoconnect) blectl_scan_once(2);
+        //if (!cliconnected && blectl_config.autoconnect)
+        //{
+        //    blectl_new_scan = true;
+        //     log_i("Disconnected... starting scan");
+        //    BLEDevice::getScan()->start(2, scanCompleteCB);
+        //}
     }
 }
 
@@ -524,6 +593,7 @@ bool connectToServer()
     log_i(" - Created client");
 
     pClient->setClientCallbacks(new MyClientCallback());
+    log_i(" - set callbacks");
 
     // Connect to the remote BLE Server.
     pClient->connect(myDevice); // if you pass BLEAdvertisedDevice instead of address, it will be recognized type of peer device address (public or private)
@@ -580,7 +650,7 @@ bool blectl_cli_getconnected( void )
 
 void blectl_scan_once(int scantime)
 { 
-    if (!cliconnected && blectl_config.autoconnect)
+    if ( !cliconnected )
     {
         blectl_new_scan = true;
         log_i("Disconnected... starting scan");
@@ -592,6 +662,8 @@ void blectl_scan_setup()
 {
     log_i("Starting Arduino BLE Client application...");
     blectl_read_config();
+    blectl_read_stored_wheels();
+    //blectl_save_stored_wheels();
     BLEDevice::init("esp32-ble");
     // Retrieve a Scanner and set the callback we want to use to be informed when we
     // have detected a new device.  Specify that we want active scanning and start the

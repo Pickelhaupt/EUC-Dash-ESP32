@@ -111,6 +111,7 @@
     #define BATTERY_POWER_STATE_LEVEL_CRITICALLY_LOW        0xC0
 
     #define BLECTL_JSON_COFIG_FILE         "/blectl.json"   /** @brief defines json config file name */
+    #define BLECTL_JSON_WHEEL_FILE         "/blectl_wheel.json"   /** @brief defines json stored wheels file name */
 
     #define EndofText               0x03
     #define LineFeed                0x0a
@@ -129,8 +130,22 @@
         bool autoon = false;             /** @brief auto on/off */
         bool enable_on_standby = false; /** @brief enable on standby on/off */
         int32_t txpower = 1;            /** @brief tx power, valide values are from 0 to 4 */
-        bool autoconnect = true;      /** @brief Mac address of wheel, string */
+        bool autoconnect = true;      /** @brief enable autoconnect to wheel on/off */
+        String default_wheel = "00:00:00:00:00:00"; /** @brief Mac address of wheel, string */
+        byte default_wheel_type = 0;
     } blectl_config_t;
+
+    typedef struct {
+        String address = "00:00:00:00:00:00";
+        byte type = 0;
+    } stored_wheel_t;
+
+    enum { 
+        WHEEL_1,
+        WHEEL_2,
+        WHEEL_3,
+        MAX_STORED_WHEELS
+    };
 
     /**
      * @brief blectl send msg structure
@@ -290,5 +305,7 @@
     bool blectl_cli_getconnected( void );
 
     void blectl_scan_once(int scantime);
+
+    void blectl_save_stored_wheels (void);
 
 #endif // _BLECTL_H
