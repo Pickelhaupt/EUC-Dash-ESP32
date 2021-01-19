@@ -1,5 +1,7 @@
 # EUC-Dash-ESP32
 
+**2021-01-19 rewrite of bluetooth code to enable better wheel identification and detection in progress**
+
 **2021-01-03 Updated all settings screens and fixed a lot of bugs**
 
 **2020-12-09 Updated ttgo t-watch library to latest version(master branch) with lvgl 7.7.1**
