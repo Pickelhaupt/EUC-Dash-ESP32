@@ -1,7 +1,6 @@
 /****************************************************************************
- *   Aug 11 17:13:51 2020
- *   Copyright  2020  Dirk Brosswick
- *   Email: dirk.brosswick@googlemail.com
+ *  Jesper Ortlund 2021
+ *  Based on code Copyright 2020 Dirk Brosswick
  ****************************************************************************/
  
 /*
@@ -41,8 +40,11 @@
     #define BLECTL_CLI_DOCONNECT         _BV(13)        /** @brief event mask for ble client connect to a server */
     #define BLECTL_CLI_DOSCAN            _BV(14)        /** @brief event mask for ble client scanning */
     #define BLECTL_CLI_CONNECTED         _BV(15)        /** @brief event mask for ble client connected */
-    #define BLECTL_CLI_MSG               _BV(16)        /** @brief event mask for client blectl msg */
-
+    #define BLECTL_CLI_DISCONNECTED      _BV(16)        /** @brief event mask for ble client disconnected */
+    #define BLECTL_CLI_ON                _BV(17)        /** @brief event mask for ble client on */
+    #define BLECTL_CLI_OFF               _BV(18)        /** @brief event mask for ble client off */
+    #define BLECTL_CLI_MSG               _BV(19)        /** @brief event mask for client blectl msg */
+    #define BLECTL_CLI_DETECT            _BV(20)        /** @brief event mask for detecting new wheels */
 
     // See the following for generating UUIDs:
     // https://www.uuidgenerator.net/
@@ -123,6 +125,8 @@
 
     #define BLECTL_MAX_ADVERTISED   5      /** @brief max number of wheels to simultaniously show */
 
+    
+
     /**
      * @brief blectl config structure
      */
@@ -135,16 +139,41 @@
         byte default_wheel_type = 0;
     } blectl_config_t;
 
+    enum { 
+        WHEELTYPE_KS,
+        WHEELTYPE_GW,
+        WHEELTYPE_IM,
+        WHEELTYPE_NB,
+        WHEELTYPE_NBZ,
+        WHEELTYPE_NUM
+    };
+
     typedef struct {
         String address = "00:00:00:00:00:00";
-        byte type = 0;
+        byte type = WHEELTYPE_NUM;
     } stored_wheel_t;
 
     enum { 
         WHEEL_1,
         WHEEL_2,
         WHEEL_3,
+        WHEEL_4,
+        WHEEL_5,
         MAX_STORED_WHEELS
+    };
+
+    typedef struct {
+        String address = "00:00:00:00:00:00";
+        byte type = WHEELTYPE_NUM;
+    } detected_wheel_t;
+
+    enum { 
+        DETECTED_1,
+        DETECTED_2,
+        DETECTED_3,
+        DETECTED_4,
+        DETECTED_5,
+        MAX_DETECTED_WHEELS
     };
 
     /**
@@ -156,17 +185,6 @@
         int32_t msglen;                 /** @brief msg lenght */
         int32_t msgpos;                 /** @brief msg postition for next send */
     } blectl_msg_t;
-
-    
-    enum { 
-        WHEELTYPE_KS,
-        WHEELTYPE_GW,
-        WHEELTYPE_IM,
-        WHEELTYPE_NB,
-        WHEELTYPE_NBZ,
-        WHEELTYPE_NUM
-    };
-
 
     /**
      * @brief ble setup function
@@ -303,9 +321,120 @@
      * @return true if connected to the whhel, false if disconnected
      */
     bool blectl_cli_getconnected( void );
-
-    void blectl_scan_once(int scantime);
-
-    void blectl_save_stored_wheels (void);
+    /**
+     * @brief scan for EUCs via BLE
+     * 
+     * @param scantime the time scanning is active (1-2sec is usually sufficient)
+     * 
+     * @param scan_for_new true if scanning for new wheels, false if connecting to stored wheel
+     * 
+     * @return N/A
+     */
+    void blectl_scan_once(int scantime, bool scan_for_new);
+    /**
+     * @brief Save stored wheels to flash
+     * 
+     * @return true if successful, false otherwise
+     */ 
+    bool blectl_save_stored_wheels (void);
+    /**
+     * @brief get the BLE address of a stored wheel
+     * 
+     * @param wheelnum the number of the wheel storage slot should be < MAX_STORED_WHEELS
+     * 
+     * @return String containing the BLE address of the wheel
+     */ 
+    String blectl_get_stored_wheel_address(byte wheelnum);
+    /**
+     * @brief get the wheel type of a stored wheel (KS, GW, IM, NB or NBZ)
+     * 
+     * @param wheelnum the number of the wheel storage slot should be < MAX_STORED_WHEELS
+     * 
+     * @return byte containing the assigned type id of the wheel
+     * 0 = WHEELTYPE_KS
+     * 1 = WHEELTYPE_GW
+     * 2 = WHEELTYPE_IM
+     * 3 = WHEELTYPE_NB
+     * 4 = WHEELTYPE_NBZ
+     * 5 = WHEELTYPE_NUM -- also used when wheeltype cannot be determined
+     */
+    byte blectl_get_stored_wheel_type(byte wheelnum);
+    /**
+     * @brief get the BLE address of a detected wheel
+     * 
+     * @param wheelnum the number of the wheel storage slot should be < MAX_STORED_WHEELS
+     * 
+     * @return String containing the BLE address of the wheel
+     */
+    String blectl_get_detected_wheel_address(byte wheelnum);
+    /**
+     * @brief get the wheel type of a detected wheel (KS, GW, IM, NB or NBZ)
+     * 
+     * @param wheelnum the number of the wheel storage slot should be < MAX_STORED_WHEELS
+     * 
+     * @return byte containing the assigned type id of the wheel
+     * 0 = WHEELTYPE_KS,
+     * 1 = WHEELTYPE_GW,
+     * 2 = WHEELTYPE_IM,
+     * 3 = WHEELTYPE_NB,
+     * 4 = WHEELTYPE_NBZ,
+     * 5 = WHEELTYPE_NUM -- also used when wheeltype cannot be determined
+     */
+    byte blectl_get_detected_wheel_type(byte wheelnum);
+    /**
+     * @brief get the maximum number of detected wheels
+     *  
+     * @return byte containing max number of detected wheels
+     */
+    byte blectl_get_max_detected_wheels(void);
+    /**
+     * @brief get the status of a wheel storage slot
+     * 
+     * @param wheelnum the number of the wheel storage slot should be < MAX_STORED_WHEELS
+     * 
+     * @return true if wheel is stored in the slot, false otherwise
+     */
+    bool blectl_stored_wheel_exist(byte wheelnum);
+    /**
+     * @brief get the next free wheel storage slot
+     *  
+     * @return byte containing the first free slot number
+     */
+    byte blectl_get_free_wheelslot( void );
+    /**
+     * @brief add a wheel to a storage slot
+     * 
+     * @param wheeladdress String containing the BLE address of the wheel to be stored
+     * @param wheeltype byte containing the assigned type id of the wheel
+     * 0 = WHEELTYPE_KS,
+     * 1 = WHEELTYPE_GW,
+     * 2 = WHEELTYPE_IM,
+     * 3 = WHEELTYPE_NB,
+     * 4 = WHEELTYPE_NBZ,
+     * 5 = WHEELTYPE_NUM -- also used when wheeltype cannot be determined
+     * 
+     * @param wheelslot the number of the wheel storage slot should be < MAX_STORED_WHEELS
+     * 
+     * @return true if wheel is stored in the slot, false otherwise
+     */
+    bool blectl_add_stored_wheel(String wheeladdress, byte wheeltype, byte wheelslot);
+    /**
+     * @brief remove a stored wheel from flash
+     * 
+     * @param wheelnum the number of the wheel storage slot should be < MAX_STORED_WHEELS
+     * 
+     * @return true if remove successful, false otherwise
+     */
+    bool blectl_remove_stored_wheel(byte wheelnum);
+    /**
+     * @brief move the selected stored wheel to the first storage slot
+     * 
+     * @param wheelnum the number of the wheel storage slot, should be < MAX_STORED_WHEELS
+     * 
+     * @return true if successful, false otherwise
+     */
+    bool blectl_set_prio_stored_wheel(byte wheelnum);
+    
+    byte blectl_get_num_detected_wheels(void);
 
 #endif // _BLECTL_H

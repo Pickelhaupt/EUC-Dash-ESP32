@@ -434,11 +434,7 @@ void ks_ble_set(byte parameter, byte value)
     writeBLE(KS_BLEreq, 20);
 }
 
-void initks()
-{
-    //Setting of some model specific parametes,
-    setKSconstants();
-
+void ks_init_notifications() {
     log_i("requesting model..");
     ks_ble_request(0x9B);
     delay(200);
@@ -448,7 +444,13 @@ void initks()
     log_i("requesting speed settings..");
     ks_ble_request(0x98);
     delay(200);
+}
 
+void initks()
+{
+    //Setting of some model specific parametes,
+    setKSconstants();
+    ks_init_notifications();
     kingsong_decode_serial();
     wheelctl_connect_actions();
 } //End of initks

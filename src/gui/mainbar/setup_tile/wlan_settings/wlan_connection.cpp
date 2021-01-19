@@ -168,12 +168,15 @@ bool wifi_setup_wifictl_event_cb( EventBits_t event, void *arg ) {
             while ( lv_list_remove( wifiname_list, 0 ) );
 
             int len = WiFi.scanComplete();
+            Serial.printf("%d ssids detected\n", len);
             for( int i = 0 ; i < len ; i++ ) {
                 if ( wifictl_is_known( WiFi.SSID(i).c_str() ) ) {
+                    Serial.printf( "%d found known ssid: %s\n", i, WiFi.SSID(i).c_str() );
                     lv_obj_t * wifiname_list_btn = lv_list_add_btn( wifiname_list, &unlock_16px, WiFi.SSID(i).c_str() );
                     lv_obj_set_event_cb( wifiname_list_btn, wifi_connection_enter_pass_event_cb);
                 }
                 else {
+                    Serial.printf( "%d found unknown ssid: %s\n", i, WiFi.SSID(i).c_str() );
                     lv_obj_t * wifiname_list_btn = lv_list_add_btn( wifiname_list, &lock_16px, WiFi.SSID(i).c_str() );
                     lv_obj_set_event_cb( wifiname_list_btn, wifi_connection_enter_pass_event_cb);
                 }

@@ -101,8 +101,12 @@ void ks_led(byte mode);
 */
 void decodeKS(byte KSData[]);
 /**
-* @brief Initialise the Kingsong BLE notification function by sending a series of requests
+* @brief Initialise the Kingsong wheel
 */
 void initks();
+/**
+* @brief Initialise the Kingsong BLE notification function by sending a series of requests
+*/
+void ks_init_notifications();
 
 #endif /* __KINGSONG */

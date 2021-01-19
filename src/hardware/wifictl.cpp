@@ -47,7 +47,8 @@ TaskHandle_t _wifictl_Task;
 char *wifiname=NULL;
 char *wifipassword=NULL;
 
-static networklist *wifictl_networklist = NULL;
+//static networklist *wifictl_networklist = NULL;
+networklist wifictl_networklist[NETWORKLIST_ENTRYS];
 wifictl_config_t wifictl_config;
 
 static esp_wps_config_t esp_wps_config;
@@ -70,12 +71,12 @@ void wifictl_setup( void ) {
 
     wifi_init = true;
 
-    wifictl_networklist = (networklist*)CALLOC( sizeof( networklist ) * NETWORKLIST_ENTRYS, 1 );
-
-    if( !wifictl_networklist ) {
-      log_e("wifictl_networklist calloc faild");
-      while(true);
-    }
+    //wifictl_networklist = (networklist*)CALLOC( sizeof( networklist ) * NETWORKLIST_ENTRYS, 1 );
+    //wifictl_networklist = (networklist*)calloc( sizeof( networklist ) * NETWORKLIST_ENTRYS, 1 );
+    //if( !wifictl_networklist ) {
+    //  log_e("wifictl_networklist calloc faild");
+    // while(true);
+    //}
 
     // clean network list table
     for ( int entry = 0 ; entry < NETWORKLIST_ENTRYS ; entry++ ) {
