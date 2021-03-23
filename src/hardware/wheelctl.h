@@ -33,7 +33,7 @@
 
     // POWER_CORRECT_CONST is used to tune the power consumption and economy values I have not 
     // done enough tests to come up with an accurate value yet, it might also differ between wheel models
-    #define POWER_CORRECT_COST  1.3
+    #define POWER_CORRECT_CONST  1.3
 
     /**
      * @brief persistent tripdata structure
@@ -127,7 +127,7 @@
         WHEELCTL_RMODE,     //Wheel ride mode
         WHEELCTL_BATTPCT,   //Calculated percentage of remaining battery
         WHEELCTL_POWER,     //Wheel power output
-        WHEELCTL_TRIP,      //Value = Ride distance since wheel power on, max_value = trip1, min_value=trip2 managed by watch
+        WHEELCTL_TRIP,      //Value = Ride distance since wheel power on
         WHEELCTL_UPTIME,    //Time since power on in seconds
         WHEELCTL_TOPSPEED,  //max speed reached in kmh since power on
         WHEELCTL_FANSTATE,  //Internal fan run state
@@ -135,9 +135,6 @@
         WHEELCTL_ALARM2,    //Speed when second alarm is triggered
         WHEELCTL_ALARM3,    //Speed when third alarm is triggered
         WHEELCTL_TILTBACK,  //Speed when tiltback is triggered  -required
-        WHEELCTL_RIDETIME,  //Total time in motion since trip reset
-        WHEELCTL_POWERCONS, //Power cunsumed 
-        WHEELCTL_ECONOMY,   //Wh/km(mi)
         WHEELCTL_DATA_NUM   //number of data entries
     };
     
@@ -187,25 +184,6 @@
      * @param   max_value    the value of the data entry
      */
     void wheelctl_set_max_data( int entry, float max_value );
-
-    /**
-     * @brief get the min value for a specific wheel data entry
-     * 
-     * @param   entry     configitem: WHEELCTL_VOLTAGE, WHEELCTL_SPEED, WHEELCTL_CURRENT,  
-     * WHEELCTL_TEMP,  WHEELCTL_BATTPCT, WHEELCTL_POWER
-     * 
-     * @return  float
-     */
-    float wheelctl_get_min_data( int entry );
-
-    /**
-     * @brief set the min value for a specific wheel data entry
-     * 
-     * @param   entry     configitem: WHEELCTL_VOLTAGE, WHEELCTL_SPEED, WHEELCTL_CURRENT,  
-     * WHEELCTL_TEMP,  WHEELCTL_BATTPCT, WHEELCTL_POWER
-     * @param   min_value    the value of the data entry
-     */
-    void wheelctl_set_min_data( int entry, float min_value );
 
     /**
      * @brief get the  value of the wheel constant

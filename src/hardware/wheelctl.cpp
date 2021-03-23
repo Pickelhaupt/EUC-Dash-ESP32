@@ -52,7 +52,7 @@ void wheelctl_update_regen_current(int entry, float value);
 void wheelctl_update_battpct_max_min(int entry, float value);
 void update_calc_battery(float value);
 void wheelctl_calc_power(float value);
-void wheelctl_tick_update(lv_task_t *ride_tick);
+void wheelctl_tick_update( void );
 void wheelctl_save_trip_task(lv_task_t *save_trip_task);
 void wheelctl_update_powercons( float seconds );
 void wheelctl_update_avgspeed(float value);
@@ -113,14 +113,14 @@ void wheelctl_connect_actions(void)
     }
     sync_trip = true;
     sync_millis = true;
-    ride_tick = lv_task_create( wheelctl_tick_update, 1000, LV_TASK_PRIO_LOW, NULL );
-    save_trip_task = lv_task_create( wheelctl_save_trip_task, 20000, LV_TASK_PRIO_LOW, NULL );
+    //ride_tick = lv_task_create( wheelctl_tick_update, 1000, LV_TASK_PRIO_LOW, NULL );
+    //save_trip_task = lv_task_create( wheelctl_save_trip_task, 20000, LV_TASK_PRIO_LOW, NULL );
     setup_tile_connect_update(wheelctl_get_info(WHEELCTL_INFO_MODEL));
 }
 
 void wheelctl_disconnect_actions(){
-    if (ride_tick != nullptr) lv_task_del(ride_tick);
-    if (save_trip_task != nullptr) lv_task_del(save_trip_task);
+    //if (ride_tick != nullptr) lv_task_del(ride_tick);
+    //if (save_trip_task != nullptr) lv_task_del(save_trip_task);
     setup_tile_connect_update("disconnected");
 }
 
@@ -191,8 +191,8 @@ void wheelctl_set_data(int entry, float value)
             if (wheelctl_data[entry].value != value || firstrun[entry])
             {
                 wheelctl_update_battpct_max_min(entry, value);
-                if (fulldash_active) fulldash_batt_update(value, wheelctl_data[WHEELCTL_BATTPCT].min_value, wheelctl_data[WHEELCTL_BATTPCT].max_value);
-                if (simpledash_active) simpledash_batt_update(value, wheelctl_data[WHEELCTL_BATTPCT].min_value, wheelctl_data[WHEELCTL_BATTPCT].max_value);
+                if (fulldash_active) fulldash_batt_update(value, current_trip.min_battery, current_trip.max_battery);
+                if (simpledash_active) simpledash_batt_update(value, current_trip.min_battery, current_trip.max_battery);
                 firstrun[entry] = false;
             }
             break;
@@ -207,16 +207,19 @@ void wheelctl_set_data(int entry, float value)
             if (fulldash_active) fulldash_fan_indic(value);
             if (simpledash_active) simpledash_fan_indic(value);
             break;
+        case WHEELCTL_UPTIME:
+            wheelctl_tick_update();
         }
         firstrun[entry] = false;
         wheelctl_data[entry].value = value;
     }
 }
 
-void wheelctl_tick_update(lv_task_t *ride_tick)
+void wheelctl_tick_update( void )
 {
     static unsigned long oldmillis = 0;
     static float delta_seconds = 0.0;
+    static byte savedelay = 0;
 
     if ( oldmillis == 0 || oldmillis > millis() || sync_millis ) {
         oldmillis = millis();
@@ -224,7 +227,6 @@ void wheelctl_tick_update(lv_task_t *ride_tick)
     }
     delta_seconds = (millis() - oldmillis) / 1000.0;
     if (wheelctl_data[WHEELCTL_SPEED].value >= MIN_RIDE_SPEED) {
-        wheelctl_data[WHEELCTL_RIDETIME].value += delta_seconds;
         current_trip.ride_time += delta_seconds;
     }
     wheelctl_update_powercons(delta_seconds);
@@ -234,6 +236,12 @@ void wheelctl_tick_update(lv_task_t *ride_tick)
     current_trip.max_current = wheelctl_data[WHEELCTL_CURRENT].max_value;
     current_trip.max_power = wheelctl_data[WHEELCTL_POWER].max_value;
     current_trip.max_temperature = wheelctl_data[WHEELCTL_TEMP].max_value;
+
+    if (savedelay > 28) {
+        current_trip_save_data();
+        savedelay = 0;
+    }
+    savedelay++;
 }
 
 void wheelctl_save_trip_task(lv_task_t *save_trip_task) {
@@ -246,27 +254,21 @@ void wheelctl_update_watch_trip(float value)
     if (value < last_value || sync_trip || wheelctl_data[WHEELCTL_SPEED].value < MIN_RIDE_SPEED) { 
         last_value = value; 
     }
-    wheelctl_data[WHEELCTL_TRIP].max_value += (value - last_value);
     current_trip.trip += (value - last_value);
     last_value = value;
     sync_trip = false;
+    if (fulldash_active && !saving_trip_data) fulldash_trip_update(current_trip.trip);
 }
 
 void wheelctl_update_avgspeed(float value)
 {
-    float trip_distance = wheelctl_data[WHEELCTL_TRIP].max_value;
-    if (wheelctl_data[WHEELCTL_RIDETIME].value != 0) {
-        wheelctl_data[WHEELCTL_SPEED].min_value = trip_distance / (wheelctl_data[WHEELCTL_RIDETIME].value / 3600);
+    if (current_trip.ride_time != 0) {
+        current_trip.avg_speed = current_trip.trip / (current_trip.ride_time / 3600);
     }
-    current_trip.avg_speed = wheelctl_data[WHEELCTL_SPEED].min_value;
 }
 
 void wheelctl_update_powercons( float seconds ) {
-    float trip_distance = wheelctl_data[WHEELCTL_TRIP].max_value;
-    if( seconds != 0 ) wheelctl_data[WHEELCTL_POWERCONS].value = wheelctl_data[WHEELCTL_POWERCONS].value + (POWER_CORRECT_COST * wheelctl_data[WHEELCTL_POWER].value / (seconds * 3600));
-    if (trip_distance !=0) wheelctl_data[WHEELCTL_ECONOMY].value = wheelctl_data[WHEELCTL_POWERCONS].value / trip_distance;
-    
-    if( seconds != 0 ) current_trip.consumed_energy = current_trip.consumed_energy + (wheelctl_data[WHEELCTL_POWER].value / (seconds * 3600));
+    if( seconds != 0 ) current_trip.consumed_energy = current_trip.consumed_energy + (POWER_CORRECT_CONST * wheelctl_data[WHEELCTL_POWER].value * seconds / 3600 );
     if (current_trip.trip != 0) current_trip.trip_economy = current_trip.consumed_energy / current_trip.trip;
 }
 
@@ -395,23 +397,6 @@ void wheelctl_set_max_data(int entry, float max_value)
     if (entry < WHEELCTL_DATA_NUM)
     {
         wheelctl_data[entry].max_value = max_value;
-    }
-}
-
-float wheelctl_get_min_data(int entry)
-{
-    if (entry < WHEELCTL_DATA_NUM)
-    {
-        return (wheelctl_data[entry].min_value);
-    }
-    return 0;
-}
-
-void wheelctl_set_min_data(int entry, float min_value)
-{
-    if (entry < WHEELCTL_DATA_NUM)
-    {
-        wheelctl_data[entry].min_value = min_value;
     }
 }
 
@@ -643,7 +628,7 @@ void current_trip_save_data(void)
         doc["max_battery"] = current_trip.max_battery;
         doc["min_battery"] = current_trip.min_battery;
         doc["max_temperature"] =  current_trip.max_temperature;
-        doc["cunsumed_energy"] = current_trip.consumed_energy;
+        doc["consumed_energy"] = current_trip.consumed_energy;
         doc["trip_economy"] = current_trip.trip_economy;
 
         if (serializeJsonPretty(doc, file) == 0)
@@ -687,11 +672,9 @@ void current_trip_read_data(void)
             current_trip.max_battery = doc["max_battery"] | 0.0;
             current_trip.min_battery = doc["min_battery"] | 100.0;
             current_trip.max_temperature = doc["max_temperature"] | 0.0;
-            current_trip.consumed_energy= doc["cunsumed_energy"] | 0.0;
+            current_trip.consumed_energy= doc["consumed_energy"] | 0.0;
             current_trip.trip_economy = doc["trip_economy"] | 0.0;
 
-            wheelctl_data[WHEELCTL_TRIP].max_value = current_trip.trip;
-            wheelctl_data[WHEELCTL_RIDETIME].value = current_trip.ride_time;
             wheelctl_data[WHEELCTL_SPEED].max_value = current_trip.max_speed;
             wheelctl_data[WHEELCTL_SPEED].min_value = current_trip.avg_speed;
             wheelctl_data[WHEELCTL_CURRENT].max_value = current_trip.max_current;
@@ -700,8 +683,6 @@ void current_trip_read_data(void)
             wheelctl_data[WHEELCTL_BATTPCT].max_value = current_trip.max_battery;
             wheelctl_data[WHEELCTL_BATTPCT].min_value = current_trip.min_battery;
             wheelctl_data[WHEELCTL_TEMP].max_value = current_trip.max_temperature;
-            wheelctl_data[WHEELCTL_POWERCONS].value = current_trip.consumed_energy;
-            wheelctl_data[WHEELCTL_ECONOMY].value = current_trip.trip_economy;
         }
         doc.clear();
     }
@@ -720,11 +701,9 @@ void wheelctl_reset_trip( void ) {
     current_trip.max_battery = 0.0;
     current_trip.min_battery = 100.0;
     current_trip.max_temperature =  0.0;
-    current_trip.consumed_energy= 0.0;
+    current_trip.consumed_energy = 0.0;
     current_trip.trip_economy = 0.0;
 
-    wheelctl_data[WHEELCTL_TRIP].max_value = current_trip.trip;
-    wheelctl_data[WHEELCTL_RIDETIME].value = current_trip.ride_time;
     wheelctl_data[WHEELCTL_SPEED].max_value = current_trip.max_speed;
     wheelctl_data[WHEELCTL_SPEED].min_value = current_trip.avg_speed;
     wheelctl_data[WHEELCTL_CURRENT].max_value = current_trip.max_current;
@@ -733,7 +712,5 @@ void wheelctl_reset_trip( void ) {
     wheelctl_data[WHEELCTL_BATTPCT].max_value = current_trip.max_battery;
     wheelctl_data[WHEELCTL_BATTPCT].min_value = current_trip.min_battery;
     wheelctl_data[WHEELCTL_TEMP].max_value = current_trip.max_temperature;
-    wheelctl_data[WHEELCTL_POWERCONS].value = current_trip.consumed_energy;
-    wheelctl_data[WHEELCTL_ECONOMY].value = current_trip.trip_economy;
-    current_trip_save_data();
+    //current_trip_save_data();
 }

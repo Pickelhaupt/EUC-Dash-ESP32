@@ -4,9 +4,12 @@
         #include <stdbool.h>
         #include <esp32-hal-psram.h>
 
-        #define MALLOC         ps_malloc
-        #define CALLOC         ps_calloc
-        #define REALLOC        ps_realloc
+        //#define MALLOC         ps_malloc
+        //#define CALLOC         ps_calloc
+        //#define REALLOC        ps_realloc
+        #define MALLOC         malloc
+        #define CALLOC         calloc
+        #define REALLOC        realloc
     #else
         #define MALLOC         malloc
         #define CALLOC         calloc

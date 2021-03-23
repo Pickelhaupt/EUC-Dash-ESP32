@@ -107,6 +107,10 @@ void fulldash_current_update(float current_current, byte maxcurrent, float min_c
 */
 void fulldash_temp_update(float current_temp, byte warn_temp, byte crit_temp, float max_temp);
 /**
+* @brief update trip label
+*/
+void fulldash_trip_update(float current_trip);
+/**
 * @brief update overlay
 */
 void fulldash_overlay_update();

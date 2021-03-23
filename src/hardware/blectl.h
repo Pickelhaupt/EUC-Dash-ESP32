@@ -135,8 +135,6 @@
         bool enable_on_standby = false; /** @brief enable on standby on/off */
         int32_t txpower = 1;            /** @brief tx power, valide values are from 0 to 4 */
         bool autoconnect = true;      /** @brief enable autoconnect to wheel on/off */
-        String default_wheel = "00:00:00:00:00:00"; /** @brief Mac address of wheel, string */
-        byte default_wheel_type = 0;
     } blectl_config_t;
 
     enum { 
@@ -434,7 +432,7 @@
      * @return true if successful, false otherwise
      */
     bool blectl_set_prio_stored_wheel(byte wheelnum);
-    
+
     byte blectl_get_num_detected_wheels(void);
 
 #endif // _BLECTL_H

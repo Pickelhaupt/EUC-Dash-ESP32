@@ -47,8 +47,8 @@ TaskHandle_t _wifictl_Task;
 char *wifiname=NULL;
 char *wifipassword=NULL;
 
-//static networklist *wifictl_networklist = NULL;
-networklist wifictl_networklist[NETWORKLIST_ENTRYS];
+static networklist *wifictl_networklist = NULL;
+//networklist wifictl_networklist[NETWORKLIST_ENTRYS];
 wifictl_config_t wifictl_config;
 
 static esp_wps_config_t esp_wps_config;
@@ -71,12 +71,12 @@ void wifictl_setup( void ) {
 
     wifi_init = true;
 
-    //wifictl_networklist = (networklist*)CALLOC( sizeof( networklist ) * NETWORKLIST_ENTRYS, 1 );
+    wifictl_networklist = (networklist*)CALLOC( sizeof( networklist ) * NETWORKLIST_ENTRYS, 1 );
     //wifictl_networklist = (networklist*)calloc( sizeof( networklist ) * NETWORKLIST_ENTRYS, 1 );
-    //if( !wifictl_networklist ) {
-    //  log_e("wifictl_networklist calloc faild");
-    // while(true);
-    //}
+    if( !wifictl_networklist ) {
+      log_e("wifictl_networklist calloc faild");
+     while(true);
+    }
 
     // clean network list table
     for ( int entry = 0 ; entry < NETWORKLIST_ENTRYS ; entry++ ) {
@@ -206,7 +206,7 @@ void wifictl_save_config( void ) {
         log_e("Can't open file: %s!", WIFICTL_JSON_CONFIG_FILE );
     }
     else {
-        SpiRamJsonDocument doc( 10000 );
+        SpiRamJsonDocument doc( 5000 );
 
         doc["autoon"] = wifictl_config.autoon;
         doc["enable_on_standby"] = wifictl_config.enable_on_standby;

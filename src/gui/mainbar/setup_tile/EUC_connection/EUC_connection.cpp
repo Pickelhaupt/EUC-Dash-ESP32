@@ -32,7 +32,7 @@
 
 #include "hardware/blectl.h"
 #include "hardware/json_psram_allocator.h"
-#include "gui/mainbar/setup_tile/watch_settings/watch_settings.h"
+#include "gui/mainbar/setup_tile/eucdash_settings/eucdash_settings.h"
 
 
 LV_IMG_DECLARE(exit_32px);
@@ -70,7 +70,7 @@ LV_IMG_DECLARE(trash_32px);
 LV_IMG_DECLARE(euc_32px);
 
 void wlan_connection_tile_pre_setup( void ){
-    watch_settings_register_menu_item(&euc_32px, enter_euc_connection_event_cb, "connect euc");
+    eucdash_settings_register_menu_item(&euc_32px, enter_euc_connection_event_cb, "connect euc");
 }
 
 void wlan_connection_tile_setup( void ) {

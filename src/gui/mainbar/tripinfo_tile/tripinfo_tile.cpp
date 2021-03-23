@@ -213,18 +213,15 @@ void tripinfo_update( void ) {
     char temp[16]="";
     
     if (dashboard_get_config(DASHBOARD_IMPDIST)) {
-        //float imptrip = wheelctl_get_data(WHEELCTL_TRIP) / 1.6;
         float imptrip = current_trip.trip / 1.6;
         snprintf( temp, sizeof( temp ), "%0.2f mi", imptrip );
     } else {
-        //snprintf( temp, sizeof( temp ), "%0.2f km", wheelctl_get_data(WHEELCTL_TRIP) );
         snprintf( temp, sizeof( temp ), "%0.2f km", current_trip.trip );
     }
     lv_label_set_text( trip_data, temp);
     lv_obj_align( trip_data, tripinfo_cont, LV_ALIGN_IN_TOP_RIGHT, -5, 30 );
 
     int seconds = current_trip.ride_time;
-    //int seconds =  wheelctl_get_data(WHEELCTL_RIDETIME);
     int r_hours = seconds / 3600;
     int r_remain = seconds % 3600;
     int r_minutes = r_remain / 60;
@@ -235,7 +232,6 @@ void tripinfo_update( void ) {
     lv_obj_align( ride_time_data, trip_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
 
     if (dashboard_get_config(DASHBOARD_IMPDIST)) {
-        //float imp_avgspd = wheelctl_get_min_data(WHEELCTL_SPEED) / 1.6;
         float imp_avgspd = current_trip.avg_speed / 1.6;
         snprintf( temp, sizeof( temp ), "%0.2f mph", imp_avgspd );
     } else {
@@ -246,32 +242,26 @@ void tripinfo_update( void ) {
 
     if (dashboard_get_config(DASHBOARD_IMPDIST)) {
         float imp_maxspd = current_trip.max_speed / 1.6;
-        //float imp_maxspd = wheelctl_get_max_data(WHEELCTL_SPEED) / 1.6;
         snprintf( temp, sizeof( temp ), "%0.2f mph", imp_maxspd );
     } else {
         snprintf( temp, sizeof( temp ), "%0.2f kmh", current_trip.max_speed );
-        //snprintf( temp, sizeof( temp ), "%0.2f kmh", wheelctl_get_max_data(WHEELCTL_SPEED) );
     }
     lv_label_set_text( max_speed_data, temp);
     lv_obj_align( max_speed_data, avg_speed_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
 
-    //snprintf( temp, sizeof( temp ), "%0.2f A", wheelctl_get_max_data(WHEELCTL_CURRENT) );
     snprintf( temp, sizeof( temp ), "%0.2f A", current_trip.max_current );
     lv_label_set_text( max_current_data, temp);
     lv_obj_align( max_current_data, max_speed_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
 
-    //snprintf( temp, sizeof( temp ), "%0.1f W", wheelctl_get_max_data(WHEELCTL_POWER) );
     snprintf( temp, sizeof( temp ), "%0.1f W", current_trip.max_power );
     lv_label_set_text( max_power_data, temp);
     lv_obj_align( max_power_data, max_current_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
 
-    //snprintf( temp, sizeof( temp ), "%0.1f Wh", wheelctl_get_data(WHEELCTL_POWERCONS) );
     snprintf( temp, sizeof( temp ), "%0.1f Wh", current_trip.consumed_energy );
     lv_label_set_text( energy_consumption_data, temp);
     lv_obj_align( energy_consumption_data, max_power_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
 
     static float r_econo = 0.0;
-    //r_econo = wheelctl_get_data(WHEELCTL_ECONOMY);
     r_econo = current_trip.trip_economy;
     if (dashboard_get_config(DASHBOARD_IMPDIST)) {
         r_econo = r_econo * 1.6;

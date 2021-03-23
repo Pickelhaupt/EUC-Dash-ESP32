@@ -353,8 +353,6 @@ void blectl_save_config(void)
         doc["enable_on_standby"] = blectl_config.enable_on_standby;
         doc["tx_power"] = blectl_config.txpower;
         doc["autoconnect"] = blectl_config.autoconnect;
-        doc["default_wheel"] = blectl_config.default_wheel;
-        doc["default_wheel_type"] = blectl_config.default_wheel_type;
 
         if (serializeJsonPretty(doc, file) == 0)
         {
@@ -389,8 +387,6 @@ void blectl_read_config(void)
             blectl_config.enable_on_standby = doc["enable_on_standby"] | false;
             blectl_config.txpower = doc["tx_power"] | 1;
             blectl_config.autoconnect = doc["autoconnect"] | true;
-            blectl_config.default_wheel = doc["default_wheel"] | "00:00:00:00:00:00";
-            blectl_config.default_wheel_type = doc["default_wheel_type"] | 0;
         }
         doc.clear();
     }
@@ -406,13 +402,9 @@ bool blectl_save_stored_wheels (void) {
     }
     else {
         SpiRamJsonDocument doc( 400 ); 
-        char addrstring[16];
-        char typestring[13];
         for (int i = 0; i < MAX_STORED_WHEELS; i++) {
-            snprintf(addrstring, 16, "wheel%d_address", i + 1);
-            snprintf(typestring, 13, "wheel%d_type", i + 1);
-            doc[addrstring] = stored_wheel[ i ].address;
-            doc[typestring] = stored_wheel[ i ].type;
+            doc["wheel"][i + 1]["_address"] = stored_wheel[ i ].address;
+            doc["wheel"][i + 1]["_type"] = stored_wheel[ i ].type;
         }
         if ( serializeJsonPretty( doc, file ) == 0) {
             log_e("Failed to write config file");
@@ -439,13 +431,9 @@ void blectl_read_stored_wheels (void) {
             log_e("update check deserializeJson() failed: %s", error.c_str() );
         }
         else {
-            char addrstring[16];
-            char typestring[13];
             for (int i = 0; i < MAX_STORED_WHEELS; i++) {
-                snprintf(addrstring, 16, "wheel%d_address", i + 1);
-                snprintf(typestring, 13, "wheel%d_type", i + 1);
-                stored_wheel[ i ].address = doc[addrstring] | "00:00:00:00:00:00";
-                stored_wheel[ i ].type = doc[typestring] | 0;
+                stored_wheel[ i ].address = doc["wheel"][i + 1]["_address"] | "00:00:00:00:00:00";
+                stored_wheel[ i ].type = doc["wheel"][i + 1]["_type"] | 0;
             }
         }        
         doc.clear();
@@ -888,4 +876,7 @@ void blectl_scan_setup()
     pBLEScan->setInterval(1349);
     pBLEScan->setWindow(449);
     pBLEScan->setActiveScan(true);
+
+    stored_wheel[WHEEL_1].address = "b4:bc:7c:2e:92:49"; //temp only remove
+    stored_wheel[WHEEL_1].type = WHEELTYPE_KS; //temp only remove
 }

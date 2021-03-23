@@ -766,6 +766,21 @@ void fulldash_temp_update(float current_temp, byte warn_temp, byte crit_temp, fl
     lv_obj_realign(temp_label);
 } // update
 
+void fulldash_trip_update(float current_trip)
+{
+   if (trip != NULL)
+    {
+        char tripstring[6];
+        if (dashboard_get_config(DASHBOARD_IMPDIST))
+        {
+            current_trip = wheelctl_get_max_data(WHEELCTL_TRIP) / 1.6;
+        }
+        dtostrf(current_trip, 2, 1, tripstring);
+        lv_label_set_text(trip, tripstring);
+        lv_obj_realign(trip);
+    } 
+}
+
 void fulldash_overlay_update()
 {
     if (overlay_bar == NULL || overlay_label == NULL) return;
@@ -784,6 +799,8 @@ void fulldash_overlay_update()
         lv_obj_set_hidden(overlay_label, false);
     }
 }
+
+
 
 void updateTime()
 {
@@ -812,7 +829,7 @@ void updateTime()
         lv_label_set_text(wbatt, wbattstring);
         lv_obj_align(wbatt, fulldash_cont, LV_ALIGN_IN_BOTTOM_RIGHT, 0, -25);
     }
-    */
+    
     if (trip != NULL)
     {
         char tripstring[6];
@@ -823,14 +840,13 @@ void updateTime()
         }
         dtostrf(converted_trip, 2, 1, tripstring);
         lv_label_set_text(trip, tripstring);
-        //lv_obj_align(trip, fulldash_cont, LV_ALIGN_IN_TOP_MID, 0, 25);
         lv_obj_realign(trip);
     }
+    */
 }
 
 static void lv_time_task(lv_task_t *time_task)
 {
-    updateTime();
     fulldash_overlay_update();
 }
 

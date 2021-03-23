@@ -26,7 +26,7 @@
     #include "callback.h"
 
     #define WIFICTL_DELAY               10
-    #define NETWORKLIST_ENTRYS          20
+    #define NETWORKLIST_ENTRYS          10
     #define WIFICTL_JSON_CONFIG_FILE    "/wificfg.json"
 
     #define ESP_WPS_MODE                WPS_TYPE_PBC

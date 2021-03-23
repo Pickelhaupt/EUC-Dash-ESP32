@@ -117,6 +117,7 @@ void powermgm_loop( void ) {
         powermgm_set_event( POWERMGM_STANDBY );
 
         adc_power_off();
+        //adc_power_release();
 
         if ( powermgm_send_event_cb( POWERMGM_STANDBY ) ) {
             if (!noBuzz) motor_vibe(3);  //Only buzz if a non silent wake was performed

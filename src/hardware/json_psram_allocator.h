@@ -5,7 +5,8 @@
 // see: https://arduinojson.org/v6/how-to/use-external-ram-on-esp32/
 struct SpiRamAllocator {
     void* allocate( size_t size ) { 
-        void *psram = ps_calloc( size, 1 );
+        //void *psram = ps_calloc( size, 1 );
+        void *psram = calloc( size, 1 );
         if ( psram ) {
             return( psram );
         }
