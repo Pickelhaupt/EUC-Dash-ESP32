@@ -804,8 +804,7 @@ void fulldash_overlay_update()
 
 void updateTime()
 {
-    /*
-   
+    /*  
     time_t now;
     struct tm info;
     char buf[64];
@@ -828,19 +827,6 @@ void updateTime()
         dtostrf(watchbatt, 2, 0, wbattstring);
         lv_label_set_text(wbatt, wbattstring);
         lv_obj_align(wbatt, fulldash_cont, LV_ALIGN_IN_BOTTOM_RIGHT, 0, -25);
-    }
-    
-    if (trip != NULL)
-    {
-        char tripstring[6];
-        float converted_trip = wheelctl_get_max_data(WHEELCTL_TRIP);
-        if (dashboard_get_config(DASHBOARD_IMPDIST))
-        {
-            converted_trip = wheelctl_get_max_data(WHEELCTL_TRIP) / 1.6;
-        }
-        dtostrf(converted_trip, 2, 1, tripstring);
-        lv_label_set_text(trip, tripstring);
-        lv_obj_realign(trip);
     }
     */
 }

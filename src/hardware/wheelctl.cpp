@@ -97,9 +97,13 @@ void wheelctl_setup(void)
     wheelctl_data[WHEELCTL_CURRENT].max_value = 0;
     wheelctl_data[WHEELCTL_CURRENT].min_value = 0;
     wheelctl_data[WHEELCTL_TEMP].min_value = 0;
+    Serial.println("init constants");
     wheelctl_init_constants();
+    Serial.println("update values");
     wheelctl_update_values();
+    Serial.println("read config");
     wheelctl_read_config();
+    Serial.println("read current trip data");
     current_trip_read_data();
     sync_trip = true;
     motor_vibe(5, true);
@@ -652,12 +656,12 @@ void current_trip_read_data(void)
     else
     {
         int filesize = file.size();
-        SpiRamJsonDocument doc(filesize * 2);
+        SpiRamJsonDocument doc((filesize * 2) + 10);
 
         DeserializationError error = deserializeJson(doc, file);
         if (error)
         {
-            log_e("blectl deserializeJson() failed: %s", error.c_str());
+            log_e("wheelctl deserializeJson() failed: %s", error.c_str());
         }
         else
         {
