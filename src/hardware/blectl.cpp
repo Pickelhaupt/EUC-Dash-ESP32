@@ -1,6 +1,6 @@
 /****************************************************************************
  *   2020 Jesper Ortlund
- *   Snippets from My-TTGO-Watch by Dirk Brosswick
+ *   Snippets and inspiration from My-TTGO-Watch by Dirk Brosswick
  ****************************************************************************/
 
 /*
@@ -20,7 +20,7 @@
  */
 
 /*
- *  inspire by https://github.com/bburky/t-watch-2020-project
+ *  
  *
  */
 #include "config.h"
@@ -125,6 +125,7 @@ class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks
                 Serial.printf("stored wheel: %d wheeltype %d address: ", i, stored_wheel[i].type);
                 Serial.println(stored_wheel[i].address);
                 String adv_addr = advertisedDevice.getAddress().toString().c_str();
+                wheel_found = false;
                 if ( adv_addr == stored_wheel[i].address ) {
                     log_i("stored wheel detected");
                     //wheel_num++;
