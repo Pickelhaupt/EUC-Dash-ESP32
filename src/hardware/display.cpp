@@ -174,12 +174,21 @@ void display_read_config( void ) {
         log_e("Can't open file: %s!", DISPLAY_JSON_CONFIG_FILE );
     }
     else {
+        int fs = 0;
         int filesize = file.size();
-        SpiRamJsonDocument doc( filesize * 2 );
+        if (file.size() == 0) fs = 1000;
+        SpiRamJsonDocument doc( (filesize * 2) + fs );
 
         DeserializationError error = deserializeJson( doc, file );
         if ( error ) {
             log_e("update check deserializeJson() failed: %s", error.c_str() );
+            /*
+            SPIFFS.end();
+            delay(100);
+            SPIFFS.format();
+            log_e("SPIFFS formatted");
+            SPIFFS.begin();
+            */
         }
       
         else {

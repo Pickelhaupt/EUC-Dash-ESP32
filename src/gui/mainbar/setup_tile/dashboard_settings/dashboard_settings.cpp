@@ -33,13 +33,18 @@ lv_obj_t *dashboard_settings_tile=NULL;
 lv_style_t dashboard_settings_style;
 lv_style_t dashboard_settings_heading_style;
 lv_style_t dashboard_settings_data_style;
+lv_style_t dashboard_page_style;
+lv_style_t dashboard_page_edge_style;
+lv_style_t dashtype_btnmtx_style;
 uint32_t dashboard_tile_num;
 
-lv_obj_t *simple_onoff=NULL;
-lv_obj_t *current_onoff=NULL;
+lv_obj_t *time_onoff=NULL;
 lv_obj_t *bars_onoff=NULL;
 lv_obj_t *distunit_onoff=NULL;
 lv_obj_t *tempunit_onoff=NULL;
+lv_obj_t *dashtype_buttons=NULL;
+
+static const char * dashtype_btn_map[] = {"full", "medium", "simple", ""};
 
 LV_IMG_DECLARE(exit_32px);
 LV_IMG_DECLARE(dashboard_64px);
@@ -47,8 +52,8 @@ LV_IMG_DECLARE(dashboard_32px);
 
 static void enter_dashboard_setup_event_cb( lv_obj_t * obj, lv_event_t event );
 static void exit_dashboard_setup_event_cb( lv_obj_t * obj, lv_event_t event );
-static void simple_onoff_event_handler(lv_obj_t * obj, lv_event_t event);
-static void current_onoff_event_handler(lv_obj_t * obj, lv_event_t event);
+static void dashtype_event_handler(lv_obj_t * obj, lv_event_t event);
+static void time_onoff_event_handler(lv_obj_t * obj, lv_event_t event);
 static void bars_onoff_event_handler(lv_obj_t * obj, lv_event_t event);
 static void distunit_onoff_event_handler(lv_obj_t * obj, lv_event_t event);
 static void tempunit_onoff_event_handler(lv_obj_t * obj, lv_event_t event);
@@ -67,9 +72,9 @@ void dashboard_settings_tile_setup( void ) {
     dashboard_settings_tile = mainbar_get_tile_obj( dashboard_tile_num );
     lv_obj_clean(dashboard_settings_tile);
     lv_style_copy( &dashboard_settings_style, mainbar_get_style() );
-    lv_style_set_bg_color( &dashboard_settings_style, LV_OBJ_PART_MAIN, LV_COLOR_BLACK);
+    //lv_style_set_bg_color( &dashboard_settings_style, LV_OBJ_PART_MAIN, LV_COLOR_BLACK);
     lv_style_set_bg_opa( &dashboard_settings_style, LV_OBJ_PART_MAIN, LV_OPA_100);
-    lv_style_set_border_width( &dashboard_settings_style, LV_OBJ_PART_MAIN, 0);
+    //lv_style_set_border_width( &dashboard_settings_style, LV_OBJ_PART_MAIN, 0);
 
     lv_style_copy( &dashboard_settings_heading_style, &dashboard_settings_style );
     lv_style_set_text_color( &dashboard_settings_heading_style, LV_OBJ_PART_MAIN, LV_COLOR_WHITE );
@@ -96,10 +101,41 @@ void dashboard_settings_tile_setup( void ) {
     lv_label_set_text( exit_label, "dashboard settings");
     lv_obj_align( exit_label, dashboard_settings_tile, LV_ALIGN_IN_TOP_MID, 0, 15 );
 
-    lv_obj_t *distunit_cont = lv_obj_create( dashboard_settings_tile, NULL );
+    lv_style_copy( &dashboard_page_style, &dashboard_settings_style );
+    lv_style_set_pad_all(&dashboard_page_style, LV_STATE_DEFAULT, 0);
+    lv_style_copy( &dashboard_page_edge_style, &dashboard_page_style );
+    lv_style_set_bg_color(&dashboard_page_edge_style, LV_STATE_DEFAULT, LV_COLOR_GRAY);
+    lv_style_set_bg_opa(&dashboard_page_edge_style, LV_STATE_DEFAULT, 30);
+    lv_obj_t *dashboard_page = lv_page_create( dashboard_settings_tile, NULL);
+    lv_obj_set_size(dashboard_page, lv_disp_get_hor_res( NULL ), 195);
+    lv_page_set_edge_flash(dashboard_page, true);
+    lv_obj_add_style(dashboard_page, LV_OBJ_PART_MAIN, &dashboard_page_style );
+    lv_obj_add_style(dashboard_page, LV_PAGE_PART_EDGE_FLASH, &dashboard_page_edge_style );
+    lv_obj_add_style(dashboard_page, LV_PAGE_PART_SCROLLBAR, &dashboard_page_edge_style );
+    lv_obj_align( dashboard_page, dashboard_settings_tile, LV_ALIGN_IN_TOP_MID, 0, 45 );
+
+    lv_obj_t *dashtype_cont = lv_obj_create( dashboard_page, NULL );
+    lv_page_glue_obj(dashtype_cont, true);
+    lv_obj_set_size(dashtype_cont, lv_disp_get_hor_res( NULL ) , 40);
+    lv_obj_add_style( dashtype_cont, LV_OBJ_PART_MAIN, &dashboard_settings_style  );
+    lv_obj_align( dashtype_cont, dashboard_page, LV_ALIGN_IN_TOP_RIGHT, 0, 10 );
+    lv_style_init(&dashtype_btnmtx_style);
+    lv_style_set_bg_color(&dashtype_btnmtx_style, LV_STATE_DEFAULT, LV_COLOR_BLACK);
+    //lv_style_set_pad_left(&dashtype_btnmtx_style, LV_STATE_DEFAULT, 3);
+    //lv_style_set_pad_right(&dashtype_btnmtx_style, LV_STATE_DEFAULT, 3);
+    dashtype_buttons = lv_btnmatrix_create(dashtype_cont, NULL);
+    lv_btnmatrix_set_map(dashtype_buttons, dashtype_btn_map);
+    lv_btnmatrix_set_btn_ctrl_all(dashtype_buttons, LV_BTNMATRIX_CTRL_CHECKABLE);
+    lv_btnmatrix_set_one_check(dashtype_buttons, true);
+    lv_obj_add_style(dashtype_buttons, LV_BTNMATRIX_PART_BG, &dashtype_btnmtx_style);
+    lv_obj_align(dashtype_buttons, NULL, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_set_event_cb( dashtype_buttons, dashtype_event_handler);
+
+    lv_obj_t *distunit_cont = lv_obj_create( dashboard_page, NULL );
+    lv_page_glue_obj(distunit_cont, true);
     lv_obj_set_size(distunit_cont, lv_disp_get_hor_res( NULL ) , 40);
     lv_obj_add_style( distunit_cont, LV_OBJ_PART_MAIN, &dashboard_settings_style  );
-    lv_obj_align( distunit_cont, dashboard_settings_tile, LV_ALIGN_IN_TOP_RIGHT, 0, 45 );
+    lv_obj_align( distunit_cont, dashtype_cont, LV_ALIGN_OUT_BOTTOM_MID, 0, 0 );
     distunit_onoff = lv_switch_create( distunit_cont, NULL );
     lv_obj_add_protect( distunit_onoff, LV_PROTECT_CLICK_FOCUS);
     lv_obj_add_style( distunit_onoff, LV_SWITCH_PART_INDIC, mainbar_get_switch_style() );
@@ -112,7 +148,8 @@ void dashboard_settings_tile_setup( void ) {
     lv_label_set_text( distunit_label, "imperial dist units");
     lv_obj_align( distunit_label, distunit_cont, LV_ALIGN_IN_LEFT_MID, 5, 0 );
 
-    lv_obj_t *tempunit_cont = lv_obj_create( dashboard_settings_tile, NULL );
+    lv_obj_t *tempunit_cont = lv_obj_create( dashboard_page, NULL );
+    lv_page_glue_obj(tempunit_cont, true);
     lv_obj_set_size(tempunit_cont, lv_disp_get_hor_res( NULL ) , 40);
     lv_obj_add_style( tempunit_cont, LV_OBJ_PART_MAIN, &dashboard_settings_style  );
     lv_obj_align( tempunit_cont, distunit_cont, LV_ALIGN_OUT_BOTTOM_MID, 0, 0 );
@@ -128,26 +165,28 @@ void dashboard_settings_tile_setup( void ) {
     lv_label_set_text( tempunit_label, "imperial temp units");
     lv_obj_align( tempunit_label, tempunit_cont, LV_ALIGN_IN_LEFT_MID, 5, 0 );
 
-    lv_obj_t *simple_cont = lv_obj_create( dashboard_settings_tile, NULL );
-    lv_obj_set_size(simple_cont, lv_disp_get_hor_res( NULL ) , 40);
-    lv_obj_add_style( simple_cont, LV_OBJ_PART_MAIN, &dashboard_settings_style  );
-    lv_obj_align( simple_cont, tempunit_cont, LV_ALIGN_OUT_BOTTOM_MID, 0, 0 );
-    simple_onoff = lv_switch_create( simple_cont, NULL );
-    lv_obj_add_protect( simple_onoff, LV_PROTECT_CLICK_FOCUS);
-    lv_obj_add_style( simple_onoff, LV_SWITCH_PART_INDIC, mainbar_get_switch_style() );
-    lv_obj_add_style( simple_onoff, LV_SLIDER_PART_KNOB, mainbar_get_knob_style() );
-    lv_switch_off( simple_onoff, LV_ANIM_ON );
-    lv_obj_align( simple_onoff, simple_cont, LV_ALIGN_IN_RIGHT_MID, -5, 0 );
-    lv_obj_set_event_cb( simple_onoff, simple_onoff_event_handler );
-    lv_obj_t *simple_label = lv_label_create( simple_cont, NULL);
-    lv_obj_add_style( simple_label, LV_OBJ_PART_MAIN, &dashboard_settings_heading_style  );
-    lv_label_set_text( simple_label, "return to simpledash");
-    lv_obj_align( simple_label, simple_cont, LV_ALIGN_IN_LEFT_MID, 5, 0 );
+    lv_obj_t *time_cont = lv_obj_create( dashboard_page, NULL );
+    lv_page_glue_obj(time_cont, true);
+    lv_obj_set_size(time_cont, lv_disp_get_hor_res( NULL ) , 40);
+    lv_obj_add_style( time_cont, LV_OBJ_PART_MAIN, &dashboard_settings_style  );
+    lv_obj_align( time_cont, tempunit_cont, LV_ALIGN_OUT_BOTTOM_MID, 0, 0 );
+    time_onoff = lv_switch_create( time_cont, NULL );
+    lv_obj_add_protect( time_onoff, LV_PROTECT_CLICK_FOCUS);
+    lv_obj_add_style( time_onoff, LV_SWITCH_PART_INDIC, mainbar_get_switch_style() );
+    lv_obj_add_style( time_onoff, LV_SLIDER_PART_KNOB, mainbar_get_knob_style() );
+    lv_switch_off( time_onoff, LV_ANIM_ON );
+    lv_obj_align( time_onoff, time_cont, LV_ALIGN_IN_RIGHT_MID, -5, 0 );
+    lv_obj_set_event_cb( time_onoff, time_onoff_event_handler );
+    lv_obj_t *time_label = lv_label_create( time_cont, NULL);
+    lv_obj_add_style( time_label, LV_OBJ_PART_MAIN, &dashboard_settings_style  );
+    lv_label_set_text( time_label, "display time on dash");
+    lv_obj_align( time_label, time_cont, LV_ALIGN_IN_LEFT_MID, 5, 0 );
 
-    lv_obj_t *bars_cont = lv_obj_create( dashboard_settings_tile, NULL );
+    lv_obj_t *bars_cont = lv_obj_create( dashboard_page, NULL );
+    lv_page_glue_obj(bars_cont, true);
     lv_obj_set_size(bars_cont, lv_disp_get_hor_res( NULL ) , 40);
     lv_obj_add_style( bars_cont, LV_OBJ_PART_MAIN, &dashboard_settings_style  );
-    lv_obj_align( bars_cont, simple_cont, LV_ALIGN_OUT_BOTTOM_MID, 0, 0 );
+    lv_obj_align( bars_cont, time_cont, LV_ALIGN_OUT_BOTTOM_MID, 0, 0 );
     bars_onoff = lv_switch_create( bars_cont, NULL );
     lv_obj_add_protect( bars_onoff, LV_PROTECT_CLICK_FOCUS);
     lv_obj_add_style( bars_onoff, LV_SWITCH_PART_INDIC, mainbar_get_switch_style() );
@@ -160,21 +199,13 @@ void dashboard_settings_tile_setup( void ) {
     lv_label_set_text( bars_label, "display min/max bars");
     lv_obj_align( bars_label, bars_cont, LV_ALIGN_IN_LEFT_MID, 5, 0 );
 
-    lv_obj_t *current_cont = lv_obj_create( dashboard_settings_tile, NULL );
-    lv_obj_set_size(current_cont, lv_disp_get_hor_res( NULL ) , 40);
-    lv_obj_add_style( current_cont, LV_OBJ_PART_MAIN, &dashboard_settings_style  );
-    lv_obj_align( current_cont, bars_cont, LV_ALIGN_OUT_BOTTOM_MID, 0, 0 );
-    current_onoff = lv_switch_create( current_cont, NULL );
-    lv_obj_add_protect( current_onoff, LV_PROTECT_CLICK_FOCUS);
-    lv_obj_add_style( current_onoff, LV_SWITCH_PART_INDIC, mainbar_get_switch_style() );
-    lv_obj_add_style( current_onoff, LV_SLIDER_PART_KNOB, mainbar_get_knob_style() );
-    lv_switch_off( current_onoff, LV_ANIM_ON );
-    lv_obj_align( current_onoff, current_cont, LV_ALIGN_IN_RIGHT_MID, -5, 0 );
-    lv_obj_set_event_cb( current_onoff, current_onoff_event_handler );
-    lv_obj_t *current_label = lv_label_create( current_cont, NULL);
-    lv_obj_add_style( current_label, LV_OBJ_PART_MAIN, &dashboard_settings_style  );
-    lv_label_set_text( current_label, "display current arc");
-    lv_obj_align( current_label, current_cont, LV_ALIGN_IN_LEFT_MID, 5, 0 );
+    if (dashboard_get_config( DASHBOARD_FULL)) {
+        lv_btnmatrix_set_btn_ctrl(dashtype_buttons, 0, LV_BTNMATRIX_CTRL_CHECK_STATE) ;
+    } else if (dashboard_get_config( DASHBOARD_MEDIUM)) {
+        lv_btnmatrix_set_btn_ctrl(dashtype_buttons, 1, LV_BTNMATRIX_CTRL_CHECK_STATE) ;
+    } else if (dashboard_get_config( DASHBOARD_SIMPLE)) {
+        lv_btnmatrix_set_btn_ctrl(dashtype_buttons, 2, LV_BTNMATRIX_CTRL_CHECK_STATE) ;
+    }
 
     if ( dashboard_get_config( DASHBOARD_IMPDIST ) )
         lv_switch_on( distunit_onoff, LV_ANIM_OFF );
@@ -186,20 +217,15 @@ void dashboard_settings_tile_setup( void ) {
     else
         lv_switch_off( tempunit_onoff, LV_ANIM_OFF );
 
-    if ( dashboard_get_config( DASHBOARD_SIMPLE ) )
-        lv_switch_on( simple_onoff, LV_ANIM_OFF );
+    if ( dashboard_get_config( DASHBOARD_TIME ) )
+        lv_switch_on( time_onoff, LV_ANIM_OFF );
     else
-        lv_switch_off( simple_onoff, LV_ANIM_OFF );
+        lv_switch_off( time_onoff, LV_ANIM_OFF );
 
     if ( dashboard_get_config( DASHBOARD_BARS ) )
         lv_switch_on( bars_onoff, LV_ANIM_OFF );
     else
         lv_switch_off( bars_onoff, LV_ANIM_OFF );
-
-    if ( dashboard_get_config( DASHBOARD_CURRENT ) )
-        lv_switch_on( current_onoff, LV_ANIM_OFF );
-    else
-        lv_switch_off( current_onoff, LV_ANIM_OFF );
 }
 
 static void enter_dashboard_setup_event_cb( lv_obj_t * obj, lv_event_t event ) {
@@ -213,7 +239,27 @@ static void enter_dashboard_setup_event_cb( lv_obj_t * obj, lv_event_t event ) {
 static void exit_dashboard_setup_event_cb( lv_obj_t * obj, lv_event_t event ) {
     switch( event ) {
         case( LV_EVENT_CLICKED ):       mainbar_jump_to_tilenumber( eucdash_get_tile_num(), LV_ANIM_OFF );
+                                        dashboard_save_and_reload();
                                         break;
+    }
+}
+
+static void dashtype_event_handler(lv_obj_t * obj, lv_event_t event) {
+    switch( event ) {
+        case(LV_EVENT_VALUE_CHANGED):   byte btnnr = lv_btnmatrix_get_active_btn(obj);
+                                        if (btnnr == 0) {
+                                            dashboard_set_config(DASHBOARD_FULL, true);
+                                            dashboard_set_config(DASHBOARD_MEDIUM, false);
+                                            dashboard_set_config(DASHBOARD_SIMPLE, false);
+                                        } else if (btnnr == 1) {
+                                            dashboard_set_config(DASHBOARD_FULL, false);
+                                            dashboard_set_config(DASHBOARD_MEDIUM, true);
+                                            dashboard_set_config(DASHBOARD_SIMPLE, false);
+                                        } else if (btnnr == 2) {
+                                            dashboard_set_config(DASHBOARD_FULL, false);
+                                            dashboard_set_config(DASHBOARD_MEDIUM, false);
+                                            dashboard_set_config(DASHBOARD_SIMPLE, true);
+                                        }
     }
 }
 
@@ -229,20 +275,14 @@ static void tempunit_onoff_event_handler(lv_obj_t * obj, lv_event_t event) {
     }
 }
 
-static void simple_onoff_event_handler(lv_obj_t * obj, lv_event_t event) {
+static void time_onoff_event_handler(lv_obj_t * obj, lv_event_t event) {
     switch( event ) {
-        case( LV_EVENT_VALUE_CHANGED):  dashboard_set_config( DASHBOARD_SIMPLE, lv_switch_get_state( obj ) );
+        case( LV_EVENT_VALUE_CHANGED):  dashboard_set_config( DASHBOARD_TIME, lv_switch_get_state( obj ) );
     }
 }
 
 static void bars_onoff_event_handler(lv_obj_t * obj, lv_event_t event) {
     switch( event ) {
         case( LV_EVENT_VALUE_CHANGED):  dashboard_set_config( DASHBOARD_BARS, lv_switch_get_state( obj ) );
-    }
-}
-
-static void current_onoff_event_handler(lv_obj_t * obj, lv_event_t event) {
-    switch( event ) {
-        case( LV_EVENT_VALUE_CHANGED):  dashboard_set_config( DASHBOARD_CURRENT, lv_switch_get_state( obj ) );
     }
 }

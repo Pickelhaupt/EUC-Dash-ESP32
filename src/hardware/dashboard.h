@@ -37,10 +37,12 @@
     enum { 
         DASHBOARD_LIGHTS,
         DASHBOARD_BARS,
-        DASHBOARD_CURRENT,
+        DASHBOARD_MEDIUM,
         DASHBOARD_SIMPLE,
+        DASHBOARD_FULL,
         DASHBOARD_IMPDIST,
         DASHBOARD_IMPTEMP,
+        DASHBOARD_TIME,
         DASHBOARD_CONFIG_NUM
     };
 
@@ -101,5 +103,6 @@
      */
     bool dashboard_register_cb( EventBits_t event, CALLBACK_FUNC callback_func, const char *id );
 
+    void dashboard_save_and_reload(void);
 
 #endif // _DASHBOARD_H

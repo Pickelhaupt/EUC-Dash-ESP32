@@ -230,8 +230,10 @@ void rtcctl_load_data( void ) {
         log_e("Can't open file: %s!", CONFIG_FILE_PATH );
     }
     else {
+        int fs = 0;
         int filesize = file.size();
-        SpiRamJsonDocument doc( filesize * 2 );
+        if (file.size() == 0) fs = 1000;
+        SpiRamJsonDocument doc( (filesize * 2) + fs );
 
         DeserializationError error = deserializeJson( doc, file );
         if ( error ) {

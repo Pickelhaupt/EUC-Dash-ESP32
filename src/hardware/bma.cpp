@@ -242,7 +242,7 @@ void bma_read_config( void ) {
     }
     else {
         int filesize = file.size();
-        SpiRamJsonDocument doc( filesize * 2 );
+        SpiRamJsonDocument doc( (filesize * 2) + 1000 );
 
         DeserializationError error = deserializeJson( doc, file );
         if ( error ) {

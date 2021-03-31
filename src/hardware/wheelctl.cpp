@@ -30,7 +30,6 @@
 #include "powermgm.h"
 #include "gui/mainbar/setup_tile/setup_tile.h"
 #include "gui/mainbar/fulldash_tile/fulldash_tile.h"
-#include "gui/mainbar/simpledash_tile/simpledash_tile.h"
 
 #define BATT_AVG_ENTRIES 10
 
@@ -153,8 +152,8 @@ void wheelctl_set_data(int entry, float value)
             {
                 update_speed_shake(value);
                 wheelctl_update_max_min(entry, value, false);
-                if (fulldash_active) fulldash_speed_update(value, wheelctl_data[WHEELCTL_ALARM3].value, wheelctl_data[WHEELCTL_TILTBACK].value, wheelctl_data[WHEELCTL_SPEED].max_value, wheelctl_data[WHEELCTL_SPEED].min_value);
-                if (simpledash_active) simpledash_speed_update(value, wheelctl_data[WHEELCTL_ALARM3].value, wheelctl_data[WHEELCTL_TILTBACK].value);
+                if (dash_active) fulldash_speed_update(value, wheelctl_data[WHEELCTL_ALARM3].value, wheelctl_data[WHEELCTL_TILTBACK].value, wheelctl_data[WHEELCTL_SPEED].max_value, wheelctl_data[WHEELCTL_SPEED].min_value);
+                //if (simpledash_active) simpledash_speed_update(value, wheelctl_data[WHEELCTL_ALARM3].value, wheelctl_data[WHEELCTL_TILTBACK].value);
                 firstrun[entry] = false;
             }
             break;
@@ -165,8 +164,8 @@ void wheelctl_set_data(int entry, float value)
                 wheelctl_update_max_min(entry, value, false);
                 wheelctl_update_regen_current(entry, value);
                 wheelctl_calc_power(value);
-                if (fulldash_active) fulldash_current_update(value, wheelctl_constants[WHEELCTL_CONST_MAXCURRENT].value, wheelctl_data[WHEELCTL_CURRENT].min_value, wheelctl_data[WHEELCTL_CURRENT].max_value);
-                if (simpledash_active) simpledash_current_update(value, wheelctl_constants[WHEELCTL_CONST_MAXCURRENT].value, wheelctl_data[WHEELCTL_CURRENT].min_value, wheelctl_data[WHEELCTL_CURRENT].max_value);
+                if (dash_active) fulldash_current_update(value, wheelctl_constants[WHEELCTL_CONST_MAXCURRENT].value, wheelctl_data[WHEELCTL_CURRENT].min_value, wheelctl_data[WHEELCTL_CURRENT].max_value);
+                //if (simpledash_active) simpledash_current_update(value, wheelctl_constants[WHEELCTL_CONST_MAXCURRENT].value, wheelctl_data[WHEELCTL_CURRENT].min_value, wheelctl_data[WHEELCTL_CURRENT].max_value);
                 firstrun[entry] = false;
             }
             break;
@@ -183,7 +182,7 @@ void wheelctl_set_data(int entry, float value)
             {
                 update_temp_shake(value);
                 wheelctl_update_max_min(entry, value, true);
-                if (fulldash_active) fulldash_temp_update(value, wheelctl_constants[WHEELCTL_CONST_WARNTEMP].value, wheelctl_constants[WHEELCTL_CONST_CRITTEMP].value, wheelctl_data[WHEELCTL_TEMP].max_value);
+                if (dash_active) fulldash_temp_update(value, wheelctl_constants[WHEELCTL_CONST_WARNTEMP].value, wheelctl_constants[WHEELCTL_CONST_CRITTEMP].value, wheelctl_data[WHEELCTL_TEMP].max_value);
                 firstrun[entry] = false;
             }
             break;
@@ -191,8 +190,8 @@ void wheelctl_set_data(int entry, float value)
             if (wheelctl_data[entry].value != value || firstrun[entry])
             {
                 wheelctl_update_battpct_max_min(entry, value);
-                if (fulldash_active) fulldash_batt_update(value, current_trip.min_battery, current_trip.max_battery);
-                if (simpledash_active) simpledash_batt_update(value, current_trip.min_battery, current_trip.max_battery);
+                if (dash_active) fulldash_batt_update(value, current_trip.min_battery, current_trip.max_battery);
+                //if (simpledash_active) simpledash_batt_update(value, current_trip.min_battery, current_trip.max_battery);
                 firstrun[entry] = false;
             }
             break;
@@ -204,8 +203,8 @@ void wheelctl_set_data(int entry, float value)
             wheelctl_update_avgspeed(value);
             break;
         case WHEELCTL_FANSTATE:
-            if (fulldash_active) fulldash_fan_indic(value);
-            if (simpledash_active) simpledash_fan_indic(value);
+            if (dash_active) fulldash_fan_indic(value);
+            //if (simpledash_active) simpledash_fan_indic(value);
             break;
         case WHEELCTL_UPTIME:
             wheelctl_tick_update();
@@ -257,7 +256,7 @@ void wheelctl_update_watch_trip(float value)
     current_trip.trip += (value - last_value);
     last_value = value;
     sync_trip = false;
-    if (fulldash_active && !saving_trip_data) fulldash_trip_update(current_trip.trip);
+    if (dash_active && !saving_trip_data) fulldash_trip_update(current_trip.trip);
 }
 
 void wheelctl_update_avgspeed(float value)
@@ -293,12 +292,12 @@ void wheelctl_update_battpct_max_min(int entry, float value)
         current_trip.min_battery = wheelctl_data[WHEELCTL_BATTPCT].min_value;
     }
     if (value < 10) {
-        if (fulldash_active) fulldash_batt_alert(true);
-        if (simpledash_active) simpledash_batt_alert(true);
+        if (dash_active) fulldash_batt_alert(true);
+        //if (simpledash_active) simpledash_batt_alert(true);
     }
     else {
-        if (fulldash_active) fulldash_batt_alert(false);
-        if (simpledash_active) simpledash_batt_alert(false);
+        if (dash_active) fulldash_batt_alert(false);
+        //if (simpledash_active) simpledash_batt_alert(false);
     }
 }
 
@@ -439,7 +438,7 @@ void update_speed_shake(float value)
 {
     if (value >= wheelctl_data[WHEELCTL_ALARM3].value && shakeoff[0])
     {
-        powermgm_set_event(POWERMGM_BMA_TILT);
+        powermgm_set_event(POWERMGM_BMA_TILT); //used tilt event mask to wake up display
         speed_shake = lv_task_create(lv_speed_shake, 250, LV_TASK_PRIO_LOWEST, NULL);
         lv_task_ready(speed_shake);
         shakeoff[0] = false;
@@ -461,15 +460,15 @@ void update_current_shake(float value)
         current_shake = lv_task_create(lv_current_shake, 500, LV_TASK_PRIO_LOWEST, NULL);
         lv_task_ready(current_shake);
         shakeoff[1] = false;
-        if (fulldash_active) fulldash_current_alert(true);
-        if (simpledash_active) simpledash_current_alert(true);
+        if (dash_active) fulldash_current_alert(true);
+        //if (simpledash_active) simpledash_current_alert(true);
     }
     else if (value < (wheelctl_constants[WHEELCTL_CONST_MAXCURRENT].value * 0.75) && !shakeoff[1])
     {
         lv_task_del(current_shake);
         shakeoff[1] = true;
-        if (fulldash_active) fulldash_current_alert(false);
-        if (simpledash_active) simpledash_current_alert(false);
+        if (dash_active) fulldash_current_alert(false);
+        //if (simpledash_active) simpledash_current_alert(false);
     }
 }
 
@@ -481,15 +480,15 @@ void update_temp_shake(float value)
         temp_shake = lv_task_create(lv_temp_shake, 1000, LV_TASK_PRIO_LOWEST, NULL);
         lv_task_ready(temp_shake);
         shakeoff[2] = false;
-        if (fulldash_active) fulldash_temp_alert(true);
-        if (simpledash_active) simpledash_temp_alert(true);
+        if (dash_active) fulldash_temp_alert(true);
+        //if (simpledash_active) simpledash_temp_alert(true);
     }
     else if (value <= wheelctl_constants[WHEELCTL_CONST_CRITTEMP].value && !shakeoff[2] && temp_shake != nullptr)
     {
         lv_task_del(temp_shake);
         shakeoff[2] = true;
-        if (fulldash_active) fulldash_temp_alert(false);
-        if (simpledash_active) simpledash_temp_alert(false);
+        if (dash_active) fulldash_temp_alert(false);
+        //if (simpledash_active) simpledash_temp_alert(false);
     }
 }
 
@@ -585,8 +584,10 @@ void wheelctl_read_config( void ) {
         log_e("Can't open file: %s!", WHEELCTL_JSON_CONFIG_FILE );
     }
     else {
+        int fs = 0;
         int filesize = file.size();
-        SpiRamJsonDocument doc( filesize * 2 );
+        if (file.size() == 0) fs = 1000;
+        SpiRamJsonDocument doc( (filesize * 2) + fs );
 
         DeserializationError error = deserializeJson( doc, file );
         if ( error ) {

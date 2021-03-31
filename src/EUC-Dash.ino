@@ -68,8 +68,17 @@ void setup()
     splash_screen_stage_update( "init haptic", 10 );
     motor_setup();
 
+    /*
+    SPIFFS.end();
+    log_i("SPIFFS unmounted!");
+    delay(100);
+    SPIFFS.format();
+    log_i("SPIFFS format complete!");
+    */
+
     splash_screen_stage_update( "init dashboard", 20 );
     dashboard_setup();
+
     
     splash_screen_stage_update( "init spiffs", 30 );
     if ( !SPIFFS.begin() ) {

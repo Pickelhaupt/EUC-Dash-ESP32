@@ -26,7 +26,6 @@
 #include "main_tile/main_tile.h"
 #include "setup_tile/setup_tile.h"
 #include "fulldash_tile/fulldash_tile.h"
-#include "simpledash_tile/simpledash_tile.h"
 #include "gui/keyboard.h"
 #include "hardware/blectl.h"
 #include "hardware/dashboard.h"
@@ -266,12 +265,10 @@ lv_obj_t *mainbar_get_tile_obj( uint32_t tile_number ) {
 void mainbar_jump_to_maintile( lv_anim_enable_t anim ) {
     if ( tile_entrys != 0 ) {
         if (blectl_cli_getconnected()){
-            if (dashboard_get_config(DASHBOARD_SIMPLE)) {
-                main_tile_nr = simpledash_get_tile();
-            }
-            else {
-                main_tile_nr = fulldash_get_tile();
-            }
+            //if (dashboard_get_config(DASHBOARD_SIMPLE)) {
+            //    main_tile_nr = simpledash_get_tile();
+            //}
+            main_tile_nr = fulldash_get_tile();
         } else {
             main_tile_nr = main_tile_get_tile_num();
         }

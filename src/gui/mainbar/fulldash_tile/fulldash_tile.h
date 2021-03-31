@@ -83,7 +83,7 @@ void fulldash_tile_setup(void);
 /**
 * @brief reload the full dashboard tile
 */
-void fulldash_tile_reload ( void );
+void dashboard_tile_reload ( void );
 /**
 * @brief get the tile number for the full dashboard tile
 * 
@@ -137,6 +137,6 @@ void fulldash_fan_indic(bool enabled);
 
 //variable declarations
 
-extern bool fulldash_active;
+extern bool dash_active;
 
 #endif // _FULLDASH_TILE_H

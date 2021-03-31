@@ -23,12 +23,12 @@
  */
 #ifndef _CONFIG_H 
     #define _CONFIG_H 
-    #undef BOARD_HAS_PSRAM
-    #define LILYGO_WATCH_2020_V1             //To use T-Watch2020, please uncomment this line
-    #define LILYGO_WATCH_LVGL                   //To use LVGL, you need to enable the macro LVGL
-    //#define TWATCH_USE_PSRAM_ALLOC_LVGL
-    //#define TWATCH_LVGL_DOUBLE_BUFFER
-    //#define LVGL_BUFFER_SIZE        (240*240)
+    #undef BOARD_HAS_PSRAM                  //Disable most PSRAM usage -- improves performance
+    #define LILYGO_WATCH_2020_V1            //To use T-Watch2020, please uncomment this line
+    #define LILYGO_WATCH_LVGL               //To use LVGL, you need to enable the macro LVGL
+    //#define TWATCH_USE_PSRAM_ALLOC_LVGL   //allows for more available RAM, impacts performance
+    //#define TWATCH_LVGL_DOUBLE_BUFFER     
+    //#define LVGL_BUFFER_SIZE        (240*240) //full frame buffer use 115kB
     #define LVGL_BUFFER_SIZE        (240*60)
     #define ENABLE_LVGL_FLUSH_DMA
 
@@ -37,6 +37,9 @@
     /*
     * firmware version string
     */
-    #define __FIRMWARE__            "2021010301"
+    #define __FIRMWARE__            "2021032401"
+    #define SETTINGS_VERSION        1001 //write to SPIFFS doc
+    //Not implemented yet, used to clear all data stored SPIFFS if format is changed
+    #define SETTINGS_MIN_VERSION    1001 //read from SPIFFS and reset SPIFFS data if version is lower
 
 #endif // _CONFIG_H

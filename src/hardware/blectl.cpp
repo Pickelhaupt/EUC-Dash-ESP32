@@ -40,7 +40,6 @@
 #include "alloc.h"
 #include "wheelctl.h"
 #include "gui/mainbar/fulldash_tile/fulldash_tile.h"
-#include "gui/mainbar/simpledash_tile/simpledash_tile.h"
 #include "gui/mainbar/mainbar.h"
 #include "gui/mainbar/mainbar.h"
 
@@ -375,7 +374,7 @@ void blectl_read_config(void)
     else
     {
         int filesize = file.size();
-        SpiRamJsonDocument doc(filesize * 2);
+        SpiRamJsonDocument doc((filesize * 2) + 1000);
 
         DeserializationError error = deserializeJson(doc, file);
         if (error)
@@ -424,8 +423,10 @@ void blectl_read_stored_wheels (void) {
         log_e("Can't open file: %s!", BLECTL_JSON_WHEEL_FILE );
     }
     else {
+        int fs = 0;
         int filesize = file.size();
-        SpiRamJsonDocument doc( filesize * 2 );
+        if (file.size() == 0) fs = 1000;
+        SpiRamJsonDocument doc( (filesize * 2) + fs );
 
         DeserializationError error = deserializeJson( doc, file );
         if ( error ) {
@@ -562,7 +563,7 @@ static void scanCompleteCB(BLEScanResults scanResults) {
             //if ( wheelctl_get_info(WHEELCTL_INFO_MANUFACTURER) == "NB" ) initnb();
             //if ( wheelctl_get_info(WHEELCTL_INFO_MANUFACTURER) == "NBZ" ) initnbz();
 
-            fulldash_tile_reload();
+            dashboard_tile_reload();
             simpledash_tile_reload();
             mainbar_jump_to_maintile(LV_ANIM_OFF);
         }
@@ -592,8 +593,8 @@ void blectl_cli_loop(void)
             //if ( myWheeltype == WHEELTYPE_NB ) initnb();
             //if ( myWheeltype == WHEELTYPE_NBZ ) initnbz();
 
-            fulldash_tile_reload();
-            simpledash_tile_reload();
+            dashboard_tile_reload();
+            //simpledash_tile_reload();
             mainbar_jump_to_maintile(LV_ANIM_OFF);
         }
         else

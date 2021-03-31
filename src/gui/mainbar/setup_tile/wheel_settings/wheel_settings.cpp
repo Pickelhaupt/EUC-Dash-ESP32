@@ -162,7 +162,7 @@ void wheel_settings_tile_setup() {
     lv_obj_align( autoconnect_label, autoconnect_cont, LV_ALIGN_IN_LEFT_MID, 5, 0 );
 
     lv_obj_t *horn_press_cont = lv_obj_create( wheel_page, NULL );
-    lv_page_glue_obj(autoconnect_cont, true);
+    lv_page_glue_obj(horn_press_cont, true);
     lv_obj_set_size(horn_press_cont, lv_disp_get_hor_res( NULL ) - 10, 60);
     lv_obj_add_style( horn_press_cont, LV_OBJ_PART_MAIN, &wheel_settings_style  );
     lv_obj_align( horn_press_cont, autoconnect_cont, LV_ALIGN_OUT_BOTTOM_MID, 0, 0 );

@@ -267,8 +267,10 @@ void pmu_read_config( void ) {
         log_e("Can't open file: %s!", PMU_JSON_CONFIG_FILE );
     }
     else {
+        int fs = 0;
         int filesize = file.size();
-        SpiRamJsonDocument doc( filesize * 2 );
+        if (file.size() == 0) fs = 1000;
+        SpiRamJsonDocument doc( (filesize * 2) + fs );
 
         DeserializationError error = deserializeJson( doc, file );
         if ( error ) {

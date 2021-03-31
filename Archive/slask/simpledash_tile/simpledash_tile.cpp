@@ -80,7 +80,6 @@ static lv_obj_t *sd_current_alert = NULL;
 static lv_obj_t *sd_temp_alert = NULL;
 static lv_obj_t *sd_fan_indic = NULL;
 static lv_style_t sd_alert_style;
-
 //Overlay objects and styles
 static lv_obj_t *sd_overlay_bar = NULL;
 static lv_obj_t *sd_overlay_label = NULL;
@@ -96,6 +95,7 @@ int sd_current_arc_start = 290;
 int sd_current_arc_end = 70;
 bool sd_rev_current_arc = true;
 int sd_arclinew = 25; // line width of arc gauges
+
 bool sd_display_bars = false;
 bool sd_display_current = false;
 bool simpledash_active = false;
@@ -180,7 +180,7 @@ void lv_sd_speed_arc_1(void)
 void lv_sd_batt_arc_1(void)
 {
     /*Create battery gauge arc*/
-    if (dashboard_get_config(DASHBOARD_CURRENT))
+    if (dashboard_get_config(DASHBOARD_MEDIUM))
     {
         sd_batt_arc_start = 110;
         sd_batt_arc_end = 250;
@@ -567,7 +567,7 @@ void simpledash_tile_reload(void)
     lv_sd_speed_arc_1();
     log_i("adding sd batt arc");
     lv_sd_batt_arc_1();
-    if (dashboard_get_config(DASHBOARD_CURRENT)) {
+    if (dashboard_get_config(DASHBOARD_MEDIUM)) {
         log_i("adding sd current arc");
         lv_sd_current_arc_1();
         sd_display_current = true;
