@@ -304,7 +304,7 @@ void lv_create_speed_label(void)
     lv_label_set_text(speed_label, "0");
     lv_label_set_align(speed_label, LV_LABEL_ALIGN_CENTER);
     if (dashboard_get_config(DASHBOARD_FULL)) {
-        lv_obj_align(speed_label, NULL, LV_ALIGN_CENTER, 0, -5);
+        lv_obj_align(speed_label, NULL, LV_ALIGN_CENTER, 0, -2);
     } else {
         lv_obj_align(speed_label, NULL, LV_ALIGN_CENTER, 0, 0);
     }
@@ -694,7 +694,7 @@ void fulldash_batt_update(float current_battpct, float min_battpct, float max_ba
 
 void fulldash_current_update(float current_current, byte maxcurrent, float min_current, float max_current)
 {
-    if (current_arc == NULL) return;
+    if (current_arc == NULL || dashboard_get_config(DASHBOARD_SIMPLE)) return;
     float amps = current_current;
     
     if (current_current > (maxcurrent * 0.75))
@@ -732,7 +732,6 @@ void fulldash_current_update(float current_current, byte maxcurrent, float min_c
             ang_max2 = ang_max2 - 360;
         }
         lv_arc_set_angles(current_max_bar, ang_max, ang_max2);
-
         int ang_regen = value2angle(current_arc_start, current_arc_end, 0, maxcurrent, min_current, rev_current_arc);
         int ang_regen2 = ang_regen + 3;
         if (ang_regen2 >= 360)
@@ -752,7 +751,7 @@ void fulldash_current_update(float current_current, byte maxcurrent, float min_c
 
 void fulldash_temp_update(float current_temp, byte warn_temp, byte crit_temp, float max_temp)
 {
-    if (temp_arc == NULL || temp_max_bar == NULL || temp_label == NULL) return;
+    if (temp_arc == NULL || !dashboard_get_config(DASHBOARD_FULL)) return;
     if (current_temp > crit_temp)
     {
         lv_style_set_line_color(&temp_indic_style, LV_STATE_DEFAULT, LV_COLOR_RED);
@@ -769,33 +768,38 @@ void fulldash_temp_update(float current_temp, byte warn_temp, byte crit_temp, fl
         lv_style_set_text_color(&temp_label_style, LV_STATE_DEFAULT, temp_fg_clr);
     }
     //lv_obj_add_style(temp_arc, LV_ARC_PART_INDIC, &temp_indic_style);
+    
     lv_obj_refresh_style(temp_arc, LV_ARC_PART_INDIC, LV_STYLE_LINE_COLOR);
     lv_arc_set_value(temp_arc, ((crit_temp + 10) - current_temp));
 
-    int ang_max = value2angle(temp_arc_start, temp_arc_end, 0, (crit_temp + 10), max_temp, true);
-    int ang_max2 = ang_max + 3;
-    if (ang_max2 >= 360)
-    {
-        ang_max2 = ang_max2 - 360;
+    if (dashboard_get_config(DASHBOARD_BARS) && temp_max_bar != NULL) {
+        int ang_max = value2angle(temp_arc_start, temp_arc_end, 0, (crit_temp + 10), max_temp, true);
+        int ang_max2 = ang_max + 3;
+        if (ang_max2 >= 360)
+        {
+            ang_max2 = ang_max2 - 360;
+        }
+        lv_arc_set_angles(temp_max_bar, ang_max, ang_max2);
     }
-    lv_arc_set_angles(temp_max_bar, ang_max, ang_max2);
 
-    lv_obj_refresh_style(temp_label, LV_LABEL_PART_MAIN, LV_STYLE_TEXT_COLOR);
-    char tempstring[4];
-    float converted_temp = current_temp;
-    if (dashboard_get_config(DASHBOARD_IMPTEMP))
-    {
-        converted_temp = (current_temp * 1.8) + 32;
+    if (dashboard_get_config(DASHBOARD_FULL) && temp_label != NULL) {
+        lv_obj_refresh_style(temp_label, LV_LABEL_PART_MAIN, LV_STYLE_TEXT_COLOR);
+        char tempstring[4];
+        float converted_temp = current_temp;
+        if (dashboard_get_config(DASHBOARD_IMPTEMP))
+        {
+            converted_temp = (current_temp * 1.8) + 32;
+        }
+        dtostrf(converted_temp, 2, 0, tempstring);
+        lv_label_set_text(temp_label, tempstring);
+        lv_label_set_align(temp_label, LV_LABEL_ALIGN_CENTER);
+        lv_obj_realign(temp_label);
     }
-    dtostrf(converted_temp, 2, 0, tempstring);
-    lv_label_set_text(temp_label, tempstring);
-    lv_label_set_align(temp_label, LV_LABEL_ALIGN_CENTER);
-    lv_obj_realign(temp_label);
 } 
 
 void fulldash_trip_update(float current_trip)
 {
-   if (trip != NULL)
+   if (trip != NULL && dashboard_get_config(DASHBOARD_FULL))
     {
         char tripstring[6];
         if (dashboard_get_config(DASHBOARD_IMPDIST))
