@@ -135,6 +135,8 @@ int arclinew = 15;
 int arc_spacing = 7;
 int in_arc_x = out_arc_x - (2 * (arclinew + arc_spacing));
 int in_arc_y = out_arc_y - (2 * (arclinew + arc_spacing));
+int current_arc_x;
+int current_arc_y;
 
 //end variable declarations
 
@@ -192,7 +194,11 @@ void lv_define_styles(void)
     lv_style_set_line_color(&speed_main_style, LV_STATE_DEFAULT, speed_bg_clr);
     lv_style_init(&speed_label_style);
     lv_style_set_text_color(&speed_label_style, LV_STATE_DEFAULT, speed_bg_clr);
-    lv_style_set_text_font(&speed_label_style, LV_STATE_DEFAULT, &DIN1451_m_cond_120);
+    if (dashboard_get_config(DASHBOARD_FULL)) {
+        lv_style_set_text_font(&speed_label_style, LV_STATE_DEFAULT, &DIN1451_m_cond_120);
+    } else {
+        lv_style_set_text_font(&speed_label_style, LV_STATE_DEFAULT, &DIN1451_m_cond_180);
+    }
     // Battery Arc and label
     lv_style_copy(&batt_indic_style, &arc_style);
     lv_style_copy(&batt_main_style, &arc_style);
@@ -360,13 +366,9 @@ void lv_create_current_arc(void)
 {
     //Create current gauge arc
     byte maxcurrent = wheelctl_get_constant(WHEELCTL_CONST_MAXCURRENT);
-    int current_arc_x = in_arc_x;
-    int current_arc_y = in_arc_y;
     //Arc
     current_arc = lv_arc_create(fulldash_cont, NULL);
     lv_obj_reset_style_list(current_arc, LV_OBJ_PART_MAIN);
-    lv_obj_add_style(current_arc, LV_ARC_PART_INDIC, &current_indic_style);
-    lv_obj_add_style(current_arc, LV_OBJ_PART_MAIN, &current_main_style);
     if (dashboard_get_config(DASHBOARD_FULL)) {
         lv_arc_set_type(current_arc, LV_ARC_TYPE_NORMAL);
         current_arc_x = in_arc_x;
@@ -376,9 +378,12 @@ void lv_create_current_arc(void)
         current_arc_x = out_arc_x;
         current_arc_y = out_arc_y;
     }
+    lv_obj_add_style(current_arc, LV_ARC_PART_INDIC, &current_indic_style);
+    lv_obj_add_style(current_arc, LV_OBJ_PART_MAIN, &current_main_style);
     lv_arc_set_bg_angles(current_arc, current_arc_start, current_arc_end);
     lv_arc_set_angles(current_arc, current_arc_start, current_arc_end);
     lv_arc_set_range(current_arc, 0, maxcurrent);
+    lv_arc_set_value(current_arc, (maxcurrent * rev_current_arc));
     lv_obj_set_size(current_arc, current_arc_x, current_arc_y);
     lv_obj_align(current_arc, NULL, LV_ALIGN_CENTER, 0, 0);
 
@@ -716,6 +721,8 @@ void fulldash_current_update(float current_current, byte maxcurrent, float min_c
     //lv_obj_add_style(current_arc, LV_ARC_PART_INDIC, &current_indic_style);
     lv_obj_refresh_style(current_arc, LV_ARC_PART_INDIC, LV_STYLE_LINE_COLOR);
     lv_arc_set_value(current_arc, amps);
+    if (rev_current_arc) lv_arc_set_value(current_arc, (maxcurrent - amps));
+    if (!rev_current_arc) lv_arc_set_value(current_arc, amps);
 
     if (dashboard_get_config(DASHBOARD_BARS) && current_max_bar != NULL && current_regen_bar != NULL) {
         int ang_max = value2angle(current_arc_start, current_arc_end, 0, maxcurrent, max_current, rev_current_arc);
@@ -873,50 +880,47 @@ void fulldash_hibernate_cb(void)
     dash_active = false;
 }
 
-void dashboard_tile_reload(void)
-{
-    log_i("reloading dashboard");
-    lv_obj_clean(fulldash_cont);  
+void dashboard_setup(byte dashtype) {
+    set_arc_properties(dashtype);
+    lv_define_styles();
     lv_create_alerts();
-    if (dashboard_get_config(DASHBOARD_FULL)) {
-        log_i("setting up full dashboard");
-        set_arc_properties(DASHBOARD_FULL);
-        lv_define_styles();
-        lv_style_set_text_font(&speed_label_style, LV_STATE_DEFAULT, &DIN1451_m_cond_120);
+    if (dashtype == DASHBOARD_FULL){
         lv_create_speed_arc();
-        lv_create_speed_label();
-        lv_create_batt_arc();
         lv_create_batt_label();
-        lv_create_current_arc();
         lv_create_current_label();
         lv_create_temp_arc();
         lv_create_temp_label();
         lv_create_trip_display();
-        if (dashboard_get_config(DASHBOARD_TIME)) lv_create_dashtime();
+    }
+    lv_create_speed_label();
+    if (dashtype != DASHBOARD_SIMPLE) lv_create_current_arc();
+    lv_create_batt_arc();
+    if (dashboard_get_config(DASHBOARD_TIME)) lv_create_dashtime();
+    lv_create_overlay();
+}
+
+void dashboard_tile_reload(void)
+{
+    log_i("reloading dashboard");
+    lv_obj_clean(fulldash_cont);  
+    
+    if (dashboard_get_config(DASHBOARD_FULL)) {
+        log_i("setting up full dashboard");
+        dashboard_setup(DASHBOARD_FULL);
     }
     else if (dashboard_get_config(DASHBOARD_MEDIUM)){
         log_i("setting up Medium dashboard");
-        set_arc_properties(DASHBOARD_MEDIUM);
-        lv_define_styles();
-        lv_style_set_text_font(&speed_label_style, LV_STATE_DEFAULT, &DIN1451_m_cond_180);
-        lv_create_speed_label();
-        lv_create_batt_arc();
-        lv_create_current_arc();
-        if (dashboard_get_config(DASHBOARD_TIME)) lv_create_dashtime();
+        dashboard_setup(DASHBOARD_MEDIUM);
     }
     else if (dashboard_get_config(DASHBOARD_SIMPLE)) {
         log_i("setting up Simple dashboard");
-        set_arc_properties(DASHBOARD_SIMPLE);
-        lv_define_styles();
-        lv_style_set_text_font(&speed_label_style, LV_STATE_DEFAULT, &DIN1451_m_cond_180);
-        lv_create_speed_label();
-        lv_create_batt_arc();
-        if (dashboard_get_config(DASHBOARD_TIME)) lv_create_dashtime();
+        dashboard_setup(DASHBOARD_SIMPLE);
     }
     else {
-        log_e("no dashboard setting found");
+        log_e("no dashboard setting found, using full dash");
+        dashboard_setup(DASHBOARD_FULL);
     }
-    lv_create_overlay();
+    
 }
 
 void fulldash_tile_setup(void)
