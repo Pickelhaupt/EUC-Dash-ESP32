@@ -1,5 +1,5 @@
 /****************************************************************************
- *   Modified 2020 Jesper Ortlund
+ *   Modified 2021 Jesper Ortlund
  *   Copyright  2020  Dirk Brosswick
  *   Email: dirk.brosswick@googlemail.com
  ****************************************************************************/
@@ -35,23 +35,11 @@
 #include "mainbar/tripinfo_tile/tripinfo_tile.h"
 #include "mainbar/wheelinfo_tile/wheelinfo_tile.h"
 
-#include "mainbar/setup_tile/battery_settings/battery_settings.h"
-#include "mainbar/setup_tile/battery_settings/battery_view.h"
-#include "mainbar/setup_tile/display_settings/display_settings.h"
-#include "mainbar/setup_tile/wheel_settings/wheel_settings.h"
-#include "mainbar/setup_tile/time_settings/time_settings.h"
-#include "mainbar/setup_tile/update/update.h"
-#include "mainbar/setup_tile/wlan_settings/wlan_settings.h"
-#include "mainbar/setup_tile/bluetooth_settings/bluetooth_settings.h"
-#include "mainbar/setup_tile/dashboard_settings/dashboard_settings.h"
 #include "mainbar/setup_tile/watch_settings/watch_settings.h"
 #include "mainbar/setup_tile/eucdash_settings/eucdash_settings.h"
-#include "mainbar/setup_tile/utilities/utilities.h"
 
 #include "hardware/powermgm.h"
 #include "hardware/display.h"
-
-
 
 bool gui_powermgm_event_cb( EventBits_t event, void *arg );
 bool gui_powermgm_loop_event_cb( EventBits_t event, void *arg );
@@ -62,13 +50,11 @@ void gui_setup( void )
     log_i("setting up mainbar");
     mainbar_setup();
 
-    /* add the six mainbar screens */
+    /* add the five mainbar screens */
     log_i("setting up main tile");
     main_tile_setup();
     log_i("setting up full dash");
     fulldash_tile_setup();
-    //log_i("setting up simple dash");
-    //simpledash_tile_setup();
     log_i("setting up setup tile");
     setup_tile_setup();
     log_i("setting up trip info");
@@ -76,7 +62,6 @@ void gui_setup( void )
     log_i("setting up wheel info");
     wheelinfo_tile_setup();
     
-
     /* add setup screens */
     log_i("watch settings");
     watch_settings_tile_setup();
@@ -86,17 +71,6 @@ void gui_setup( void )
     setup_add_submenu_tile();
     setup_add_submenu2_tile();
     
-    //log_i("wlan settings");
-    //wlan_settings_tile_setup();
-    //log_i("display settings");
-    //display_settings_tile_setup();
-    //log_i("utilities settings");
-    //utilities_tile_setup();
-    //update_tile_setup();
-    
-
-
-
     lv_disp_trig_activity( NULL );
      log_i("setting up keyboard");
     keyboard_setup();

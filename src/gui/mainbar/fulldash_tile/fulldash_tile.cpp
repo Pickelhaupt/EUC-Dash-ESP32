@@ -556,7 +556,7 @@ void fulldash_fan_indic(bool enabled) {
         lv_obj_set_hidden(fan_indic , !enabled);
 }
 
-int value2angle(int arcstart, int arcstop, float minvalue, float maxvalue, float arcvalue, bool reverse)
+int value2angle(int arcstart, int arcstop, float minvalue, float maxvalue, float arcvalue, bool reversep)
 {
     int rAngle;
     int arcdegrees;
@@ -564,12 +564,11 @@ int value2angle(int arcstart, int arcstop, float minvalue, float maxvalue, float
     if (arcstop < arcstart) arcdegrees = (arcstop + 360) - arcstart;
     else arcdegrees = arcstop - arcstart;
 
-    if (reverse) rAngle = arcstop - (arcvalue * arcdegrees / (maxvalue - minvalue));
+    if (reversep) rAngle = arcstop - (arcvalue * arcdegrees / (maxvalue - minvalue));
     else rAngle = arcstart + (arcvalue * arcdegrees / (maxvalue - minvalue));
 
     if (rAngle >= 360) rAngle = rAngle - 360;
     else if (rAngle < 0) rAngle = rAngle + 360;
-
     return rAngle;
 }
 

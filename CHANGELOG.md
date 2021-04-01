@@ -1,4 +1,6 @@
 # Changelog
+**2021-04-01 Dashboard bug fixes, medium dash still crashes when bars are enabled**
+
 **2021-03-26 removed the simple dash tile and added dashboard settings to configure the dashboard instead medium detail dash unstable, still some other random crashes**
 
 **2021-03-24 Furter rewrite of BT code and bug fixes, still a bit unstable though**
