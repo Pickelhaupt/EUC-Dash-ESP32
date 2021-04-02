@@ -71,6 +71,13 @@
 */
 void ks_lights(byte mode);
 /**
+* @brief toggle wheel lock
+* 
+* @param   mode     configitem: bool containing the desired lock state: false = unlocked, true = locked
+* 
+*/
+void ks_lock(void);
+/**
 * @brief toggle leds when toggling lights
 * 
 * @param   mode     configitem: byte containing the desired led state: 0x00 = on, 0x01 = off
