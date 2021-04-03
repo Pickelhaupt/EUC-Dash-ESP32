@@ -1,5 +1,6 @@
 # EUC-Dash-ESP32
 
+**2021-04-03 Master branch will be unstable for a while, use release 0.9.1 until it stabilises if you don't want to test the new BLE code**
 
 Complete rewrite added, only buildable with PlatformIO please see https://github.com/Pickelhaupt/EUC-Dash-ESP32/tree/master/src for more info
 
