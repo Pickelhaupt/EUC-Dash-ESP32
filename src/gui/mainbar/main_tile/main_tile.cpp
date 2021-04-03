@@ -26,7 +26,7 @@
 #include "main_tile.h"
 
 #include "gui/mainbar/mainbar.h"
-#include "gui/mainbar/setup_tile/time_settings/time_settings.h"
+#include "gui/mainbar/setup_tile/watch_settings/time_settings/time_settings.h"
 
 #include "hardware/timesync.h"
 #include "hardware/powermgm.h"

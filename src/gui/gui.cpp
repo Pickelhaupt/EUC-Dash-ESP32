@@ -30,7 +30,7 @@
 #include "mainbar/mainbar.h"
 
 #include "mainbar/main_tile/main_tile.h"
-#include "mainbar/fulldash_tile/fulldash_tile.h"
+#include "mainbar/dashboard_tile/dashboard_tile.h"
 #include "mainbar/setup_tile/setup_tile.h"
 #include "mainbar/tripinfo_tile/tripinfo_tile.h"
 #include "mainbar/wheelinfo_tile/wheelinfo_tile.h"
@@ -54,7 +54,7 @@ void gui_setup( void )
     log_i("setting up main tile");
     main_tile_setup();
     log_i("setting up full dash");
-    fulldash_tile_setup();
+    dashboard_tile_setup();
     log_i("setting up setup tile");
     setup_tile_setup();
     log_i("setting up trip info");

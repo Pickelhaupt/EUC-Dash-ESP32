@@ -17,8 +17,8 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
-#ifndef _FULLDASH_TILE_H
-#define _FULLDASH_TILE_H
+#ifndef _DASHBOARD_TILE_H
+#define _DASHBOARD_TILE_H
 
 #include <TTGO.h>
 
@@ -36,7 +36,7 @@ static lv_color_t speed_fg_clr = lv_color_make(0x00, 0xfa, 0x0f);   //Speed gaug
 static lv_color_t batt_bg_clr = lv_color_make(0x05, 0x2a, 0x05);    //Battery gauge arc background (default = dark green)
 
 // change default bg col for batt arc MJR 14-OCT-2020 -- could not get this to compile, reverted to original CJO 18-10
-//static lv_color_t batt_light_bg_clr = ( fulldash ? lv_color_make(0x05, 0x4a, 0x15) : lv_color_make(0xff, 0x00, 0x00) ); // green or red
+//static lv_color_t batt_light_bg_clr = ( dashboard ? lv_color_make(0x05, 0x4a, 0x15) : lv_color_make(0xff, 0x00, 0x00) ); // green or red
 static lv_color_t batt_light_bg_clr = lv_color_make(0x05, 0x4a, 0x15); //Battery gauge arc background (default = dark green)
 
 static lv_color_t batt_fg_clr = lv_color_make(0x00, 0xfa, 0x0f);        //Battery gauge indicator color (default = green)
@@ -78,7 +78,7 @@ LV_FONT_DECLARE(DIN1451_m_cond_180);
 /**
 * @brief setup the full dashboard tile
 */
-void fulldash_tile_setup(void);
+void dashboard_tile_setup(void);
 //Functions
 /**
 * @brief reload the full dashboard tile
@@ -89,54 +89,54 @@ void dashboard_tile_reload ( void );
 * 
 * @return  tile number
 */
-uint32_t fulldash_get_tile (void);
+uint32_t dashboard_get_tile (void);
 /**
 * @brief update speed arc and label
 */
-void fulldash_speed_update(float current_speed, float warn_speed, float tiltback_speed, float top_speed, float avg_speed);
+void dashboard_speed_update(float current_speed, float warn_speed, float tiltback_speed, float top_speed, float avg_speed);
 /**
 * @brief update battery arc and label
 */
-void fulldash_batt_update(float current_battpct, float min_battpct, float max_battpct);
+void dashboard_batt_update(float current_battpct, float min_battpct, float max_battpct);
 /**
 * @brief update current arc and label
 */
-void fulldash_current_update(float current_current, byte maxcurrent, float min_current, float max_current);
+void dashboard_current_update(float current_current, byte maxcurrent, float min_current, float max_current);
 /**
 * @brief update temperature arc and label
 */
-void fulldash_temp_update(float current_temp, byte warn_temp, byte crit_temp, float max_temp);
+void dashboard_temp_update(float current_temp, byte warn_temp, byte crit_temp, float max_temp);
 /**
 * @brief update trip label
 */
-void fulldash_trip_update(float current_trip);
+void dashboard_trip_update(float current_trip);
 /**
 * @brief update overlay
 */
-void fulldash_overlay_update();
+void dashboard_overlay_update();
 /**
 * @brief display current alert icon on the full dashboard
 * @param enabled set to true to enable
 */
-void fulldash_current_alert(bool enabled);
+void dashboard_current_alert(bool enabled);
 /**
 * @brief display battery alert icon on the full dashboard
 * @param enabled set to true to enable
 */
-void fulldash_batt_alert(bool enabled);
+void dashboard_batt_alert(bool enabled);
 /**
 * @brief display temperature alert icon on the full dashboard
 * @param enabled set to true to enable
 */
-void fulldash_temp_alert(bool enabled);
+void dashboard_temp_alert(bool enabled);
 /**
 * @brief display fan running notification dashboard
 * @param enabled set to true to enable
 */
-void fulldash_fan_indic(bool enabled);
+void dashboard_fan_indic(bool enabled);
 
 //variable declarations
 
 extern bool dash_active;
 
-#endif // _FULLDASH_TILE_H
+#endif // _DASHBOARD_TILE_H

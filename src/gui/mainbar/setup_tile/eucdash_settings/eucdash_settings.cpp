@@ -29,8 +29,8 @@
 #include "hardware/motor.h"
 #include "hardware/wheelctl.h"
 
-#include "gui/mainbar/setup_tile/wheel_settings/wheel_settings.h"
-#include "gui/mainbar/setup_tile/dashboard_settings/dashboard_settings.h"
+#include "gui/mainbar/setup_tile/eucdash_settings/wheel_settings/wheel_settings.h"
+#include "gui/mainbar/setup_tile/eucdash_settings/dashboard_settings/dashboard_settings.h"
 
 lv_obj_t *eucdash_settings_tile=NULL;
 lv_obj_t *eucdash_submenu_tile=NULL;

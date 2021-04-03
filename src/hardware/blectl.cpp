@@ -39,7 +39,7 @@
 #include "alloc.h"
 #include "alloc.h"
 #include "wheelctl.h"
-#include "gui/mainbar/fulldash_tile/fulldash_tile.h"
+#include "gui/mainbar/dashboard_tile/dashboard_tile.h"
 #include "gui/mainbar/mainbar.h"
 #include "gui/mainbar/mainbar.h"
 

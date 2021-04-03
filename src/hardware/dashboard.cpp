@@ -23,7 +23,7 @@
 #include "dashboard.h"
 #include "powermgm.h"
 #include "gui/gui.h"
-#include "gui/mainbar/fulldash_tile/fulldash_tile.h"
+#include "gui/mainbar/dashboard_tile/dashboard_tile.h"
 
 #include "json_psram_allocator.h"
 

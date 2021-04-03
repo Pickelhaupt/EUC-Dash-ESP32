@@ -29,13 +29,13 @@
 #include "hardware/motor.h"
 #include "hardware/wheelctl.h"
 
-#include "gui/mainbar/setup_tile/bluetooth_settings/bluetooth_settings.h"
-#include "gui/mainbar/setup_tile/battery_settings/battery_settings.h"
-#include "gui/mainbar/setup_tile/battery_settings/battery_view.h"
-#include "gui/mainbar/setup_tile/time_settings/time_settings.h"
-#include "gui/mainbar/setup_tile/display_settings/display_settings.h"
-#include "gui/mainbar/setup_tile/utilities/utilities.h"
-#include "gui/mainbar/setup_tile/wlan_settings/wlan_settings.h"
+#include "gui/mainbar/setup_tile/watch_settings/bluetooth_settings/bluetooth_settings.h"
+#include "gui/mainbar/setup_tile/watch_settings/battery_settings/battery_settings.h"
+#include "gui/mainbar/setup_tile/watch_settings/battery_settings/battery_view.h"
+#include "gui/mainbar/setup_tile/watch_settings/time_settings/time_settings.h"
+#include "gui/mainbar/setup_tile/watch_settings/display_settings/display_settings.h"
+#include "gui/mainbar/setup_tile/watch_settings/utilities/utilities.h"
+#include "gui/mainbar/setup_tile/watch_settings/wlan_settings/wlan_settings.h"
 
 
 lv_obj_t *watch_settings_tile=NULL;

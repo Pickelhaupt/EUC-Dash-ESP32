@@ -20,7 +20,7 @@
 #include "config.h"
 #include <Arduino.h>
 #include "gui/mainbar/mainbar.h"
-#include "fulldash_tile.h"
+#include "dashboard_tile.h"
 #include "hardware/pmu.h"
 #include "hardware/blectl.h"
 #include "hardware/Kingsong.h"
@@ -44,7 +44,7 @@ void updateTime();
 /*
    Declare LVGL Dashboard objects and styles
 */
-static lv_obj_t *fulldash_cont = NULL;
+static lv_obj_t *dashboard_cont = NULL;
 static lv_style_t *style;
 static lv_style_t arc_style;
 
@@ -115,7 +115,7 @@ static lv_style_t overlay_label_style;
 //End LV objects and styles
 
 //variable declarations
-uint32_t fulldash_tile_num;
+uint32_t dashboard_tile_num;
 
 int speed_arc_start = 160;
 int speed_arc_end = 20;
@@ -264,7 +264,7 @@ void lv_create_speed_arc(void)
     float tiltback_speed = wheelctl_get_data(WHEELCTL_TILTBACK);
     float current_speed = wheelctl_get_data(WHEELCTL_SPEED);
 
-    speed_arc = lv_arc_create(fulldash_cont, NULL);
+    speed_arc = lv_arc_create(dashboard_cont, NULL);
     lv_obj_reset_style_list(speed_arc, LV_OBJ_PART_MAIN);
     lv_obj_add_style(speed_arc, LV_ARC_PART_INDIC, &speed_indic_style);
     lv_obj_add_style(speed_arc, LV_OBJ_PART_MAIN, &speed_main_style);
@@ -276,7 +276,7 @@ void lv_create_speed_arc(void)
 
     if (dashboard_get_config(DASHBOARD_BARS)) {
         //Max bar
-        speed_max_bar = lv_arc_create(fulldash_cont, NULL);
+        speed_max_bar = lv_arc_create(dashboard_cont, NULL);
         lv_obj_reset_style_list(speed_max_bar, LV_OBJ_PART_MAIN);
         lv_obj_add_style(speed_max_bar, LV_ARC_PART_INDIC, &max_bar_indic_style);
         lv_obj_add_style(speed_max_bar, LV_OBJ_PART_MAIN, &bar_main_style);
@@ -285,7 +285,7 @@ void lv_create_speed_arc(void)
         lv_obj_set_size(speed_max_bar, out_arc_x, out_arc_y);
         lv_obj_align(speed_max_bar, NULL, LV_ALIGN_CENTER, 0, 0);
         //avg bar
-        speed_avg_bar = lv_arc_create(fulldash_cont, NULL);
+        speed_avg_bar = lv_arc_create(dashboard_cont, NULL);
         lv_obj_reset_style_list(speed_avg_bar, LV_OBJ_PART_MAIN);
         lv_obj_add_style(speed_avg_bar, LV_ARC_PART_INDIC, &min_bar_indic_style);
         lv_obj_add_style(speed_avg_bar, LV_OBJ_PART_MAIN, &bar_main_style);
@@ -298,7 +298,7 @@ void lv_create_speed_arc(void)
 
 void lv_create_speed_label(void)
 {
-    speed_label = lv_label_create(fulldash_cont, NULL);
+    speed_label = lv_label_create(dashboard_cont, NULL);
     lv_obj_reset_style_list(speed_label, LV_OBJ_PART_MAIN);
     lv_obj_add_style(speed_label, LV_LABEL_PART_MAIN, &speed_label_style);
     lv_label_set_text(speed_label, "0");
@@ -313,7 +313,7 @@ void lv_create_speed_label(void)
 void lv_create_batt_arc(void)
 {
     /*Create battery gauge arc*/
-    batt_arc = lv_arc_create(fulldash_cont, NULL);
+    batt_arc = lv_arc_create(dashboard_cont, NULL);
     lv_obj_reset_style_list(batt_arc, LV_OBJ_PART_MAIN);
     lv_obj_add_style(batt_arc, LV_ARC_PART_INDIC, &batt_indic_style);
     lv_obj_add_style(batt_arc, LV_OBJ_PART_MAIN, &batt_main_style);
@@ -331,7 +331,7 @@ void lv_create_batt_arc(void)
 
     if (dashboard_get_config(DASHBOARD_BARS)) {
         //max bar
-        batt_max_bar = lv_arc_create(fulldash_cont, NULL);
+        batt_max_bar = lv_arc_create(dashboard_cont, NULL);
         lv_obj_reset_style_list(batt_max_bar, LV_OBJ_PART_MAIN);
         lv_obj_add_style(batt_max_bar, LV_ARC_PART_INDIC, &max_bar_indic_style);
         lv_obj_add_style(batt_max_bar, LV_OBJ_PART_MAIN, &bar_main_style);
@@ -341,7 +341,7 @@ void lv_create_batt_arc(void)
         lv_obj_align(batt_max_bar, NULL, LV_ALIGN_CENTER, 0, 0);
 
         //min bar
-        batt_min_bar = lv_arc_create(fulldash_cont, NULL);
+        batt_min_bar = lv_arc_create(dashboard_cont, NULL);
         lv_obj_reset_style_list(batt_min_bar, LV_OBJ_PART_MAIN);
         lv_obj_add_style(batt_min_bar, LV_ARC_PART_INDIC, &min_bar_indic_style);
         lv_obj_add_style(batt_min_bar, LV_OBJ_PART_MAIN, &bar_main_style);
@@ -354,7 +354,7 @@ void lv_create_batt_arc(void)
 
 void lv_create_batt_label(void)
 {
-    batt_label = lv_label_create(fulldash_cont, NULL);
+    batt_label = lv_label_create(dashboard_cont, NULL);
     lv_obj_reset_style_list(batt_label, LV_OBJ_PART_MAIN);
     lv_obj_add_style(batt_label, LV_OBJ_PART_MAIN, &batt_label_style);
     lv_label_set_text(batt_label, "99");
@@ -367,7 +367,7 @@ void lv_create_current_arc(void)
     //Create current gauge arc
     byte maxcurrent = wheelctl_get_constant(WHEELCTL_CONST_MAXCURRENT);
     //Arc
-    current_arc = lv_arc_create(fulldash_cont, NULL);
+    current_arc = lv_arc_create(dashboard_cont, NULL);
     lv_obj_reset_style_list(current_arc, LV_OBJ_PART_MAIN);
     if (dashboard_get_config(DASHBOARD_FULL)) {
         lv_arc_set_type(current_arc, LV_ARC_TYPE_NORMAL);
@@ -389,7 +389,7 @@ void lv_create_current_arc(void)
 
     if (dashboard_get_config(DASHBOARD_BARS)) {
         //Max bar
-        current_max_bar = lv_arc_create(fulldash_cont, NULL);
+        current_max_bar = lv_arc_create(dashboard_cont, NULL);
         lv_obj_reset_style_list(current_max_bar, LV_OBJ_PART_MAIN);
         lv_obj_add_style(current_max_bar, LV_ARC_PART_INDIC, &max_bar_indic_style);
         lv_obj_add_style(current_max_bar, LV_OBJ_PART_MAIN, &bar_main_style);
@@ -399,7 +399,7 @@ void lv_create_current_arc(void)
         lv_obj_align(current_max_bar, NULL, LV_ALIGN_CENTER, 0, 0);
 
         //regen bar
-        current_regen_bar = lv_arc_create(fulldash_cont, NULL);
+        current_regen_bar = lv_arc_create(dashboard_cont, NULL);
         lv_obj_reset_style_list(current_regen_bar, LV_OBJ_PART_MAIN);
         lv_obj_add_style(current_regen_bar, LV_ARC_PART_INDIC, &regen_bar_indic_style);
         lv_obj_add_style(current_regen_bar, LV_OBJ_PART_MAIN, &bar_main_style);
@@ -412,7 +412,7 @@ void lv_create_current_arc(void)
 
 void lv_create_current_label(void)
 {
-    current_label = lv_label_create(fulldash_cont, NULL);
+    current_label = lv_label_create(dashboard_cont, NULL);
     lv_obj_reset_style_list(current_label, LV_OBJ_PART_MAIN);
     lv_obj_add_style(current_label, LV_OBJ_PART_MAIN, &current_label_style);
     lv_label_set_text(current_label, "0");
@@ -426,7 +426,7 @@ void lv_create_temp_arc(void)
     byte crit_temp = wheelctl_get_constant(WHEELCTL_CONST_CRITTEMP);
     float current_temp = wheelctl_get_data(WHEELCTL_TEMP);
     //Arc
-    temp_arc = lv_arc_create(fulldash_cont, NULL);
+    temp_arc = lv_arc_create(dashboard_cont, NULL);
     lv_obj_reset_style_list(temp_arc, LV_OBJ_PART_MAIN);
     lv_obj_add_style(temp_arc, LV_ARC_PART_INDIC, &temp_indic_style);
     lv_obj_add_style(temp_arc, LV_OBJ_PART_MAIN, &temp_main_style);
@@ -440,7 +440,7 @@ void lv_create_temp_arc(void)
     //mainbar_add_slide_element(temp_arc);
 
     //Max bar
-    temp_max_bar = lv_arc_create(fulldash_cont, NULL);
+    temp_max_bar = lv_arc_create(dashboard_cont, NULL);
     lv_obj_reset_style_list(temp_max_bar, LV_OBJ_PART_MAIN);
     lv_obj_add_style(temp_max_bar, LV_ARC_PART_INDIC, &max_bar_indic_style);
     lv_obj_add_style(temp_max_bar, LV_OBJ_PART_MAIN, &bar_main_style);
@@ -453,7 +453,7 @@ void lv_create_temp_arc(void)
 void lv_create_temp_label(void)
 {
     //Label
-    temp_label = lv_label_create(fulldash_cont, NULL);
+    temp_label = lv_label_create(dashboard_cont, NULL);
     lv_obj_reset_style_list(temp_label, LV_OBJ_PART_MAIN);
     lv_obj_add_style(temp_label, LV_OBJ_PART_MAIN, &temp_label_style);
     lv_label_set_text(temp_label, "22");
@@ -463,18 +463,18 @@ void lv_create_temp_label(void)
 
 void lv_create_dashtime(void)
 {
-    dashtime = lv_label_create(fulldash_cont, NULL);
+    dashtime = lv_label_create(dashboard_cont, NULL);
     lv_obj_reset_style_list(dashtime, LV_OBJ_PART_MAIN);
     lv_obj_add_style(dashtime, LV_OBJ_PART_MAIN, &dashtime_style);
     lv_obj_align(dashtime, NULL, LV_ALIGN_IN_BOTTOM_RIGHT, 0, 0);
-    wbatt = lv_label_create(fulldash_cont, NULL);
+    wbatt = lv_label_create(dashboard_cont, NULL);
     lv_obj_reset_style_list(wbatt, LV_OBJ_PART_MAIN);
     lv_obj_add_style(wbatt, LV_OBJ_PART_MAIN, &dashtime_style);
     lv_obj_align(wbatt, NULL, LV_ALIGN_IN_BOTTOM_RIGHT, 0, -25);
 }
 
 void lv_create_trip_display(void) {
-    trip = lv_label_create(fulldash_cont, NULL);
+    trip = lv_label_create(dashboard_cont, NULL);
     lv_obj_reset_style_list(trip, LV_OBJ_PART_MAIN);
     lv_obj_add_style(trip, LV_OBJ_PART_MAIN, &trip_label_style);
     lv_obj_align(trip, NULL, LV_ALIGN_IN_TOP_MID, 0, 25);
@@ -482,7 +482,7 @@ void lv_create_trip_display(void) {
 
 void lv_create_alerts(void) 
 {
-    fan_indic = lv_img_create(fulldash_cont, NULL);
+    fan_indic = lv_img_create(dashboard_cont, NULL);
     lv_obj_reset_style_list(fan_indic, LV_OBJ_PART_MAIN);
     lv_obj_set_size(fan_indic, 32, 32);
     lv_obj_add_style(fan_indic, LV_OBJ_PART_MAIN, &alert_style);
@@ -490,7 +490,7 @@ void lv_create_alerts(void)
     lv_obj_set_hidden(fan_indic, true);
     lv_obj_align(fan_indic, NULL, LV_ALIGN_IN_TOP_RIGHT, -5, 5);
 
-    batt_alert = lv_img_create(fulldash_cont, NULL);
+    batt_alert = lv_img_create(dashboard_cont, NULL);
     lv_obj_reset_style_list(batt_alert, LV_OBJ_PART_MAIN);
     lv_obj_set_size(batt_alert, 128, 128);
     lv_obj_add_style(batt_alert, LV_OBJ_PART_MAIN, &alert_style);
@@ -498,7 +498,7 @@ void lv_create_alerts(void)
     lv_obj_set_hidden(batt_alert, true);
     lv_obj_align(batt_alert, NULL, LV_ALIGN_IN_BOTTOM_LEFT, 0, 0);
 
-    current_alert = lv_img_create(fulldash_cont, NULL);
+    current_alert = lv_img_create(dashboard_cont, NULL);
     lv_obj_reset_style_list(current_alert, LV_OBJ_PART_MAIN);
     lv_obj_set_size(current_alert, 128, 128);
     lv_obj_add_style(current_alert, LV_OBJ_PART_MAIN, &alert_style);
@@ -506,7 +506,7 @@ void lv_create_alerts(void)
     lv_obj_set_hidden(current_alert, true);
     lv_obj_align(current_alert, NULL, LV_ALIGN_IN_TOP_LEFT, 0, 0);
 
-    temp_alert = lv_img_create(fulldash_cont, NULL);
+    temp_alert = lv_img_create(dashboard_cont, NULL);
     lv_obj_reset_style_list(temp_alert, LV_OBJ_PART_MAIN);
     lv_obj_set_size(temp_alert, 128, 128);
     lv_obj_add_style(temp_alert, LV_OBJ_PART_MAIN, &alert_style);
@@ -517,7 +517,7 @@ void lv_create_alerts(void)
 
 void lv_create_overlay(void)
 {
-    overlay_bar = lv_bar_create(fulldash_cont, NULL);
+    overlay_bar = lv_bar_create(dashboard_cont, NULL);
     lv_obj_reset_style_list(overlay_bar, LV_OBJ_PART_MAIN);
     lv_obj_set_size(overlay_bar, lv_disp_get_hor_res(NULL), lv_disp_get_ver_res(NULL));
     lv_obj_add_style(overlay_bar, LV_OBJ_PART_MAIN, &overlay_style);
@@ -543,16 +543,16 @@ static void overlay_event_cb(lv_obj_t * obj, lv_event_t event) {
     }
 }
 
-void fulldash_current_alert(bool enabled) {
+void dashboard_current_alert(bool enabled) {
         lv_obj_set_hidden(current_alert , !enabled);
 }
-void fulldash_batt_alert(bool enabled) {
+void dashboard_batt_alert(bool enabled) {
         lv_obj_set_hidden(batt_alert , !enabled);
 }
-void fulldash_temp_alert(bool enabled) {
+void dashboard_temp_alert(bool enabled) {
         lv_obj_set_hidden(temp_alert , !enabled);
 }
-void fulldash_fan_indic(bool enabled) {
+void dashboard_fan_indic(bool enabled) {
         lv_obj_set_hidden(fan_indic , !enabled);
 }
 
@@ -572,7 +572,7 @@ int value2angle(int arcstart, int arcstop, float minvalue, float maxvalue, float
     return rAngle;
 }
 
-void fulldash_speed_update(float current_speed, float warn_speed, float tiltback_speed, float top_speed, float avg_speed)
+void dashboard_speed_update(float current_speed, float warn_speed, float tiltback_speed, float top_speed, float avg_speed)
 {
     if (speed_label == NULL) return;
     if (top_speed > tiltback_speed + 5) top_speed = tiltback_speed + 5;
@@ -633,7 +633,7 @@ void fulldash_speed_update(float current_speed, float warn_speed, float tiltback
     lv_obj_realign(speed_label);
 }
 
-void fulldash_batt_update(float current_battpct, float min_battpct, float max_battpct)
+void dashboard_batt_update(float current_battpct, float min_battpct, float max_battpct)
 {
     if (batt_arc == NULL) return;
     if (current_battpct < 10)
@@ -691,7 +691,7 @@ void fulldash_batt_update(float current_battpct, float min_battpct, float max_ba
     }
 }
 
-void fulldash_current_update(float current_current, byte maxcurrent, float min_current, float max_current)
+void dashboard_current_update(float current_current, byte maxcurrent, float min_current, float max_current)
 {
     if (current_arc == NULL || dashboard_get_config(DASHBOARD_SIMPLE)) return;
     float amps = current_current;
@@ -748,7 +748,7 @@ void fulldash_current_update(float current_current, byte maxcurrent, float min_c
     }
 }
 
-void fulldash_temp_update(float current_temp, byte warn_temp, byte crit_temp, float max_temp)
+void dashboard_temp_update(float current_temp, byte warn_temp, byte crit_temp, float max_temp)
 {
     if (temp_arc == NULL || !dashboard_get_config(DASHBOARD_FULL)) return;
     if (current_temp > crit_temp)
@@ -796,7 +796,7 @@ void fulldash_temp_update(float current_temp, byte warn_temp, byte crit_temp, fl
     }
 } 
 
-void fulldash_trip_update(float current_trip)
+void dashboard_trip_update(float current_trip)
 {
    if (trip != NULL && dashboard_get_config(DASHBOARD_FULL))
     {
@@ -811,7 +811,7 @@ void fulldash_trip_update(float current_trip)
     } 
 }
 
-void fulldash_overlay_update()
+void dashboard_overlay_update()
 {
     if (overlay_bar == NULL || overlay_label == NULL) return;
     if (blectl_cli_getconnected())
@@ -845,29 +845,29 @@ void updateTime()
     if (dashtime != NULL)
     {
         lv_label_set_text(dashtime, buf);
-        lv_obj_align(dashtime, fulldash_cont, LV_ALIGN_IN_BOTTOM_RIGHT, 0, 0);
+        lv_obj_align(dashtime, dashboard_cont, LV_ALIGN_IN_BOTTOM_RIGHT, 0, 0);
     }
     if (wbatt != NULL)
     {
         char wbattstring[4];
         dtostrf(watchbatt, 2, 0, wbattstring);
         lv_label_set_text(wbatt, wbattstring);
-        lv_obj_align(wbatt, fulldash_cont, LV_ALIGN_IN_BOTTOM_RIGHT, 0, -25);
+        lv_obj_align(wbatt, dashboard_cont, LV_ALIGN_IN_BOTTOM_RIGHT, 0, -25);
     }
 }
 
 static void lv_time_task(lv_task_t *time_task)
 {
-    fulldash_overlay_update();
+    dashboard_overlay_update();
     if (dashboard_get_config(DASHBOARD_TIME)) updateTime();
 }
 
-uint32_t fulldash_get_tile(void)
+uint32_t dashboard_get_tile(void)
 {
-    return fulldash_tile_num;
+    return dashboard_tile_num;
 }
 
-void fulldash_activate_cb(void)
+void dashboard_activate_cb(void)
 {
     if (!dash_active){
         time_task = lv_task_create(lv_time_task, 2000, LV_TASK_PRIO_LOWEST, NULL);
@@ -877,7 +877,7 @@ void fulldash_activate_cb(void)
     }
 }
 
-void fulldash_hibernate_cb(void)
+void dashboard_hibernate_cb(void)
 {
     if (time_task != nullptr) lv_task_del(time_task);
     dash_active = false;
@@ -905,7 +905,7 @@ void dashboard_setup(byte dashtype) {
 void dashboard_tile_reload(void)
 {
     log_i("reloading dashboard");
-    lv_obj_clean(fulldash_cont);  
+    lv_obj_clean(dashboard_cont);  
     
     if (dashboard_get_config(DASHBOARD_FULL)) {
         log_i("setting up full dashboard");
@@ -926,14 +926,14 @@ void dashboard_tile_reload(void)
     
 }
 
-void fulldash_tile_setup(void)
+void dashboard_tile_setup(void)
 {
-    fulldash_tile_num = mainbar_add_tile(1, 0, "fd tile");
-    fulldash_cont = mainbar_get_tile_obj(fulldash_tile_num);
+    dashboard_tile_num = mainbar_add_tile(1, 0, "fd tile");
+    dashboard_cont = mainbar_get_tile_obj(dashboard_tile_num);
     style = mainbar_get_style();
     log_i("setting up dashboard");
     dashboard_tile_reload();
 
-    mainbar_add_tile_activate_cb(fulldash_tile_num, fulldash_activate_cb);
-    mainbar_add_tile_hibernate_cb(fulldash_tile_num, fulldash_hibernate_cb);
+    mainbar_add_tile_activate_cb(dashboard_tile_num, dashboard_activate_cb);
+    mainbar_add_tile_hibernate_cb(dashboard_tile_num, dashboard_hibernate_cb);
 }

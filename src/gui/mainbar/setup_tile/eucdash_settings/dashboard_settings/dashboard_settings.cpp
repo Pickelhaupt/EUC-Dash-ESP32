@@ -36,7 +36,7 @@ lv_style_t dashboard_settings_data_style;
 lv_style_t dashboard_page_style;
 lv_style_t dashboard_page_edge_style;
 lv_style_t dashtype_btnmtx_style;
-uint32_t dashboard_tile_num;
+uint32_t dashboard_settings_tile_num;
 
 lv_obj_t *time_onoff=NULL;
 lv_obj_t *bars_onoff=NULL;
@@ -63,13 +63,13 @@ void dashboard_settings_tile_pre_setup( void ) {
 }
 
 uint32_t dashboard_settings_get_tile_num( void ) {
-    return dashboard_tile_num;
+    return dashboard_settings_tile_num;
 }
 
 void dashboard_settings_tile_setup( void ) {
     // get an app tile and copy mainstyle
-    dashboard_tile_num = setup_get_submenu_tile_num();
-    dashboard_settings_tile = mainbar_get_tile_obj( dashboard_tile_num );
+    dashboard_settings_tile_num = setup_get_submenu_tile_num();
+    dashboard_settings_tile = mainbar_get_tile_obj( dashboard_settings_tile_num );
     lv_obj_clean(dashboard_settings_tile);
     lv_style_copy( &dashboard_settings_style, mainbar_get_style() );
     //lv_style_set_bg_color( &dashboard_settings_style, LV_OBJ_PART_MAIN, LV_COLOR_BLACK);
@@ -231,7 +231,7 @@ void dashboard_settings_tile_setup( void ) {
 static void enter_dashboard_setup_event_cb( lv_obj_t * obj, lv_event_t event ) {
     switch( event ) {
         case( LV_EVENT_CLICKED ):       dashboard_settings_tile_setup();
-                                        mainbar_jump_to_tilenumber( dashboard_tile_num, LV_ANIM_OFF );
+                                        mainbar_jump_to_tilenumber( dashboard_settings_tile_num, LV_ANIM_OFF );
                                         break;
     }
 }

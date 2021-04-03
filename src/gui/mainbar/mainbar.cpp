@@ -1,5 +1,5 @@
 /****************************************************************************
- *   Modified 2020 Jesper Ortlund
+ *   Modified 2021 Jesper Ortlund
  *   Copyright  2020  Dirk Brosswick
  *   Email: dirk.brosswick@googlemail.com
  ****************************************************************************/
@@ -25,17 +25,10 @@
 #include "mainbar.h"
 #include "main_tile/main_tile.h"
 #include "setup_tile/setup_tile.h"
-#include "fulldash_tile/fulldash_tile.h"
+#include "dashboard_tile/dashboard_tile.h"
 #include "gui/keyboard.h"
 #include "hardware/blectl.h"
 #include "hardware/dashboard.h"
-#include "setup_tile/battery_settings/battery_settings.h"
-#include "setup_tile/wlan_settings/wlan_settings.h"
-#include "setup_tile/wheel_settings/wheel_settings.h"
-#include "setup_tile/display_settings/display_settings.h"
-#include "setup_tile/time_settings/time_settings.h"
-#include "setup_tile/watch_settings/watch_settings.h"
-#include "setup_tile/update/update.h"
 
 LV_FONT_DECLARE(DIN1451_m_cond_24);
 LV_FONT_DECLARE(DIN1451_m_cond_28);
@@ -55,7 +48,7 @@ static uint32_t current_tile = 0;
 static uint32_t tile_entrys = 0;
 static uint32_t app_tile_pos = MAINBAR_APP_TILE_X_START;
 uint32_t main_tile_nr = 0;
-bool fulldash_default = true;
+bool dashboard_default = true;
 
 void mainbar_setup( void ) {
     log_i("mainbar setup style");
@@ -268,7 +261,7 @@ void mainbar_jump_to_maintile( lv_anim_enable_t anim ) {
             //if (dashboard_get_config(DASHBOARD_SIMPLE)) {
             //    main_tile_nr = simpledash_get_tile();
             //}
-            main_tile_nr = fulldash_get_tile();
+            main_tile_nr = dashboard_get_tile();
         } else {
             main_tile_nr = main_tile_get_tile_num();
         }
