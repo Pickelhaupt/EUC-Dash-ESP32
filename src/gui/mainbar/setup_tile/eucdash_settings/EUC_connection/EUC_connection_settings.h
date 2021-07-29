@@ -18,9 +18,9 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-/*
-#ifndef _WLAN_SETTINGS_H
-    #define _WLAN_SETTINGS_H
+
+#ifndef _EUC_CONN_SETTINGS_H
+    #define _EUC_CONN_SETTINGS_H
 
     #include <TTGO.h>
 
@@ -31,5 +31,4 @@
     void euc_setup_tile_setup( void );
     void euc_setup_display_ssid(String ssid);
 
-#endif // _WLAN_SETTINGS_H
-*/
+#endif // _EUC_CONN_SETTINGS_H

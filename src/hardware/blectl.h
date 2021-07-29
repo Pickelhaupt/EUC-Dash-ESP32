@@ -394,6 +394,14 @@
      */
     bool blectl_stored_wheel_exist(byte wheelnum);
     /**
+     * @brief check if wheel is in storage slot
+     * 
+     * @param addr the mac-address of the wheel
+     * 
+     * @return true if wheel with the address is stored, false otherwise
+     */
+    bool blectl_wheeladdress_stored(String addr);
+    /**
      * @brief get the next free wheel storage slot
      *  
      * @return byte containing the first free slot number

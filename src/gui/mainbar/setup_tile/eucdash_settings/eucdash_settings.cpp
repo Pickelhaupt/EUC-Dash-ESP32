@@ -31,6 +31,7 @@
 
 #include "gui/mainbar/setup_tile/eucdash_settings/wheel_settings/wheel_settings.h"
 #include "gui/mainbar/setup_tile/eucdash_settings/dashboard_settings/dashboard_settings.h"
+#include "gui/mainbar/setup_tile/eucdash_settings/EUC_connection/EUC_connection_settings.h"
 
 lv_obj_t *eucdash_settings_tile=NULL;
 lv_obj_t *eucdash_submenu_tile=NULL;
@@ -44,7 +45,6 @@ uint32_t eucdash_submenu_tile_num;
 int eucdash_cont_height = 50;
 
 lv_obj_t *eucdash_settings_page = NULL;
-
 
 eucdash_settings_item_t *eucdash_menu_item[MAX_MENU_ITEMS];
 
@@ -167,6 +167,7 @@ void eucdash_settings_menu_item_setup() {
     log_i("wheel settings");
     wheel_settings_tile_pre_setup();
     dashboard_settings_tile_pre_setup();
+    euc_connection_tile_pre_setup();
 }
 
 static void enter_eucdash_setup_event_cb( lv_obj_t * obj, lv_event_t event ) {

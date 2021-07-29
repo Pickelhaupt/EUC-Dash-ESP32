@@ -112,7 +112,10 @@ class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks
     */
     void onResult(BLEAdvertisedDevice advertisedDevice)
     {
-        if(blectl_new_scan) wheel_num = 0;
+        if (blectl_new_scan) {
+            wheel_num = 0;
+            blectl_clear_detected_wheels();
+        }
         blectl_new_scan = false;
         Serial.print("BLE Advertised Device found: ");
         Serial.println(advertisedDevice.toString().c_str());
@@ -140,13 +143,22 @@ class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks
         
         // Scan for all EUCs in range
         // We have found a device, let us now see if it contains the service we are looking for.
+        Serial.printf("discover enabled? %d\n", discover_new_wheels);
         if(discover_new_wheels) {
-            blectl_clear_detected_wheels();
+            //blectl_clear_detected_wheels();
             if (advertisedDevice.haveServiceUUID() && advertisedDevice.isAdvertisingService(KS_SERVICE_UUID_1))
             {
                 log_i("Kingsong, gotway or Inmotion wheel detected");
-                detected_wheel[wheel_num].type = WHEELTYPE_NUM;
+                Serial.println("Kingsong, gotway or Inmotion wheel detected");
+                detected_wheel[wheel_num].type = WHEELTYPE_KS;
                 detected_wheel[wheel_num].address = advertisedDevice.getAddress().toString().c_str();
+                if (!blectl_wheeladdress_stored(detected_wheel[wheel_num].address)){
+                    byte fws = blectl_get_free_wheelslot();
+                    blectl_add_stored_wheel(detected_wheel[wheel_num].address, detected_wheel[wheel_num].type, fws);
+                    blectl_clear_event(BLECTL_CLI_DETECT);
+                }  else {
+                    Serial.println("wheel already stored, skipping");
+                }
                 wheel_num++;
             } 
             else if (advertisedDevice.haveServiceUUID() && advertisedDevice.isAdvertisingService(NB_SERVICE_UUID))
@@ -154,6 +166,11 @@ class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks
                 log_i("Ninebot wheel detected");
                 detected_wheel[wheel_num].type = WHEELTYPE_NB;
                 detected_wheel[wheel_num].address = advertisedDevice.getAddress().toString().c_str();
+                if (!blectl_wheeladdress_stored(detected_wheel[wheel_num].address)){
+                    byte fws = blectl_get_free_wheelslot();
+                    blectl_add_stored_wheel(detected_wheel[wheel_num].address, detected_wheel[wheel_num].type, fws);
+                    blectl_clear_event(BLECTL_CLI_DETECT);
+                }
                 wheel_num++;
             } 
             else if (advertisedDevice.haveServiceUUID() && advertisedDevice.isAdvertisingService(NBZ_SERVICE_UUID))
@@ -477,6 +494,14 @@ bool blectl_stored_wheel_exist(byte wheelnum) {
     if ( stored_wheel[ wheelnum ].address == "00:00:00:00:00:00" ) return false;
     else return true;
 }
+bool blectl_wheeladdress_stored(String addr){
+for (int i = 0; i < MAX_STORED_WHEELS; i++) { 
+        if (stored_wheel[i].address == addr) {
+            return true;
+        } 
+    }
+    return false;
+}
 
 byte blectl_get_free_wheelslot( void ){
     for (int i = 0; i < MAX_STORED_WHEELS; i++) { 
@@ -507,6 +532,12 @@ bool blectl_remove_stored_wheel(byte wheelnum) {
     }
     else successful = false;
     return successful;
+}
+
+void blectl_remove_all_wheels(void) {
+    for (byte i = 0; i < MAX_STORED_WHEELS; i++) { 
+        blectl_remove_stored_wheel(i);
+    }
 }
 
 bool blectl_set_prio_stored_wheel(byte wheelnum) {
@@ -613,13 +644,13 @@ void blectl_cli_loop(void)
             //blectl_scan_once(1, false);
         }
     }
-    if (blectl_get_event(BLECTL_CLI_DOSCAN)) {
-        blectl_scan_once(2, false);
-        blectl_clear_event(BLECTL_CLI_DOSCAN);
-    }
+
     if (blectl_get_event(BLECTL_CLI_DETECT)) {
         blectl_scan_once(2, true);
-        blectl_clear_event(BLECTL_CLI_DETECT);
+        //blectl_clear_event(BLECTL_CLI_DETECT);
+    } else if (blectl_get_event(BLECTL_CLI_DOSCAN)) {
+        blectl_scan_once(2, false);
+        blectl_clear_event(BLECTL_CLI_DOSCAN);
     }
 }
 
@@ -853,6 +884,7 @@ void blectl_scan_once(int scantime, bool scan_for_new)
         log_i("Disconnected... starting scan");
         pBLEScan->start(scantime, scanCompleteCB, false);
         //blectl_clear_event(BLECTL_CLI_DOSCAN);
+        //if (scan_for_new) blectl_clear_event(BLECTL_CLI_DETECT);
         //blectl_clear_event(BLECTL_CLI_DETECT);
     }
 }
@@ -878,7 +910,9 @@ void blectl_scan_setup()
     pBLEScan->setInterval(1349);
     pBLEScan->setWindow(449);
     pBLEScan->setActiveScan(true);
+    blectl_set_event(BLECTL_CLI_DETECT);
+    blectl_remove_all_wheels();
 
-    stored_wheel[WHEEL_1].address = "b4:bc:7c:2e:92:49"; //temp only remove
-    stored_wheel[WHEEL_1].type = WHEELTYPE_KS; //temp only remove
+    //stored_wheel[WHEEL_1].address = "b4:bc:7c:2e:92:49"; //temp only remove
+    //stored_wheel[WHEEL_1].type = WHEELTYPE_KS; //temp only remove
 }

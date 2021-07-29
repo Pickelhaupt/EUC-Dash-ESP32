@@ -21,7 +21,7 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-/*
+
 #include "config.h"
 #include "EUC_connection_settings.h"
 
@@ -67,13 +67,13 @@ LV_IMG_DECLARE(unlock_16px);
 LV_IMG_DECLARE(check_32px);
 LV_IMG_DECLARE(exit_32px);
 LV_IMG_DECLARE(trash_32px);
-LV_IMG_DECLARE(euc_32px);
+LV_IMG_DECLARE(wheel_32px);
 
-void wlan_connection_tile_pre_setup( void ){
-    eucdash_settings_register_menu_item(&euc_32px, enter_euc_connection_event_cb, "connect euc");
+void euc_connection_tile_pre_setup( void ){
+    eucdash_settings_register_menu_item(&wheel_32px, enter_euc_connection_event_cb, "connect euc");
 }
 
-void wlan_connection_tile_setup( void ) {
+void euc_connection_tile_setup( void ) {
     // get an app tile and copy mainstyle
     euc_connection_tile_num = setup_get_submenu_tile_num();
     euc_add_tile_num = setup_get_submenu2_tile_num();
@@ -131,11 +131,12 @@ void wlan_connection_tile_setup( void ) {
     lv_obj_add_style( euc_address_list, LV_OBJ_PART_MAIN, &euc_list_style  );
     lv_obj_align( euc_address_list, euc_connection_tile, LV_ALIGN_IN_TOP_MID, 0, 80);
 
-    wlan_password_tile_setup( euc_add_tile_num );
+    //wlan_password_tile_setup( euc_add_tile_num );
 
     //blectl_register_cb( BLECTL_CLI_ON | BLECTL_CLI_OFF | BLECTL_CLI_DOSCAN | BLECTL_CLI_DOCONNECT, euc_setup_eucctl_event_cb, "euc network scan" );
 }
 
+/*
 void wlan_setup_display_ssid(String ssid) {
     if (euc_connection_ssid != NULL) {
         lv_label_set_text( euc_connection_ssid, ssid.c_str());
@@ -182,9 +183,10 @@ bool euc_setup_eucctl_event_cb( EventBits_t event, void *arg ) {
     return( true );
 }
 
+*/
 static void enter_euc_connection_event_cb( lv_obj_t * obj, lv_event_t event ) {
     switch( event ) {
-        case( LV_EVENT_CLICKED ):       wlan_connection_tile_setup();
+        case( LV_EVENT_CLICKED ):       euc_connection_tile_setup();
                                         mainbar_jump_to_tilenumber( euc_connection_tile_num, LV_ANIM_OFF );
                                         break;
     }
@@ -192,7 +194,7 @@ static void enter_euc_connection_event_cb( lv_obj_t * obj, lv_event_t event ) {
 
 static void exit_euc_connection_event_cb( lv_obj_t * obj, lv_event_t event ) {
     switch( event ) {
-        case( LV_EVENT_CLICKED ):       mainbar_jump_to_tilenumber( watch_get_tile_num(), LV_ANIM_OFF );
+        case( LV_EVENT_CLICKED ):       mainbar_jump_to_tilenumber( eucdash_get_tile_num(), LV_ANIM_OFF );
                                         break;
     }
 }
@@ -202,6 +204,8 @@ static void euc_connect_onoff_event_handler(lv_obj_t * obj, lv_event_t event) {
         case( LV_EVENT_VALUE_CHANGED ): blectl_set_autoconnect(lv_switch_get_state( obj ));
     }
 }
+
+/*
 
 void euc_connection_enter_pass_event_cb( lv_obj_t * obj, lv_event_t event ) {
     switch( event ) {
