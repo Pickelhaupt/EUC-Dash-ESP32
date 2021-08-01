@@ -39,6 +39,7 @@
 #include "hardware/Kingsong.h"
 #include "hardware/dashboard.h"
 #include "hardware/wheelctl.h"
+#include "hardware/wheeldb.h"
 
 TTGOClass *ttgo = TTGOClass::getWatch();
 
@@ -104,7 +105,7 @@ void setup()
     // enable to store data in normal heap
     splash_screen_stage_update( "alloc heap", 75 );
     //heap_caps_malloc_extmem_enable( 16*1024 );
-
+    wheeldb_setup();
     splash_screen_stage_update( "init wheel data", 90 );
     wheelctl_setup();
     splash_screen_stage_update( "init gui", 100 );

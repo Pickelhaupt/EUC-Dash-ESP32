@@ -131,7 +131,7 @@ void wheelctl_update_values(void)
     }
 }
 
-float wheelctl_get_data(int entry)
+float wheelctl_get_data(byte entry)
 {
     if (entry < WHEELCTL_DATA_NUM)
     {
@@ -140,7 +140,7 @@ float wheelctl_get_data(int entry)
     return 0;
 }
 
-void wheelctl_set_data(int entry, float value)
+void wheelctl_set_data(byte entry, float value)
 {
     if (entry < WHEELCTL_DATA_NUM && !saving_trip_data)
     {
@@ -382,7 +382,7 @@ void update_calc_battery(float value)
     }
 }
 
-float wheelctl_get_max_data(int entry)
+float wheelctl_get_max_data(byte entry)
 {
     if (entry < WHEELCTL_DATA_NUM)
     {
@@ -391,7 +391,7 @@ float wheelctl_get_max_data(int entry)
     return 0;
 }
 
-void wheelctl_set_max_data(int entry, float max_value)
+void wheelctl_set_max_data(byte entry, float max_value)
 {
     if (entry < WHEELCTL_DATA_NUM)
     {
@@ -399,7 +399,7 @@ void wheelctl_set_max_data(int entry, float max_value)
     }
 }
 
-byte wheelctl_get_constant(int entry)
+byte wheelctl_get_constant(byte entry)
 {
     if (entry < WHEELCTL_CONST_NUM)
     {
@@ -408,7 +408,7 @@ byte wheelctl_get_constant(int entry)
     return 0;
 }
 
-void wheelctl_set_constant(int entry, byte value)
+void wheelctl_set_constant(byte entry, byte value)
 {
     if (entry < WHEELCTL_CONST_NUM)
     {
@@ -416,7 +416,7 @@ void wheelctl_set_constant(int entry, byte value)
     }
 }
 
-String wheelctl_get_info(int entry)
+String wheelctl_get_info(byte entry)
 {
     if (entry < WHEELCTL_INFO_NUM)
     {
@@ -425,7 +425,7 @@ String wheelctl_get_info(int entry)
     return "undefined";
 }
 
-void wheelctl_set_info(int entry, String value)
+void wheelctl_set_info(byte entry, String value)
 {
     if (entry < WHEELCTL_INFO_NUM)
     {
@@ -542,14 +542,14 @@ void wheelctl_toggle_lights(void)
     }
 }
 
-bool wheelctl_get_config( int config ) {
+bool wheelctl_get_config( byte config ) {
     if ( config < WHEELCTL_CONFIG_NUM ) {
         return( wheelctl_config[ config ].enable );
     }
     return false;
 }
 
-void wheelctl_set_config( int config, bool enable ) {
+void wheelctl_set_config( byte config, bool enable ) {
     if ( config < WHEELCTL_CONFIG_NUM ) {
         wheelctl_config[ config ].enable = enable;
         wheelctl_save_config();

@@ -32,34 +32,6 @@
 #define KS_DEFAULT_BATTWARN     25 //remaining battery percentage warning -- 
 #define KS_DEFAULT_BATT_IR      20 //internal resistance in 1/100 ohms -- 
 
-#define KS_14D_MAXCURRENT   35 //maximum current draw
-#define KS_14D_CRITTEMP     65 //critical internal temperature
-#define KS_14D_WARNTEMP     50 //High internal temperature
-#define KS_14D_BATTVOLT     67 //battery pack max voltage
-#define KS_14D_BATTWARN     40 //remaining battery percentage warning
-#define KS_14D_BATT_IR      22 //battery pack internal resistance in 1/100 ohms -- just a guess at the moment, will need tuning
-
-#define KS_14S_MAXCURRENT   40
-#define KS_14S_CRITTEMP     65
-#define KS_14S_WARNTEMP     50
-#define KS_14S_BATTVOLT     67
-#define KS_14S_BATTWARN     25
-#define KS_14S_BATT_IR      11
-
-#define KS_16S_MAXCURRENT   40
-#define KS_16S_CRITTEMP     65
-#define KS_16S_WARNTEMP     50
-#define KS_16S_BATTVOLT     67
-#define KS_16S_BATTWARN     25
-#define KS_16S_BATT_IR      11
-
-#define KS_16X_MAXCURRENT   45
-#define KS_16X_CRITTEMP     65
-#define KS_16X_WARNTEMP     50
-#define KS_16X_BATTVOLT     84
-#define KS_16X_BATTWARN     25
-#define KS_16X_BATT_IR      10
-
 
 #include <TTGO.h>
 #include "callback.h"

@@ -28,6 +28,7 @@
 
 #include "blectl.h"
 #include "wheelctl.h"
+#include "wheeldb.h"
 #include "callback.h"
 #include "json_psram_allocator.h"
 #include "alloc.h"
@@ -125,243 +126,30 @@ void decodeKS(byte KSdata[])
 
 void kingsong_decode_serial( void ) {
     String ks_serialno = wheelctl_get_info(WHEELCTL_INFO_SERIAL);
-    String ks_size = ks_serialno.substring(0,4);
-    String ks_battsize = ks_serialno.substring(4,6);
+    String ks_model = ks_serialno.substring(0,6);
     String ks_colour = ks_serialno.substring(6,7);
     String ks_manuf_date = ks_serialno.substring(7,13);
 
-    if (ks_size == "KS14") {
-        wheelctl_set_constant(WHEELCTL_CONST_MAXCURRENT, 35);
-        if (ks_battsize == "D0") { 
-            wheelctl_set_info(WHEELCTL_INFO_BATTCAP, "174");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTVOLT, 67);
-            wheelctl_set_constant(WHEELCTL_CONST_BATT_P, 1);
-            wheelctl_set_info(WHEELCTL_INFO_MODEL, "KS14M");
-            wheelctl_set_constant(WHEELCTL_CONST_MAXCURRENT, 25);
-            wheelctl_set_constant(WHEELCTL_CONST_BATTWARN, 50);
-        }
-        else if (ks_battsize == "D1") {
-            wheelctl_set_info(WHEELCTL_INFO_BATTCAP, "340");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTVOLT, 67);
-            wheelctl_set_constant(WHEELCTL_CONST_BATT_P, 2);
-            wheelctl_set_info(WHEELCTL_INFO_MODEL, "KS14D");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTWARN, 40);
-            wheelctl_set_constant(WHEELCTL_CONST_MAXCURRENT, 35);
-        }
-        else if (ks_battsize == "D2") {
-            wheelctl_set_info(WHEELCTL_INFO_BATTCAP, "420");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTVOLT, 67);
-            wheelctl_set_constant(WHEELCTL_CONST_BATT_P, 2);
-            wheelctl_set_info(WHEELCTL_INFO_MODEL, "KS14D");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTWARN, 40);
-            wheelctl_set_constant(WHEELCTL_CONST_MAXCURRENT, 35);
-        }
-        else if (ks_battsize == "D3") {
-            wheelctl_set_info(WHEELCTL_INFO_BATTCAP, "680");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTVOLT, 67);
-            wheelctl_set_constant(WHEELCTL_CONST_BATT_P, 4);
-            wheelctl_set_info(WHEELCTL_INFO_MODEL, "KS14S");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTWARN, 25);
-            wheelctl_set_constant(WHEELCTL_CONST_MAXCURRENT, 40);
-        }
-        else if (ks_battsize == "D4") {
-            wheelctl_set_info(WHEELCTL_INFO_BATTCAP, "840");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTVOLT, 67);
-            wheelctl_set_constant(WHEELCTL_CONST_BATT_P, 4);
-            wheelctl_set_info(WHEELCTL_INFO_MODEL, "KS14S");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTWARN, 25);
-            wheelctl_set_constant(WHEELCTL_CONST_MAXCURRENT, 40);
-        }
-    }
-    else if (ks_size == "KS16"){
-        if (ks_battsize == "D1") {
-            wheelctl_set_info(WHEELCTL_INFO_BATTCAP, "320");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTVOLT, 67);
-            wheelctl_set_constant(WHEELCTL_CONST_BATT_P, 2);
-            wheelctl_set_info(WHEELCTL_INFO_MODEL, "KS16");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTWARN, 30);
-            wheelctl_set_constant(WHEELCTL_CONST_MAXCURRENT, 35);
-        }
-        else if (ks_battsize == "D2") {
-            wheelctl_set_info(WHEELCTL_INFO_BATTCAP, "420");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTVOLT, 67);
-            wheelctl_set_constant(WHEELCTL_CONST_BATT_P, 2);
-            wheelctl_set_info(WHEELCTL_INFO_MODEL, "KS16");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTWARN, 30);
-            wheelctl_set_constant(WHEELCTL_CONST_MAXCURRENT, 35);
-        }
-        else if (ks_battsize == "D3") {
-            wheelctl_set_info(WHEELCTL_INFO_BATTCAP, "680");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTVOLT, 67);
-            wheelctl_set_constant(WHEELCTL_CONST_BATT_P, 4);
-            wheelctl_set_info(WHEELCTL_INFO_MODEL, "KS16");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTWARN, 25);
-            wheelctl_set_constant(WHEELCTL_CONST_MAXCURRENT, 45);
-        }
-        else if (ks_battsize == "D4") {
-            wheelctl_set_info(WHEELCTL_INFO_BATTCAP, "840");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTVOLT, 67);
-            wheelctl_set_constant(WHEELCTL_CONST_BATT_P, 4);
-            wheelctl_set_info(WHEELCTL_INFO_MODEL, "KS16");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTWARN, 25);
-            wheelctl_set_constant(WHEELCTL_CONST_MAXCURRENT, 45);
-        }
-        else if (ks_battsize == "D5") {
-            wheelctl_set_info(WHEELCTL_INFO_BATTCAP, "520");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTVOLT, 67);
-            wheelctl_set_constant(WHEELCTL_CONST_BATT_P, 3);
-            wheelctl_set_info(WHEELCTL_INFO_MODEL, "KS16");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTWARN, 30);
-            wheelctl_set_constant(WHEELCTL_CONST_MAXCURRENT, 40);
-        }
-        else if (ks_battsize == "S1") {
-            wheelctl_set_info(WHEELCTL_INFO_BATTCAP, "680");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTVOLT, 67);
-            wheelctl_set_constant(WHEELCTL_CONST_BATT_P, 4);
-            wheelctl_set_info(WHEELCTL_INFO_MODEL, "KS16S");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTWARN, 25);
-            wheelctl_set_constant(WHEELCTL_CONST_MAXCURRENT, 45);
-        }
-        else if (ks_battsize == "S2") {
-            wheelctl_set_info(WHEELCTL_INFO_BATTCAP, "840");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTVOLT, 67);
-            wheelctl_set_constant(WHEELCTL_CONST_BATT_P, 4);
-            wheelctl_set_info(WHEELCTL_INFO_MODEL, "KS16S");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTWARN, 25);
-            wheelctl_set_constant(WHEELCTL_CONST_MAXCURRENT, 45);
-        }
-        else if (ks_battsize == "S4") {
-            wheelctl_set_info(WHEELCTL_INFO_BATTCAP, "420");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTVOLT, 67);
-            wheelctl_set_constant(WHEELCTL_CONST_BATT_P, 2);
-            wheelctl_set_info(WHEELCTL_INFO_MODEL, "KS16S");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTWARN, 40);
-            wheelctl_set_constant(WHEELCTL_CONST_MAXCURRENT, 35);
-        }
-        else if (ks_battsize == "X1") {
-            wheelctl_set_info(WHEELCTL_INFO_BATTCAP, "777");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTVOLT, 84);
-            wheelctl_set_constant(WHEELCTL_CONST_BATT_P, 3);
-            wheelctl_set_info(WHEELCTL_INFO_MODEL, "KS16XS");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTWARN, 25);
-            wheelctl_set_constant(WHEELCTL_CONST_MAXCURRENT, 45);
-        }
-        else if (ks_battsize == "X2") {
-            wheelctl_set_info(WHEELCTL_INFO_BATTCAP, "1554");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTVOLT, 84);
-            wheelctl_set_constant(WHEELCTL_CONST_BATT_P, 6);
-            wheelctl_set_info(WHEELCTL_INFO_MODEL, "KS16X");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTWARN, 20);
-            wheelctl_set_constant(WHEELCTL_CONST_MAXCURRENT, 50);
-        }
-    }
-    else if (ks_size == "KS18"){
-        if (ks_battsize == "A4") {
-            wheelctl_set_info(WHEELCTL_INFO_BATTCAP, "520");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTVOLT, 67);
-            wheelctl_set_constant(WHEELCTL_CONST_BATT_P, 3);
-            wheelctl_set_info(WHEELCTL_INFO_MODEL, "KS18A");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTWARN, 30);
-            wheelctl_set_constant(WHEELCTL_CONST_MAXCURRENT, 45);
-        }
-        else if (ks_battsize == "A5") {
-            wheelctl_set_info(WHEELCTL_INFO_BATTCAP, "680");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTVOLT, 67);
-            wheelctl_set_constant(WHEELCTL_CONST_BATT_P, 4);
-            wheelctl_set_info(WHEELCTL_INFO_MODEL, "KS18A");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTWARN, 25);
-            wheelctl_set_constant(WHEELCTL_CONST_MAXCURRENT, 45);
-        }
-        else if (ks_battsize == "A6") {
-            wheelctl_set_info(WHEELCTL_INFO_BATTCAP, "1360");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTVOLT, 67);
-            wheelctl_set_constant(WHEELCTL_CONST_BATT_P, 8);
-            wheelctl_set_info(WHEELCTL_INFO_MODEL, "KS18A");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTWARN, 20);
-            wheelctl_set_constant(WHEELCTL_CONST_MAXCURRENT, 55);
-        }
-        else if (ks_battsize == "A7") {
-            wheelctl_set_info(WHEELCTL_INFO_BATTCAP, "840");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTVOLT, 67);
-            wheelctl_set_constant(WHEELCTL_CONST_BATT_P, 4);
-            wheelctl_set_info(WHEELCTL_INFO_MODEL, "KS18A");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTWARN, 25);
-            wheelctl_set_constant(WHEELCTL_CONST_MAXCURRENT, 45);
-        }
-        else if (ks_battsize == "A8") {
-            wheelctl_set_info(WHEELCTL_INFO_BATTCAP, "1680");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTVOLT, 67);
-            wheelctl_set_constant(WHEELCTL_CONST_BATT_P, 8);
-            wheelctl_set_info(WHEELCTL_INFO_MODEL, "KS18A");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTWARN, 20);
-            wheelctl_set_constant(WHEELCTL_CONST_MAXCURRENT, 50);
-        }
+    Serial.print("Model: ");
+    Serial.println(ks_model);
 
-        else if (ks_battsize == "S3") {
-            wheelctl_set_info(WHEELCTL_INFO_BATTCAP, "680");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTVOLT, 67);
-            wheelctl_set_constant(WHEELCTL_CONST_BATT_P, 4);
-            wheelctl_set_info(WHEELCTL_INFO_MODEL, "KS18S");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTWARN, 25);
-            wheelctl_set_constant(WHEELCTL_CONST_MAXCURRENT, 50);
-        }
-        else if (ks_battsize == "S4") {
-            wheelctl_set_info(WHEELCTL_INFO_BATTCAP, "1360");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTVOLT, 67);
-            wheelctl_set_constant(WHEELCTL_CONST_BATT_P, 6);
-            wheelctl_set_info(WHEELCTL_INFO_MODEL, "KS18S");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTWARN, 20);
-            wheelctl_set_constant(WHEELCTL_CONST_MAXCURRENT, 55);
-        }
-        else if (ks_battsize == "S5") {
-            wheelctl_set_info(WHEELCTL_INFO_BATTCAP, "840");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTVOLT, 67);
-            wheelctl_set_constant(WHEELCTL_CONST_BATT_P, 4);
-            wheelctl_set_info(WHEELCTL_INFO_MODEL, "KS18S");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTWARN, 25);
-            wheelctl_set_constant(WHEELCTL_CONST_MAXCURRENT, 50);
-        }
-        else if (ks_battsize == "S6") {
-            wheelctl_set_info(WHEELCTL_INFO_BATTCAP, "1680");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTVOLT, 67);
-            wheelctl_set_constant(WHEELCTL_CONST_BATT_P, 8);
-            wheelctl_set_info(WHEELCTL_INFO_MODEL, "KS18S");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTWARN, 20);
-            wheelctl_set_constant(WHEELCTL_CONST_MAXCURRENT, 55);
-        }
-        else if (ks_battsize == "L2") {
-            wheelctl_set_info(WHEELCTL_INFO_BATTCAP, "1036");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTVOLT, 84);
-            wheelctl_set_constant(WHEELCTL_CONST_BATT_P, 4);
-            wheelctl_set_info(WHEELCTL_INFO_MODEL, "KS18L");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTWARN, 25);
-            wheelctl_set_constant(WHEELCTL_CONST_MAXCURRENT, 45);
-        }
-        else if (ks_battsize == "L4") {
-            wheelctl_set_info(WHEELCTL_INFO_BATTCAP, "1554");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTVOLT, 84);
-            wheelctl_set_constant(WHEELCTL_CONST_BATT_P, 6);
-            wheelctl_set_info(WHEELCTL_INFO_MODEL, "KS18XL");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTWARN, 20);
-            wheelctl_set_constant(WHEELCTL_CONST_MAXCURRENT, 55);
-        }
+    if (ks_model == "KS14D0") wheeldb_set_wheelctl_data(KS14D0);
+    else if (ks_model == "KS14D1") wheeldb_set_wheelctl_data(KS14D1);
+    else if (ks_model == "KS14D2") wheeldb_set_wheelctl_data(KS14D2);
+    else if (ks_model == "KS14D3") wheeldb_set_wheelctl_data(KS14D3);
+    else if (ks_model == "KS14D4") wheeldb_set_wheelctl_data(KS14D4);
+    else if (ks_model == "KS16S1") wheeldb_set_wheelctl_data(KS16S1);
+    else if (ks_model == "KS16S2") wheeldb_set_wheelctl_data(KS16S2);
+    else if (ks_model == "KS16S4") wheeldb_set_wheelctl_data(KS16S4);
+    else if (ks_model == "KS16X1") wheeldb_set_wheelctl_data(KS16X1);
+    else if (ks_model == "KS16X2") wheeldb_set_wheelctl_data(KS16X2);
+    else if (ks_model == "KSS181") wheeldb_set_wheelctl_data(KSS181);
+    else if (ks_model == "KS18L2") wheeldb_set_wheelctl_data(KS18L2);
+    else if (ks_model == "KS18L4") wheeldb_set_wheelctl_data(KS18L4);
+    else {
+        wheeldb_set_wheelctl_data(KSUNKN);
+        Serial.println("unknown KS model -- please add");
     }
-    else if (ks_size == "KSS1"){
-        if (ks_battsize == "81") {
-            wheelctl_set_info(WHEELCTL_INFO_BATTCAP, "1110");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTVOLT, 84);
-            wheelctl_set_constant(WHEELCTL_CONST_BATT_P, 3);
-            wheelctl_set_info(WHEELCTL_INFO_MODEL, "KS-S18");
-            wheelctl_set_constant(WHEELCTL_CONST_BATTWARN, 25);
-            wheelctl_set_constant(WHEELCTL_CONST_MAXCURRENT, 50);
-        }
-    }
-    if (wheelctl_get_constant(WHEELCTL_CONST_BATT_P) == 1) wheelctl_set_constant(WHEELCTL_CONST_BATT_IR, 40);
-    if (wheelctl_get_constant(WHEELCTL_CONST_BATT_P) == 2) wheelctl_set_constant(WHEELCTL_CONST_BATT_IR, 22);
-    if (wheelctl_get_constant(WHEELCTL_CONST_BATT_P) == 3) wheelctl_set_constant(WHEELCTL_CONST_BATT_IR, 18);
-    if (wheelctl_get_constant(WHEELCTL_CONST_BATT_P) == 4) wheelctl_set_constant(WHEELCTL_CONST_BATT_IR, 12);
-    if (wheelctl_get_constant(WHEELCTL_CONST_BATT_P) == 6) wheelctl_set_constant(WHEELCTL_CONST_BATT_IR, 10);
-    if (wheelctl_get_constant(WHEELCTL_CONST_BATT_P) == 8) wheelctl_set_constant(WHEELCTL_CONST_BATT_IR, 7);
 
     if (ks_colour == "B") wheelctl_set_info(WHEELCTL_INFO_WHEELCOLOR, "black");
     if (ks_colour == "C") wheelctl_set_info(WHEELCTL_INFO_WHEELCOLOR, "custom");
@@ -370,6 +158,7 @@ void kingsong_decode_serial( void ) {
     if (ks_colour == "S") wheelctl_set_info(WHEELCTL_INFO_WHEELCOLOR, "silver");
     if (ks_colour == "W") wheelctl_set_info(WHEELCTL_INFO_WHEELCOLOR, "white");
     if (ks_colour == "Y") wheelctl_set_info(WHEELCTL_INFO_WHEELCOLOR, "yellow");
+
 }
 
 void ks_ble_request(byte reqtype)

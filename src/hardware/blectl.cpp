@@ -844,6 +844,9 @@ bool connectToServer()
             //ks_init_notifications();
             value_str = pRemoteCharacteristic->readValue().c_str();
             Serial.printf("characteristic readable value: x%sx\n", value_str);
+        } else {
+            Serial.println("characteristic value received");
+            Serial.printf("characteristic readable value: x%sx\n", value_str);
         }
     }
     // Register for notify

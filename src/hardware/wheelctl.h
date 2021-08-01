@@ -78,7 +78,7 @@
 
     enum { 
         WHEELCTL_CONST_MAXCURRENT,  //Maximum current draw for wheel model -required
-        WHEELCTL_CONST_CRITTEMP,    //Critical internal temperature -required, might e made optional
+        WHEELCTL_CONST_CRITTEMP,    //Critical internal temperature -required, might be made optional
         WHEELCTL_CONST_WARNTEMP,    //internal temperature to trigger warning -required, might e made optional
         WHEELCTL_CONST_BATTVOLT,    //Voltage of the battery pack for the wheel model -required
         WHEELCTL_CONST_BATTWARN,    //Percentage of battery remaining when warning should be triggered for the specific wheel model -required
@@ -87,6 +87,15 @@
         WHEELCTL_CONST_BATT_P,     //number of battery cells in parallel
         WHEELCTL_CONST_NUM          //number of wheel constants
     };
+
+    /**
+     * @brief battery cell data structure
+     */
+    typedef struct {
+        byte volt; //volt * 10
+        byte capacity; //Ah * 10
+        byte resistance; //mOhm
+    } wheelctl_celldata_t;
 
     typedef struct {
         String value;
@@ -153,7 +162,7 @@
      * 
      * @return  float
      */
-    float wheelctl_get_data( int entry );
+    float wheelctl_get_data( byte entry );
 
     /**
      * @brief set the value for a specific wheel data entry
@@ -164,7 +173,7 @@
      * WHEELCTL_RIDETIME
      * @param   value    the value of the data entry
      */
-    void wheelctl_set_data( int entry, float value );
+    void wheelctl_set_data( byte entry, float value );
 
     /**
      * @brief get the max value for a specific wheel data entry
@@ -174,7 +183,7 @@
      * 
      * @return  float
      */
-    float wheelctl_get_max_data( int entry );
+    float wheelctl_get_max_data( byte entry );
 
     /**
      * @brief set the max value for a specific wheel data entry
@@ -183,7 +192,7 @@
      * WHEELCTL_TEMP,  WHEELCTL_BATTPCT, WHEELCTL_POWER
      * @param   max_value    the value of the data entry
      */
-    void wheelctl_set_max_data( int entry, float max_value );
+    void wheelctl_set_max_data( byte entry, float max_value );
 
     /**
      * @brief get the  value of the wheel constant
@@ -193,7 +202,7 @@
      * 
      * @return  uint8_t
      */
-    byte wheelctl_get_constant( int entry );
+    byte wheelctl_get_constant( byte entry );
 
     /**
      * @brief set the value of the wheel constant
@@ -202,7 +211,7 @@
      * WHEELCTL_CONST_WARNTEMP, WHEELCTL_CONST_BATTVOLT, WHEELCTL_CONST_BATTWARN
      * @param   value     the value of the constant
      */
-    void wheelctl_set_constant( int entry, uint8_t value );
+    void wheelctl_set_constant( byte entry, uint8_t value );
 
     /**
      * @brief get the value of the wheel info entry
@@ -212,7 +221,7 @@
      * 
      * @return  String
      */
-    String wheelctl_get_info( int entry );
+    String wheelctl_get_info( byte entry );
 
     /**
      * @brief set the value of the wheel info entry
@@ -222,14 +231,14 @@
      * 
      * @param   value     the value of the info entry
      */
-    void wheelctl_set_info( int entry, String value );
+    void wheelctl_set_info( byte entry, String value );
     /**
      * @brief get the state of the wheel configuraion setting
      * 
      * @param   config     configitem: WHEELCTL_CONFIG_LED, WHEELCTL_CONFIG_HORN, 
      * WHEELCTL_CONFIG_HAPTIC, WHEELCTL_CONFIG_LIGHTS_OFF, WHEELCTL_CONST_BATTWARN
      */
-    bool wheelctl_get_config( int config );
+    bool wheelctl_get_config( byte config );
     /**
      * @brief set the state of the wheel configuration entry
      * 
@@ -238,7 +247,7 @@
      * 
      * @param   enable     if the setting is true or false
      */
-    void wheelctl_set_config( int config, bool enable );
+    void wheelctl_set_config( byte config, bool enable );
     /**
      * @brief toggle EUC main lights
      */
