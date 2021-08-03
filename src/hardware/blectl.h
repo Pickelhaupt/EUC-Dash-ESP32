@@ -125,8 +125,6 @@
 
     #define BLECTL_MAX_ADVERTISED   5      /** @brief max number of wheels to simultaniously show */
 
-    
-
     /**
      * @brief blectl config structure
      */
@@ -328,7 +326,7 @@
      * 
      * @return N/A
      */
-    void blectl_scan_once(int scantime, bool scan_for_new);
+    void blectl_scan_once(int scantime);
     /**
      * @brief Save stored wheels to flash
      * 

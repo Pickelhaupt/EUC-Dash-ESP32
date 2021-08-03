@@ -65,15 +65,13 @@ void blectl_clear_detected_wheels(void);
 bool clidoConnect = false;
 bool cliconnected = false;
 bool cli_ondisconnect = false;
-bool blectl_new_scan;
 bool wheel_found = false;
 bool notify_active = false;
-bool discover_new_wheels = false;
 int wheel_num = 0;
 int scandelay = 0;
 byte blectl_detected_wheels;
 
-uint8_t txValue = 0;
+uint8_t txfValue = 0;
 String blename;
 String blemfg;
 byte myWheeltype;
@@ -112,17 +110,13 @@ class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks
     */
     void onResult(BLEAdvertisedDevice advertisedDevice)
     {
-        if (blectl_new_scan) {
-            wheel_num = 0;
-            blectl_clear_detected_wheels();
-        }
-        blectl_new_scan = false;
+        Serial.printf("discover enabled? %d\n", blectl_get_event(BLECTL_CLI_DETECT));
         Serial.print("BLE Advertised Device found: ");
         Serial.println(advertisedDevice.toString().c_str());
         log_i("BLE Advertised Device found: %s", advertisedDevice.toString().c_str());
         
         //connect to stored wheel first discovered
-        if(!discover_new_wheels) {
+        if(!blectl_get_event(BLECTL_CLI_DETECT)) {
             for (int i = 0; i < MAX_STORED_WHEELS; i++) { 
                 Serial.printf("stored wheel: %d wheeltype %d address: ", i, stored_wheel[i].type);
                 Serial.println(stored_wheel[i].address);
@@ -143,8 +137,8 @@ class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks
         
         // Scan for all EUCs in range
         // We have found a device, let us now see if it contains the service we are looking for.
-        Serial.printf("discover enabled? %d\n", discover_new_wheels);
-        if(discover_new_wheels) {
+        
+        if(blectl_get_event(BLECTL_CLI_DETECT)) {
             //blectl_clear_detected_wheels();
             if (advertisedDevice.haveServiceUUID() && advertisedDevice.isAdvertisingService(KS_SERVICE_UUID_1))
             {
@@ -155,7 +149,7 @@ class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks
                 if (!blectl_wheeladdress_stored(detected_wheel[wheel_num].address)){
                     byte fws = blectl_get_free_wheelslot();
                     blectl_add_stored_wheel(detected_wheel[wheel_num].address, detected_wheel[wheel_num].type, fws);
-                    blectl_clear_event(BLECTL_CLI_DETECT);
+                    //blectl_clear_event(BLECTL_CLI_DETECT);
                 }  else {
                     Serial.println("wheel already stored, skipping");
                 }
@@ -169,7 +163,7 @@ class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks
                 if (!blectl_wheeladdress_stored(detected_wheel[wheel_num].address)){
                     byte fws = blectl_get_free_wheelslot();
                     blectl_add_stored_wheel(detected_wheel[wheel_num].address, detected_wheel[wheel_num].type, fws);
-                    blectl_clear_event(BLECTL_CLI_DETECT);
+                    //blectl_clear_event(BLECTL_CLI_DETECT);
                 }
                 wheel_num++;
             } 
@@ -180,7 +174,7 @@ class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks
                 detected_wheel[wheel_num].address = advertisedDevice.getAddress().toString().c_str();
                 wheel_num++;
             }
-            if (wheel_num <= MAX_DETECTED_WHEELS) {
+            if (wheel_num >= (MAX_DETECTED_WHEELS -1)) {
                 log_i("max number of wheels detected %d", MAX_DETECTED_WHEELS);
                 pBLEScan->stop();
                 scanCompleteCB( pBLEScan->getResults() );
@@ -556,55 +550,17 @@ bool blectl_set_prio_stored_wheel(byte wheelnum) {
 }
 
 static void scanCompleteCB(BLEScanResults scanResults) {
-	log_i("Scan complete!\n");
-	log_i("We found %d devices\n", scanResults.getCount());
-    Serial.printf("We found %d devices\n", scanResults.getCount());
+	log_e("Scan complete!\n");
+	log_e("We found %d devices\n", scanResults.getCount());
+    //Serial.printf("We found %d devices\n", scanResults.getCount());
 	scanResults.dump();
     if(wheel_found){
-        if (myWheeltype == WHEELTYPE_KS) {
-            wheelctl_set_info(WHEELCTL_INFO_MANUFACTURER, "KS");
-        }
-        if (myWheeltype == WHEELTYPE_GW) {
-            wheelctl_set_info(WHEELCTL_INFO_MANUFACTURER, "GW");
-        }
-        if (myWheeltype == WHEELTYPE_IM) {
-            wheelctl_set_info(WHEELCTL_INFO_MANUFACTURER, "IM");
-        }
-        if (myWheeltype == WHEELTYPE_NB) {
-            wheelctl_set_info(WHEELCTL_INFO_MANUFACTURER, "NB");
-        }
-        if (myWheeltype == WHEELTYPE_NBZ) {
-            wheelctl_set_info(WHEELCTL_INFO_MANUFACTURER, "NBZ");
-        }
-        if (myWheeltype == WHEELTYPE_NUM) {
-            wheelctl_set_info(WHEELCTL_INFO_MANUFACTURER, "TBD");
-        }
         clidoConnect = true;
         blectl_set_event(BLECTL_CLI_DOCONNECT);
         Serial.printf("We found %d wheels\n", wheel_num);
         blectl_detected_wheels = wheel_num;
-        /*
-        if (connectToServer())
-        {
-            log_i("We are now connected to the BLE Server.");
-            
-            if ( wheelctl_get_info(WHEELCTL_INFO_MANUFACTURER) == "KS" ) initks();
-            //if ( wheelctl_get_info(WHEELCTL_INFO_MANUFACTURER) == "GW" ) initgw();
-            //if ( wheelctl_get_info(WHEELCTL_INFO_MANUFACTURER) == "IM" ) initim();
-            //if ( wheelctl_get_info(WHEELCTL_INFO_MANUFACTURER) == "NB" ) initnb();
-            //if ( wheelctl_get_info(WHEELCTL_INFO_MANUFACTURER) == "NBZ" ) initnbz();
-
-            dashboard_tile_reload();
-            simpledash_tile_reload();
-            mainbar_jump_to_maintile(LV_ANIM_OFF);
-        }
-        else
-        {
-            log_w("We have failed to connect to the server;");
-        }
-        clidoConnect = false;
-        */
-    }  
+    }
+    blectl_clear_event(BLECTL_CLI_DETECT);  
 } // scanCompleteCB
 
 void blectl_cli_loop(void)
@@ -618,7 +574,6 @@ void blectl_cli_loop(void)
         {
             log_i("We are now connected to the BLE Server.");
             if ( myWheeltype == WHEELTYPE_KS ) initks();
-            //if ( wheelctl_get_info(WHEELCTL_INFO_MANUFACTURER) == "KS" ) initks();
             //if ( myWheeltype == WHEELTYPE_GW ) initgw();
             //if ( myWheeltype == WHEELTYPE_IM ) initim();
             //if ( myWheeltype == WHEELTYPE_NB ) initnb();
@@ -641,16 +596,19 @@ void blectl_cli_loop(void)
         NextMillis += scandelay;
         if (blectl_config.autoconnect) {
             blectl_set_event(BLECTL_CLI_DOSCAN);
-            //blectl_scan_once(1, false);
         }
     }
-
-    if (blectl_get_event(BLECTL_CLI_DETECT)) {
-        blectl_scan_once(2, true);
-        //blectl_clear_event(BLECTL_CLI_DETECT);
-    } else if (blectl_get_event(BLECTL_CLI_DOSCAN)) {
-        blectl_scan_once(2, false);
-        blectl_clear_event(BLECTL_CLI_DOSCAN);
+    if (blectl_get_event(BLECTL_CLI_DOSCAN)) {
+        wheel_num = 0;
+        if (blectl_get_event(BLECTL_CLI_DETECT)) {
+            Serial.println("detecting new wheels..");
+            
+            blectl_clear_detected_wheels();
+        } else {
+            Serial.println("scanning for stored wheels");
+        }
+        blectl_scan_once(2);
+        blectl_clear_event(BLECTL_CLI_DOSCAN); 
     }
 }
 
@@ -878,12 +836,11 @@ bool blectl_cli_getconnected( void )
     return cliconnected;
 }
 
-void blectl_scan_once(int scantime, bool scan_for_new)
+void blectl_scan_once(int scantime)
 { 
     if ( !cliconnected )
     {
-        blectl_new_scan = true;
-        discover_new_wheels = scan_for_new;
+        
         log_i("Disconnected... starting scan");
         pBLEScan->start(scantime, scanCompleteCB, false);
         //blectl_clear_event(BLECTL_CLI_DOSCAN);
@@ -914,8 +871,5 @@ void blectl_scan_setup()
     pBLEScan->setWindow(449);
     pBLEScan->setActiveScan(true);
     blectl_set_event(BLECTL_CLI_DETECT);
-    blectl_remove_all_wheels();
-
-    //stored_wheel[WHEEL_1].address = "b4:bc:7c:2e:92:49"; //temp only remove
-    //stored_wheel[WHEEL_1].type = WHEELTYPE_KS; //temp only remove
+    //blectl_remove_all_wheels();
 }

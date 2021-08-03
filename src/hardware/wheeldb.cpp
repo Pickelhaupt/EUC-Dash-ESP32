@@ -40,21 +40,21 @@ void wheeldb_set_celldata(void){
 void wheeldb_set_wheeldata(void) {
 
     //KingSong
-    //                   Manufacturer  Model    wh    Battery type  P  S  spd thr dia  w
-    wheeldata[KS14D0] = {"King Song", "KS14M", "174", GENERIC_2900, 1, 16, 20, 50, 14, 5};
-    wheeldata[KS14D1] = {"King Song", "KS14D", "340", GENERIC_2900, 2, 16, 30, 50, 14, 8};
-    wheeldata[KS14D2] = {"King Song", "KS14D", "420", LG_MJ1, 2, 16, 30, 50, 14, 8};
-    wheeldata[KS14D3] = {"King Song", "KS14S", "680", GENERIC_2900, 4, 16, 30, 30, 14, 8};
-    wheeldata[KS14D4] = {"King Song", "KS14S", "840", LG_MJ1, 4, 16, 30, 30, 14, 8};
-    wheeldata[KS16S1] = {"King Song", "KS16S", "680", GENERIC_2900, 4, 16, 35, 30, 16, 12};
-    wheeldata[KS16S2] = {"King Song", "KS16S", "840", LG_MJ1, 4, 16, 30, 50, 16, 12};
-    wheeldata[KS16S4] = {"King Song", "KS16S", "420", LG_MJ1, 2, 16, 35, 30, 16, 12};
-    wheeldata[KS16X1] = {"King Song", "KS16XS", "777", LG_MJ1, 3, 20, 45, 40, 16, 22};
-    wheeldata[KS16X2] = {"King Song", "KS16X", "1554", LG_MJ1, 6, 20, 50, 30, 16, 22};
-    wheeldata[KSS181] = {"King Song", "KSS18", "1110", LG_M50T, 3, 20, 50, 30, 18, 22};
-    wheeldata[KS18L2] = {"King Song", "KS18L", "1036", LG_MJ1, 4, 20, 50, 30, 18, 22};
-    wheeldata[KS18L4] = {"King Song", "KS18XL", "1554", LG_MJ1, 6, 20, 50, 30, 18, 22};
-    wheeldata[KSUNKN] = {"King Song", "Unknown", "840", LG_MJ1, 4, 16, 45, 30, 16, 12};
+    //                   Mfg    Model    wh    Battery type  P  S  spd thr dia  w
+    wheeldata[KS14D0] = {"KS", "KS14M", "174", GENERIC_2900, 1, 16, 20, 50, 14, 5};
+    wheeldata[KS14D1] = {"KS", "KS14D", "340", GENERIC_2900, 2, 16, 30, 50, 14, 8};
+    wheeldata[KS14D2] = {"KS", "KS14D", "420", LG_MJ1, 2, 16, 30, 50, 14, 8};
+    wheeldata[KS14D3] = {"KS", "KS14S", "680", GENERIC_2900, 4, 16, 30, 30, 14, 8};
+    wheeldata[KS14D4] = {"KS", "KS14S", "840", LG_MJ1, 4, 16, 30, 30, 14, 8};
+    wheeldata[KS16S1] = {"KS", "KS16S", "680", GENERIC_2900, 4, 16, 35, 30, 16, 12};
+    wheeldata[KS16S2] = {"KS", "KS16S", "840", LG_MJ1, 4, 16, 30, 50, 16, 12};
+    wheeldata[KS16S4] = {"KS", "KS16S", "420", LG_MJ1, 2, 16, 35, 30, 16, 12};
+    wheeldata[KS16X1] = {"KS", "KS16XS", "777", LG_MJ1, 3, 20, 45, 40, 16, 22};
+    wheeldata[KS16X2] = {"KS", "KS16X", "1554", LG_MJ1, 6, 20, 50, 30, 16, 22};
+    wheeldata[KSS181] = {"KS", "KSS18", "1110", LG_M50T, 3, 20, 50, 30, 18, 22};
+    wheeldata[KS18L2] = {"KS", "KS18L", "1036", LG_MJ1, 4, 20, 50, 30, 18, 22};
+    wheeldata[KS18L4] = {"KS", "KS18XL", "1554", LG_MJ1, 6, 20, 50, 30, 18, 22};
+    wheeldata[KSUNKN] = {"KS", "Unknown", "840", LG_MJ1, 4, 16, 45, 30, 16, 12};
 
     //Gotway
 
@@ -64,6 +64,7 @@ void wheeldb_set_wheeldata(void) {
 }
 
 void wheeldb_set_wheelctl_data(byte wheel_type) {
+    wheelctl_set_info(WHEELCTL_INFO_MANUFACTURER, wheeldata[wheel_type].manufacturer);
     wheelctl_set_info(WHEELCTL_INFO_MODEL, wheeldata[wheel_type].model);
     wheelctl_set_info(WHEELCTL_INFO_BATTCAP, wheeldata[wheel_type].mfgwh);
     wheelctl_set_constant(WHEELCTL_CONST_MAXCURRENT, (200 * wheeldata[wheel_type].power / (wheeldata[wheel_type].numcellsS * 3.7)));
@@ -75,5 +76,4 @@ void wheeldb_set_wheelctl_data(byte wheel_type) {
 void wheeldb_setup(void){
     wheeldb_set_celldata();
     wheeldb_set_wheeldata();
-
 }

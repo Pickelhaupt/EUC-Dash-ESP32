@@ -175,7 +175,7 @@ static void brightness_setup_event_cb( lv_obj_t * obj, lv_event_t event ) {
 static void toggle_wheel_connect_onoff_event_handler(lv_obj_t * obj, lv_event_t event) {
     switch( event ) {
         case( LV_EVENT_VALUE_CHANGED):  blectl_set_autoconnect(lv_switch_get_state( obj ));
-                                        if(lv_switch_get_state( obj )) blectl_scan_once(2, false);
+                                        if(lv_switch_get_state( obj )) blectl_scan_once(2);
                                         break;
     }
 }

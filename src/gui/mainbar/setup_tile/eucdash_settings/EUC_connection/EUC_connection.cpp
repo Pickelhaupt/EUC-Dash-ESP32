@@ -1,8 +1,5 @@
 /****************************************************************************
- *   Modified 2020 Jesper Ortlund  
- *   Tu May 22 21:23:51 2020
- *   Copyright  2020  Dirk Brosswick
- *   Email: dirk.brosswick@googlemail.com
+ *   2021 Jesper Ortlund  
  ****************************************************************************/
  
 /*
@@ -102,26 +99,17 @@ void euc_connection_tile_setup( void ) {
     
     lv_obj_t *exit_label = lv_label_create( euc_connection_tile, NULL);
     lv_obj_add_style( exit_label, LV_OBJ_PART_MAIN, &euc_connection_heading_style );
-    lv_label_set_text( exit_label, "connect wlan");
+    lv_label_set_text( exit_label, "scan for EUC");
     lv_obj_align( exit_label, exit_btn, LV_ALIGN_OUT_RIGHT_MID, 15, 0 );
-
-    //Copy the first switch and turn it ON   
+  
     euc_connect_onoff = lv_switch_create( euc_connection_tile, NULL );
     lv_obj_add_protect( euc_connect_onoff, LV_PROTECT_CLICK_FOCUS);
     lv_obj_add_style( euc_connect_onoff, LV_SWITCH_PART_INDIC, mainbar_get_switch_style()  );
     lv_obj_add_style( euc_connect_onoff, LV_SLIDER_PART_KNOB, mainbar_get_knob_style() );
-    lv_switch_off( euc_connect_onoff, LV_ANIM_ON );
+    if(blectl_get_event(BLECTL_CLI_DETECT)) lv_switch_on( euc_connect_onoff, LV_ANIM_ON );
+    else lv_switch_off( euc_connect_onoff, LV_ANIM_ON );
     lv_obj_align( euc_connect_onoff, exit_label, LV_ALIGN_OUT_RIGHT_MID, 10, 0 );
     lv_obj_set_event_cb( euc_connect_onoff, euc_connect_onoff_event_handler);
-
-    euc_connection_label = lv_label_create( euc_connection_tile, NULL );
-    lv_label_set_text( euc_connection_label, "connected:");
-    lv_obj_align( euc_connection_label, euc_connection_tile, LV_ALIGN_IN_TOP_LEFT, 10, 45 );
-    
-    euc_connection_ssid = lv_label_create( euc_connection_tile, NULL );
-    lv_obj_add_style( euc_connection_ssid, LV_OBJ_PART_MAIN, &euc_connection_data_style );
-    lv_label_set_text( euc_connection_ssid, "NULL");
-    lv_obj_align( euc_connection_ssid, euc_connection_label, LV_ALIGN_OUT_RIGHT_MID, 10, 0 );
 
     euc_address_list = lv_list_create( euc_connection_tile, NULL);
     lv_obj_set_size( euc_address_list, lv_disp_get_hor_res( NULL ), 160);
@@ -199,9 +187,14 @@ static void exit_euc_connection_event_cb( lv_obj_t * obj, lv_event_t event ) {
     }
 }
 
+//static void euc_connect_onoff_event_handler(lv_obj_t * obj, lv_event_t event) {
+//    switch( event ) {
+//        case( LV_EVENT_VALUE_CHANGED ): blectl_set_autoconnect(lv_switch_get_state( obj ));
+//    }
+//}
 static void euc_connect_onoff_event_handler(lv_obj_t * obj, lv_event_t event) {
     switch( event ) {
-        case( LV_EVENT_VALUE_CHANGED ): blectl_set_autoconnect(lv_switch_get_state( obj ));
+        case( LV_EVENT_VALUE_CHANGED ): if(lv_switch_get_state( obj )) blectl_set_event(BLECTL_CLI_DETECT);
     }
 }
 
