@@ -40,7 +40,7 @@ void wheeldb_set_celldata(void){
 void wheeldb_set_wheeldata(void) {
 
     //KingSong
-    //                   Mfg    Model    wh    Battery type  P  S  spd thr dia  w
+    //                   Mfg    Model    wh    Battery type  P  S  spd thr dia  w/100
     wheeldata[KS14D0] = {"KS", "KS14M", "174", GENERIC_2900, 1, 16, 20, 50, 14, 5};
     wheeldata[KS14D1] = {"KS", "KS14D", "340", GENERIC_2900, 2, 16, 30, 50, 14, 8};
     wheeldata[KS14D2] = {"KS", "KS14D", "420", LG_MJ1, 2, 16, 30, 50, 14, 8};

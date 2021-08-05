@@ -63,7 +63,6 @@ static void scanCompleteCB(BLEScanResults scanResults);
 void blectl_clear_detected_wheels(void);
 
 bool clidoConnect = false;
-bool cliconnected = false;
 bool cli_ondisconnect = false;
 bool wheel_found = false;
 bool notify_active = false;
@@ -94,7 +93,6 @@ class MyClientCallback : public BLEClientCallbacks
     void onDisconnect(BLEClient *pclient)
     {
         cli_ondisconnect = true;
-        cliconnected = false;
         blectl_set_event(BLECTL_CLI_DISCONNECTED);
         blectl_clear_event(BLECTL_CLI_CONNECTED);
         wheelctl_disconnect_actions();
@@ -190,7 +188,7 @@ bool blectl_cli_powermgm_event_cb(EventBits_t event, void *arg)
     switch (event)
     {
     case POWERMGM_STANDBY:
-        if (cliconnected)
+        if (blectl_get_event(BLECTL_CLI_CONNECTED))
         {
             retval = false;
             log_i("standby blocked by wheel being connected");
@@ -598,7 +596,7 @@ void blectl_cli_loop(void)
             blectl_set_event(BLECTL_CLI_DOSCAN);
         }
     }
-    if (blectl_get_event(BLECTL_CLI_DOSCAN)) {
+    if (blectl_get_event(BLECTL_CLI_DOSCAN) && !blectl_get_event(BLECTL_CLI_CONNECTED)) {
         wheel_num = 0;
         if (blectl_get_event(BLECTL_CLI_DETECT)) {
             Serial.println("detecting new wheels..");
@@ -735,7 +733,7 @@ bool connectToServer()
     {
         log_e("Failed to find our service UUID: ", KS_SERVICE_UUID_2.toString().c_str());
         pClient->disconnect();
-        cliconnected = false;
+        blectl_clear_event(BLECTL_CLI_CONNECTED);
         return false;
     }
 
@@ -787,7 +785,7 @@ bool connectToServer()
     {
         log_e("Failed to find any suitable characteristic UUID");
         pClient->disconnect();
-        cliconnected = false;
+        blectl_clear_event(BLECTL_CLI_CONNECTED);
         return false;
     }
     // Read the value of the characteristic.
@@ -827,18 +825,18 @@ bool connectToServer()
             }
         }
     }
-    cliconnected = true;
-    return cliconnected;
+    blectl_set_event(BLECTL_CLI_CONNECTED);
+    return blectl_get_event(BLECTL_CLI_CONNECTED);
 }
 
 bool blectl_cli_getconnected( void )
 { 
-    return cliconnected;
+    return blectl_get_event(BLECTL_CLI_CONNECTED);
 }
 
 void blectl_scan_once(int scantime)
 { 
-    if ( !cliconnected )
+    if ( !blectl_get_event(BLECTL_CLI_CONNECTED) )
     {
         
         log_i("Disconnected... starting scan");

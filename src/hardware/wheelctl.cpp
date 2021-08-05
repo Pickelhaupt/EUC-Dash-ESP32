@@ -615,7 +615,7 @@ void current_trip_save_data(void)
     }
     else
     {
-        log_e("Saving trip data file %s", CURRENT_TRIP_JSON_FILE);
+        log_i("Saving trip data file %s", CURRENT_TRIP_JSON_FILE);
         SpiRamJsonDocument doc(1500);
 
         doc["timestamp"] = current_trip.timestamp;

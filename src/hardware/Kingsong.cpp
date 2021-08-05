@@ -34,7 +34,6 @@
 #include "alloc.h"
 
 byte KS_BLEreq[20];
-String wheelmodel = "KS14D";
 
 void ks_ble_set(byte parameter, byte value);
 void kingsong_decode_serial( void );
