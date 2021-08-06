@@ -414,6 +414,7 @@ bool blectl_save_stored_wheels (void) {
         for (int i = 0; i < MAX_STORED_WHEELS; i++) {
             doc["wheel"][i + 1]["_address"] = stored_wheel[ i ].address;
             doc["wheel"][i + 1]["_type"] = stored_wheel[ i ].type;
+            doc["wheel"][i + 1]["_name"] = stored_wheel[ i ].name;
         }
         if ( serializeJsonPretty( doc, file ) == 0) {
             log_e("Failed to write config file");
@@ -445,6 +446,7 @@ void blectl_read_stored_wheels (void) {
             for (int i = 0; i < MAX_STORED_WHEELS; i++) {
                 stored_wheel[ i ].address = doc["wheel"][i + 1]["_address"] | "00:00:00:00:00:00";
                 stored_wheel[ i ].type = doc["wheel"][i + 1]["_type"] | 0;
+                stored_wheel[ i ].name = doc["wheel"][i + 1]["_name"] | blectl_wheeltype_to_string(stored_wheel[ i ].type);
             }
         }        
         doc.clear();
@@ -458,6 +460,10 @@ String blectl_get_stored_wheel_address(byte wheelnum) {
 
 byte blectl_get_stored_wheel_type(byte wheelnum) {
     return stored_wheel[ wheelnum ].type;
+}
+
+String blectl_get_stored_wheel_name(byte wheelnum) {
+    return stored_wheel[ wheelnum ].name;
 }
 
 String blectl_get_detected_wheel_address(byte wheelnum) {
@@ -505,10 +511,21 @@ byte blectl_get_free_wheelslot( void ){
     return MAX_STORED_WHEELS;
 }
 
+String blectl_wheeltype_to_string (byte wheeltype) {
+    if (wheeltype == WHEELTYPE_KS) return "KS";
+    if (wheeltype == WHEELTYPE_GW) return "GW";
+    if (wheeltype == WHEELTYPE_IM) return "IM";
+    if (wheeltype == WHEELTYPE_NB) return "NB";
+    if (wheeltype == WHEELTYPE_NBZ) return "NBZ";
+    if (wheeltype == WHEELTYPE_NUM) return "N/A";
+    else return "N/A";
+}
+
 bool blectl_add_stored_wheel(String wheeladdress, byte wheeltype, byte wheelslot) {
     bool successful;
     stored_wheel[ wheelslot ].address = wheeladdress;
     stored_wheel[ wheelslot ].type = wheeltype;
+    stored_wheel[ wheelslot ].name = blectl_wheeltype_to_string(wheeltype);
     if (stored_wheel[ wheelslot ].address = wheeladdress) {
         successful = blectl_save_stored_wheels();
     }
@@ -519,6 +536,8 @@ bool blectl_add_stored_wheel(String wheeladdress, byte wheeltype, byte wheelslot
 bool blectl_remove_stored_wheel(byte wheelnum) {
     bool successful;
     stored_wheel[ wheelnum ].address = "00:00:00:00:00:00";
+    stored_wheel[ wheelnum ].type = WHEELTYPE_NUM;
+    stored_wheel[ wheelnum ].name = blectl_wheeltype_to_string(WHEELTYPE_NUM);
     if ( stored_wheel[ wheelnum ].address == "00:00:00:00:00:00" ) {
         successful = blectl_save_stored_wheels();
     }
@@ -868,6 +887,6 @@ void blectl_scan_setup()
     pBLEScan->setInterval(1349);
     pBLEScan->setWindow(449);
     pBLEScan->setActiveScan(true);
-    blectl_set_event(BLECTL_CLI_DETECT);
+    //blectl_set_event(BLECTL_CLI_DETECT);
     //blectl_remove_all_wheels();
 }

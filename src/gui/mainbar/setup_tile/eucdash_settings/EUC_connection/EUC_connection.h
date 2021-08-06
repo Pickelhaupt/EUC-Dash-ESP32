@@ -24,11 +24,20 @@
 
     #include <TTGO.h>
 
+    extern uint32_t wheelscan_tile_num;
+    extern uint32_t wheelmgmt_tile_num;
+
     void euc_connection_tile_pre_setup( void );
     void euc_connection_tile_setup( void );
     void euc_password_tile_setup( uint32_t wifi_password_tile_num );
     void euc_setup_tile_pre_setup( void );
     void euc_setup_tile_setup( void );
     void euc_setup_display_ssid(String ssid);
+
+    void wheelmgmt_tile_pre_setup( void );
+    void wheelscan_tile_pre_setup( void );
+    void wheelmgmt_tile_setup( void );
+    void wheelscan_tile_setup( void );
+
 
 #endif // _EUC_CONN_SETTINGS_H

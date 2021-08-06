@@ -20,7 +20,7 @@
 
 
 #include "config.h"
-#include "EUC_connection_settings.h"
+#include "EUC_connection.h"
 
 #include "gui/mainbar/mainbar.h"
 #include "gui/mainbar/setup_tile/setup_tile.h"
@@ -32,14 +32,15 @@
 #include "gui/mainbar/setup_tile/eucdash_settings/eucdash_settings.h"
 
 
-LV_IMG_DECLARE(exit_32px);
-
 lv_obj_t *euc_connection_tile=NULL;
 lv_style_t euc_connection_style;
 lv_style_t euc_connection_heading_style;
 lv_style_t euc_connection_data_style;
 lv_style_t euc_list_style;
 uint32_t euc_connection_tile_num;
+
+uint32_t wheelscan_tile_num;
+uint32_t wheelmgmt_tile_num;
 
 lv_obj_t *euc_add_tile=NULL;
 lv_style_t euc_add_style;
@@ -53,6 +54,9 @@ lv_obj_t *euc_address_list=NULL;
 lv_obj_t *euc_connection_label=NULL;
 lv_obj_t *euc_connection_ssid=NULL;
 
+static void enter_wheelscan_event_cb( lv_obj_t * obj, lv_event_t event );
+static void enter_wheelmgmt_event_cb( lv_obj_t * obj, lv_event_t event );
+
 static void enter_euc_connection_event_cb( lv_obj_t * obj, lv_event_t event );
 static void exit_euc_connection_event_cb( lv_obj_t * obj, lv_event_t event );
 static void euc_connect_onoff_event_handler(lv_obj_t * obj, lv_event_t event);
@@ -65,9 +69,10 @@ LV_IMG_DECLARE(check_32px);
 LV_IMG_DECLARE(exit_32px);
 LV_IMG_DECLARE(trash_32px);
 LV_IMG_DECLARE(wheel_32px);
+LV_IMG_DECLARE(eucdash_64px);
 
 void euc_connection_tile_pre_setup( void ){
-    eucdash_settings_register_menu_item(&wheel_32px, enter_euc_connection_event_cb, "connect euc");
+    eucdash_settings_register_menu_item(&wheel_32px, enter_euc_connection_event_cb, "wheel connection");
 }
 
 void euc_connection_tile_setup( void ) {
@@ -99,8 +104,13 @@ void euc_connection_tile_setup( void ) {
     
     lv_obj_t *exit_label = lv_label_create( euc_connection_tile, NULL);
     lv_obj_add_style( exit_label, LV_OBJ_PART_MAIN, &euc_connection_heading_style );
-    lv_label_set_text( exit_label, "scan for EUC");
+    lv_label_set_text( exit_label, "wheel connection");
     lv_obj_align( exit_label, exit_btn, LV_ALIGN_OUT_RIGHT_MID, 15, 0 );
+
+    lv_obj_t *autoconnect_label = lv_label_create( euc_connection_tile, NULL);
+    lv_obj_add_style( autoconnect_label, LV_OBJ_PART_MAIN, &euc_connection_style );
+    lv_label_set_text( autoconnect_label, "scan for wheels");
+    lv_obj_align( autoconnect_label, euc_connection_tile, LV_ALIGN_IN_TOP_LEFT, 10, 50 );    
   
     euc_connect_onoff = lv_switch_create( euc_connection_tile, NULL );
     lv_obj_add_protect( euc_connect_onoff, LV_PROTECT_CLICK_FOCUS);
@@ -108,16 +118,41 @@ void euc_connection_tile_setup( void ) {
     lv_obj_add_style( euc_connect_onoff, LV_SLIDER_PART_KNOB, mainbar_get_knob_style() );
     if(blectl_get_event(BLECTL_CLI_DETECT)) lv_switch_on( euc_connect_onoff, LV_ANIM_ON );
     else lv_switch_off( euc_connect_onoff, LV_ANIM_ON );
-    lv_obj_align( euc_connect_onoff, exit_label, LV_ALIGN_OUT_RIGHT_MID, 10, 0 );
+    lv_obj_align( euc_connect_onoff, euc_connection_tile, LV_ALIGN_IN_TOP_RIGHT, -10, 50 );
     lv_obj_set_event_cb( euc_connect_onoff, euc_connect_onoff_event_handler);
 
-    euc_address_list = lv_list_create( euc_connection_tile, NULL);
-    lv_obj_set_size( euc_address_list, lv_disp_get_hor_res( NULL ), 160);
-    lv_style_init( &euc_list_style  );
-    lv_style_set_border_width( &euc_list_style , LV_OBJ_PART_MAIN, 0);
-    lv_style_set_radius( &euc_list_style , LV_OBJ_PART_MAIN, 0);
-    lv_obj_add_style( euc_address_list, LV_OBJ_PART_MAIN, &euc_list_style  );
-    lv_obj_align( euc_address_list, euc_connection_tile, LV_ALIGN_IN_TOP_MID, 0, 80);
+    lv_obj_t *wheelmgmt_label = lv_label_create( euc_connection_tile, NULL);
+    lv_obj_add_style( wheelmgmt_label, LV_OBJ_PART_MAIN, &euc_connection_heading_style );
+    lv_obj_set_width(wheelmgmt_label, 100);
+    lv_label_set_align(wheelmgmt_label, LV_LABEL_ALIGN_CENTER);
+    lv_label_set_text( wheelmgmt_label, "manage stored\nwheels");
+    lv_obj_align( wheelmgmt_label, euc_connection_tile, LV_ALIGN_IN_BOTTOM_LEFT, 10, -10 );
+    
+    lv_obj_t *wheelmgmt_btn = lv_imgbtn_create( euc_connection_tile, NULL);
+    lv_imgbtn_set_src( wheelmgmt_btn, LV_BTN_STATE_RELEASED, &eucdash_64px);
+    lv_imgbtn_set_src( wheelmgmt_btn, LV_BTN_STATE_PRESSED, &eucdash_64px);
+    lv_imgbtn_set_src( wheelmgmt_btn, LV_BTN_STATE_CHECKED_RELEASED, &eucdash_64px);
+    lv_imgbtn_set_src( wheelmgmt_btn, LV_BTN_STATE_CHECKED_PRESSED, &eucdash_64px);
+    lv_obj_add_style( wheelmgmt_btn, LV_IMGBTN_PART_MAIN, &euc_connection_style );
+    lv_obj_align( wheelmgmt_btn, wheelmgmt_label, LV_ALIGN_OUT_TOP_MID, 0, 0 );
+    lv_obj_set_event_cb( wheelmgmt_btn, enter_wheelmgmt_event_cb );
+
+    lv_obj_t *wheelscan_label = lv_label_create( euc_connection_tile, NULL);
+    lv_obj_add_style( wheelscan_label, LV_OBJ_PART_MAIN, &euc_connection_heading_style );
+    lv_obj_set_width(wheelscan_label, 100);
+    lv_label_set_align(wheelscan_label, LV_LABEL_ALIGN_CENTER);
+    lv_label_set_text( wheelscan_label, "scan for\nnew wheels");
+    lv_obj_align( wheelscan_label, euc_connection_tile, LV_ALIGN_IN_BOTTOM_RIGHT, -10, -10 );
+
+    lv_obj_t *wheelscan_btn = lv_imgbtn_create( euc_connection_tile, NULL);
+    lv_imgbtn_set_src( wheelscan_btn, LV_BTN_STATE_RELEASED, &eucdash_64px);
+    lv_imgbtn_set_src( wheelscan_btn, LV_BTN_STATE_PRESSED, &eucdash_64px);
+    lv_imgbtn_set_src( wheelscan_btn, LV_BTN_STATE_CHECKED_RELEASED, &eucdash_64px);
+    lv_imgbtn_set_src( wheelscan_btn, LV_BTN_STATE_CHECKED_PRESSED, &eucdash_64px);
+    lv_obj_add_style( wheelscan_btn, LV_IMGBTN_PART_MAIN, &euc_connection_style );
+    lv_obj_align( wheelscan_btn, wheelscan_label, LV_ALIGN_OUT_TOP_MID, 0, 0 );
+    lv_obj_set_event_cb( wheelscan_btn, enter_wheelscan_event_cb );
+
 
     //wlan_password_tile_setup( euc_add_tile_num );
 
@@ -183,6 +218,22 @@ static void enter_euc_connection_event_cb( lv_obj_t * obj, lv_event_t event ) {
 static void exit_euc_connection_event_cb( lv_obj_t * obj, lv_event_t event ) {
     switch( event ) {
         case( LV_EVENT_CLICKED ):       mainbar_jump_to_tilenumber( eucdash_get_tile_num(), LV_ANIM_OFF );
+                                        break;
+    }
+}
+
+static void enter_wheelscan_event_cb( lv_obj_t * obj, lv_event_t event ) {
+    switch( event ) {
+        case( LV_EVENT_CLICKED ):       wheelscan_tile_setup();
+                                        mainbar_jump_to_tilenumber( wheelscan_tile_num, LV_ANIM_OFF );
+                                        break;
+    }
+}
+
+static void enter_wheelmgmt_event_cb( lv_obj_t * obj, lv_event_t event ) {
+    switch( event ) {
+        case( LV_EVENT_CLICKED ):       wheelmgmt_tile_setup();
+                                        mainbar_jump_to_tilenumber( wheelmgmt_tile_num, LV_ANIM_OFF );
                                         break;
     }
 }

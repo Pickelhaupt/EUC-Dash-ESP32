@@ -147,6 +147,7 @@
     typedef struct {
         String address = "00:00:00:00:00:00";
         byte type = WHEELTYPE_NUM;
+        String name;
     } stored_wheel_t;
 
     enum { 
@@ -355,6 +356,7 @@
      * 5 = WHEELTYPE_NUM -- also used when wheeltype cannot be determined
      */
     byte blectl_get_stored_wheel_type(byte wheelnum);
+    String blectl_get_stored_wheel_name(byte wheelnum);
     /**
      * @brief get the BLE address of a detected wheel
      * 
@@ -440,5 +442,7 @@
     bool blectl_set_prio_stored_wheel(byte wheelnum);
 
     byte blectl_get_num_detected_wheels(void);
+
+    String blectl_wheeltype_to_string (byte wheeltype);
 
 #endif // _BLECTL_H
