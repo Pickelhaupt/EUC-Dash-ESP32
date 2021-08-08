@@ -45,6 +45,8 @@
     #define BLECTL_CLI_OFF               _BV(18)        /** @brief event mask for ble client off */
     #define BLECTL_CLI_MSG               _BV(19)        /** @brief event mask for client blectl msg */
     #define BLECTL_CLI_DETECT            _BV(20)        /** @brief event mask for detecting new wheels */
+    #define BLECTL_CLI_DETECT_DONE       _BV(21)        /** @brief event mask for detecting new wheels */
+
 
     // See the following for generating UUIDs:
     // https://www.uuidgenerator.net/
@@ -162,6 +164,7 @@
     typedef struct {
         String address = "00:00:00:00:00:00";
         byte type = WHEELTYPE_NUM;
+        String name;
     } detected_wheel_t;
 
     enum { 
@@ -379,6 +382,7 @@
      * 5 = WHEELTYPE_NUM -- also used when wheeltype cannot be determined
      */
     byte blectl_get_detected_wheel_type(byte wheelnum);
+    String blectl_get_detected_wheel_name(byte wheelnum);
     /**
      * @brief get the maximum number of detected wheels
      *  
@@ -444,5 +448,7 @@
     byte blectl_get_num_detected_wheels(void);
 
     String blectl_wheeltype_to_string (byte wheeltype);
+
+    void blectl_reset_scandelay(void);
 
 #endif // _BLECTL_H

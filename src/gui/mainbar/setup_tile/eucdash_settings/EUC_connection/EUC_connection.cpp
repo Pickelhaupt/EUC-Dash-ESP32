@@ -152,61 +152,8 @@ void euc_connection_tile_setup( void ) {
     lv_obj_add_style( wheelscan_btn, LV_IMGBTN_PART_MAIN, &euc_connection_style );
     lv_obj_align( wheelscan_btn, wheelscan_label, LV_ALIGN_OUT_TOP_MID, 0, 0 );
     lv_obj_set_event_cb( wheelscan_btn, enter_wheelscan_event_cb );
-
-
-    //wlan_password_tile_setup( euc_add_tile_num );
-
-    //blectl_register_cb( BLECTL_CLI_ON | BLECTL_CLI_OFF | BLECTL_CLI_DOSCAN | BLECTL_CLI_DOCONNECT, euc_setup_eucctl_event_cb, "euc network scan" );
 }
 
-/*
-void wlan_setup_display_ssid(String ssid) {
-    if (euc_connection_ssid != NULL) {
-        lv_label_set_text( euc_connection_ssid, ssid.c_str());
-        lv_obj_align( euc_connection_ssid, euc_connection_label, LV_ALIGN_OUT_RIGHT_MID, 10, 0 );
-    }
-}
-
-bool euc_setup_eucctl_event_cb( EventBits_t event, void *arg ) {
-    String getssid;
-    switch( event ) {
-        case    EUCCTL_ON:
-            lv_switch_on( euc_connect_onoff, LV_ANIM_OFF );
-            getssid = EUC.SSID();
-            wlan_setup_display_ssid(getssid);
-            break;
-        case    EUCCTL_OFF:
-            getssid = EUC.SSID();
-            wlan_setup_display_ssid(getssid);
-            lv_switch_off( euc_connect_onoff, LV_ANIM_OFF );
-            while ( lv_list_remove( euc_address_list, 0 ) );
-            break;
-        case    EUCCTL_CONNECT:
-            getssid = EUC.SSID();
-            wlan_setup_display_ssid(getssid);
-            break;
-        case    EUCCTL_SCAN:
-            getssid = EUC.SSID();
-            wlan_setup_display_ssid(getssid);
-            while ( lv_list_remove( euc_address_list, 0 ) );
-
-            int len = EUC.scanComplete();
-            for( int i = 0 ; i < len ; i++ ) {
-                if ( eucctl_is_known( EUC.SSID(i).c_str() ) ) {
-                    lv_obj_t * euc_address_list_btn = lv_list_add_btn( euc_address_list, &unlock_16px, EUC.SSID(i).c_str() );
-                    lv_obj_set_event_cb( euc_address_list_btn, euc_connection_enter_pass_event_cb);
-                }
-                else {
-                    lv_obj_t * euc_address_list_btn = lv_list_add_btn( euc_address_list, &lock_16px, EUC.SSID(i).c_str() );
-                    lv_obj_set_event_cb( euc_address_list_btn, euc_connection_enter_pass_event_cb);
-                }
-            }            
-            break;
-    }
-    return( true );
-}
-
-*/
 static void enter_euc_connection_event_cb( lv_obj_t * obj, lv_event_t event ) {
     switch( event ) {
         case( LV_EVENT_CLICKED ):       euc_connection_tile_setup();
@@ -225,7 +172,9 @@ static void exit_euc_connection_event_cb( lv_obj_t * obj, lv_event_t event ) {
 static void enter_wheelscan_event_cb( lv_obj_t * obj, lv_event_t event ) {
     switch( event ) {
         case( LV_EVENT_CLICKED ):       wheelscan_tile_setup();
+                                        blectl_set_event(BLECTL_CLI_DETECT);
                                         mainbar_jump_to_tilenumber( wheelscan_tile_num, LV_ANIM_OFF );
+                                        blectl_reset_scandelay();
                                         break;
     }
 }
@@ -238,119 +187,8 @@ static void enter_wheelmgmt_event_cb( lv_obj_t * obj, lv_event_t event ) {
     }
 }
 
-//static void euc_connect_onoff_event_handler(lv_obj_t * obj, lv_event_t event) {
-//    switch( event ) {
-//        case( LV_EVENT_VALUE_CHANGED ): blectl_set_autoconnect(lv_switch_get_state( obj ));
-//    }
-//}
 static void euc_connect_onoff_event_handler(lv_obj_t * obj, lv_event_t event) {
     switch( event ) {
         case( LV_EVENT_VALUE_CHANGED ): if(lv_switch_get_state( obj )) blectl_set_event(BLECTL_CLI_DETECT);
     }
 }
-
-/*
-
-void euc_connection_enter_pass_event_cb( lv_obj_t * obj, lv_event_t event ) {
-    switch( event ) {
-        case( LV_EVENT_CLICKED ):   lv_label_set_text( euc_add_name_label, lv_list_get_btn_text(obj) );
-                                    lv_textarea_set_text( euc_add_pass_textfield, "");
-                                    mainbar_jump_to_tilenumber( euc_add_tile_num, LV_ANIM_ON );
-    }
-}
-
-static void exit_euc_add_event_cb( lv_obj_t * obj, lv_event_t event );
-static void wlan_password_event_cb(lv_obj_t * obj, lv_event_t event);
-static void apply_euc_add_event_cb(  lv_obj_t * obj, lv_event_t event );
-static void delete_euc_add_event_cb(  lv_obj_t * obj, lv_event_t event );
-
-void wlan_password_tile_setup( uint32_t euc_add_tile_num ) {
-    // get an app tile and copy mainstyle
-    euc_add_tile = mainbar_get_tile_obj( euc_add_tile_num );
-    lv_style_copy( &euc_add_style, mainbar_get_style() );
-    lv_style_set_bg_color( &euc_add_style, LV_OBJ_PART_MAIN, LV_COLOR_BLACK);
-    lv_style_set_bg_opa( &euc_add_style, LV_OBJ_PART_MAIN, LV_OPA_100);
-    lv_style_set_border_width( &euc_add_style, LV_OBJ_PART_MAIN, 0);
-    lv_obj_add_style( euc_add_tile, LV_OBJ_PART_MAIN, &euc_add_style );
-
-    lv_obj_t *exit_btn = lv_imgbtn_create( euc_add_tile, NULL);
-    lv_imgbtn_set_src( exit_btn, LV_BTN_STATE_RELEASED, &exit_32px);
-    lv_imgbtn_set_src( exit_btn, LV_BTN_STATE_PRESSED, &exit_32px);
-    lv_imgbtn_set_src( exit_btn, LV_BTN_STATE_CHECKED_RELEASED, &exit_32px);
-    lv_imgbtn_set_src( exit_btn, LV_BTN_STATE_CHECKED_PRESSED, &exit_32px);
-    lv_obj_add_style( exit_btn, LV_IMGBTN_PART_MAIN, &euc_add_style );
-    lv_obj_align( exit_btn, euc_add_tile, LV_ALIGN_IN_TOP_LEFT, 10, 10 );
-    lv_obj_set_event_cb( exit_btn, exit_euc_add_event_cb );
-    
-    euc_add_name_label = lv_label_create( euc_add_tile, NULL);
-    lv_obj_add_style( euc_add_name_label, LV_OBJ_PART_MAIN, &euc_add_style  );
-    lv_label_set_text( euc_add_name_label, "wlan setting");
-    lv_obj_align( euc_add_name_label, exit_btn, LV_ALIGN_OUT_RIGHT_MID, 5, 0 );
-
-    euc_add_pass_textfield = lv_textarea_create( euc_add_tile, NULL);
-    lv_textarea_set_text( euc_add_pass_textfield, "");
-    lv_textarea_set_pwd_mode( euc_add_pass_textfield, false);
-    lv_textarea_set_one_line( euc_add_pass_textfield, true);
-    lv_textarea_set_cursor_hidden( euc_add_pass_textfield, true);
-    lv_obj_set_width( euc_add_pass_textfield, lv_disp_get_hor_res( NULL ) );
-    lv_obj_align( euc_add_pass_textfield, euc_add_tile, LV_ALIGN_IN_TOP_LEFT, 0, 75);
-    lv_obj_set_event_cb( euc_add_pass_textfield, wlan_password_event_cb );
-
-    lv_obj_t *mac_label = lv_label_create( euc_add_tile, NULL);
-    lv_obj_add_style( mac_label, LV_IMGBTN_PART_MAIN, &euc_add_style );
-    lv_obj_set_width( mac_label, lv_disp_get_hor_res( NULL ) );
-    lv_obj_align( mac_label, euc_add_tile, LV_ALIGN_IN_BOTTOM_LEFT, 0, 0);
-    lv_label_set_text_fmt( mac_label, "MAC: %s", EUC.macAddress().c_str());
-
-    lv_obj_t *apply_btn = lv_imgbtn_create( euc_add_tile, NULL);
-    lv_imgbtn_set_src( apply_btn, LV_BTN_STATE_RELEASED, &check_32px);
-    lv_imgbtn_set_src( apply_btn, LV_BTN_STATE_PRESSED, &check_32px);
-    lv_imgbtn_set_src( apply_btn, LV_BTN_STATE_CHECKED_RELEASED, &check_32px);
-    lv_imgbtn_set_src( apply_btn, LV_BTN_STATE_CHECKED_PRESSED, &check_32px);
-    lv_obj_add_style( apply_btn, LV_IMGBTN_PART_MAIN, &euc_add_style );
-    lv_obj_align( apply_btn, euc_add_pass_textfield, LV_ALIGN_OUT_BOTTOM_RIGHT, -10, 10 );
-    lv_obj_set_event_cb( apply_btn, apply_euc_add_event_cb );
-
-    lv_obj_t *delete_btn = lv_imgbtn_create( euc_add_tile, NULL);
-    lv_imgbtn_set_src( delete_btn, LV_BTN_STATE_RELEASED, &trash_32px);
-    lv_imgbtn_set_src( delete_btn, LV_BTN_STATE_PRESSED, &trash_32px);
-    lv_imgbtn_set_src( delete_btn, LV_BTN_STATE_CHECKED_RELEASED, &trash_32px);
-    lv_imgbtn_set_src( delete_btn, LV_BTN_STATE_CHECKED_PRESSED, &trash_32px);
-    lv_obj_add_style( delete_btn, LV_IMGBTN_PART_MAIN, &euc_add_style );
-    lv_obj_align( delete_btn, euc_add_pass_textfield, LV_ALIGN_OUT_BOTTOM_LEFT, 10, 10 );
-    lv_obj_set_event_cb( delete_btn, delete_euc_add_event_cb );
-}
-
-static void apply_euc_add_event_cb(  lv_obj_t * obj, lv_event_t event ) {
-    switch( event ) {
-        case( LV_EVENT_CLICKED ):       eucctl_insert_network( lv_label_get_text( euc_add_name_label ), lv_textarea_get_text( euc_add_pass_textfield ) );
-                                        keyboard_hide();
-                                        mainbar_jump_to_tilenumber( euc_connection_tile_num, LV_ANIM_ON );
-                                        break;
-    }
-}
-
-static void delete_euc_add_event_cb(  lv_obj_t * obj, lv_event_t event ) {
-    switch( event ) {
-        case( LV_EVENT_CLICKED ):       eucctl_delete_network( lv_label_get_text( euc_add_name_label ) );
-                                        keyboard_hide();
-                                        mainbar_jump_to_tilenumber( euc_connection_tile_num, LV_ANIM_ON );
-                                        break;
-    }
-}
-
-static void wlan_password_event_cb( lv_obj_t * obj, lv_event_t event ) {
-    switch( event ) {
-        case( LV_EVENT_CLICKED ):       keyboard_set_textarea( obj );
-                                        break;
-    }
-}
-
-static void exit_euc_add_event_cb( lv_obj_t * obj, lv_event_t event ) {
-    switch( event ) {
-        case( LV_EVENT_CLICKED ):       keyboard_hide();
-                                        mainbar_jump_to_tilenumber( euc_connection_tile_num, LV_ANIM_ON );
-                                        break;
-    }
-}
-*/

@@ -88,8 +88,7 @@ void wheelmgmt_tile_setup( void ) {
     lv_label_set_text( exit_label, "stored wheels");
     lv_obj_align( exit_label, exit_btn, LV_ALIGN_OUT_RIGHT_MID, 15, 0 );
 
-    wheelmgmt_create_list_btn();
-             
+    wheelmgmt_create_list_btn();           
 }
 
 void wheelmgmt_create_list_btn() {
@@ -123,7 +122,6 @@ void wheelmgmt_create_list_btn() {
 
 void wheelmgmt_refresh_list(void) {
     Serial.println("refreshing stored wheel list (cleaning list)");
-    //lv_obj_clean(wheelmgmt_list);
     lv_obj_del(wheelmgmt_list);
     Serial.println("refreshing stored wheel list (reloading)");
     wheelmgmt_create_list_btn();
