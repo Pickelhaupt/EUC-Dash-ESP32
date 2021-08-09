@@ -922,7 +922,8 @@ void blectl_scan_setup()
     pBLEScan->setWindow(449);
     pBLEScan->setActiveScan(true);
     blectl_clear_detected_wheels();
-    blectl_reset_scandelay();
+    blectl_scan_once(2);
+    //blectl_reset_scandelay();
     //blectl_set_event(BLECTL_CLI_DETECT);
     //blectl_remove_all_wheels();
 }

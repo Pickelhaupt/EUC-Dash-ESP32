@@ -37,7 +37,7 @@
     void wheelmgmt_tile_pre_setup( void );
     void wheelscan_tile_pre_setup( void );
     void wheelmgmt_tile_setup( void );
-    void wheelscan_tile_setup( void );
+    void wheelscan_tile_setup( bool ac );
 
 
 #endif // _EUC_CONN_SETTINGS_H

@@ -46,19 +46,24 @@ lv_obj_t * wheelscan_mbox=NULL;
 lv_obj_t * wheelscan_list_btn=NULL;
 
 int wheel_detect_id;
+bool autoconnect_enabled;
 
 //static void enter_wheelscan_event_cb( lv_obj_t * obj, lv_event_t event );
 static void exit_wheelscan_event_cb( lv_obj_t * obj, lv_event_t event );
 void wheelscan_select_event_cb( lv_obj_t * obj, lv_event_t event );
-void wheelscan_create_list();
+void wheelscan_create_list(bool scanning);
 void wheelscan_create_list_btn();
 bool wheelscan_blectl_event_cb(EventBits_t event, void *arg);
 void wheelscan_refresh_list(void);
 
 LV_IMG_DECLARE(exit_32px);
 
-void wheelscan_tile_setup( void ) {
+void wheelscan_tile_setup( bool ac ) {
     // get an app tile and copy mainstyle
+    autoconnect_enabled = ac;
+    if (autoconnect_enabled) {
+        //blectl_set_autoconnect(false);
+    }
     wheelscan_tile_num = setup_get_submenu2_tile_num();
     wheelscan_tile = mainbar_get_tile_obj( wheelscan_tile_num );
     lv_obj_clean(wheelscan_tile);
@@ -87,24 +92,16 @@ void wheelscan_tile_setup( void ) {
     lv_obj_add_style( exit_label, LV_OBJ_PART_MAIN, &wheelscan_heading_style );
     lv_label_set_text( exit_label, "detected wheels");
     lv_obj_align( exit_label, exit_btn, LV_ALIGN_OUT_RIGHT_MID, 15, 0 );
-  
-    wheelscan_list = lv_list_create( wheelscan_tile, NULL);
-    lv_obj_set_size( wheelscan_list, lv_disp_get_hor_res( NULL ), 190);
-    lv_style_init( &wheelscan_list_style  );
-    lv_style_set_border_width( &wheelscan_list_style , LV_OBJ_PART_MAIN, 0);
-    lv_style_set_radius( &wheelscan_list_style , LV_OBJ_PART_MAIN, 0);
-    lv_obj_add_style( wheelscan_list, LV_OBJ_PART_MAIN, &wheelscan_list_style  );
-    lv_obj_align( wheelscan_list, wheelscan_tile, LV_ALIGN_IN_TOP_MID, 0, 50);
 
-    wheelscan_create_list();
+    wheelscan_create_list(true);
+
+    blectl_set_autoconnect(true);
+    blectl_scan_once(2);
 
     blectl_register_cb(BLECTL_CLI_DETECT_DONE, wheelscan_blectl_event_cb, "wheelscan");
-
 }
 
-
-
-void wheelscan_create_list() {
+void wheelscan_create_list(bool scanning) {
     wheelscan_list = lv_list_create( wheelscan_tile, NULL);
     lv_obj_set_size( wheelscan_list, lv_disp_get_hor_res( NULL ), 190);
     lv_style_init( &wheelscan_list_style  );
@@ -112,6 +109,12 @@ void wheelscan_create_list() {
     lv_style_set_radius( &wheelscan_list_style , LV_OBJ_PART_MAIN, 0);
     lv_obj_add_style( wheelscan_list, LV_OBJ_PART_MAIN, &wheelscan_list_style  );
     lv_obj_align( wheelscan_list, wheelscan_tile, LV_ALIGN_IN_TOP_MID, 0, 50);
+
+    if (scanning) {
+        lv_obj_t *scan_label = lv_label_create( wheelscan_list, NULL);
+        lv_label_set_text( scan_label, "scanning...");
+        lv_obj_align( scan_label, NULL, LV_ALIGN_CENTER, 0, 0 );
+    }
 }
 
 
@@ -139,6 +142,7 @@ void wheelscan_create_list_btn() {
 bool wheelscan_blectl_event_cb(EventBits_t event, void *arg) {
     switch( event ) {
         case BLECTL_CLI_DETECT_DONE:
+            blectl_set_autoconnect(false);
             wheelscan_refresh_list();
             break;
     }
@@ -149,7 +153,7 @@ void wheelscan_refresh_list() {
     Serial.println("refreshing stored wheel list (cleaning list)");
     lv_obj_del(wheelscan_list);
     Serial.println("refreshing stored wheel list (reloading)");
-    wheelscan_create_list();
+    wheelscan_create_list(false);
     wheelscan_create_list_btn();
 }
 
@@ -157,6 +161,8 @@ static void exit_wheelscan_event_cb( lv_obj_t * obj, lv_event_t event ) {
     switch( event ) {
         case( LV_EVENT_CLICKED ):       mainbar_jump_to_tilenumber( setup_get_submenu_tile_num(), LV_ANIM_OFF );
         blectl_clear_event(BLECTL_CLI_DETECT_DONE);
+        blectl_clear_event(BLECTL_CLI_DETECT);
+        if (autoconnect_enabled) blectl_set_autoconnect(true);
                                         break;
     }
 }
@@ -167,6 +173,9 @@ void wheelscan_mbox_event_cb( lv_obj_t * obj, lv_event_t event ) {
             printf("store wheel to slot %d\n", blectl_get_free_wheelslot());
             blectl_add_stored_wheel(blectl_get_detected_wheel_address(wheel_detect_id), blectl_get_detected_wheel_type(wheel_detect_id), blectl_get_free_wheelslot());
             lv_obj_del(wheelscan_mbox);
+            mainbar_jump_to_tilenumber( setup_get_submenu_tile_num(), LV_ANIM_OFF );
+            blectl_clear_event(BLECTL_CLI_DETECT_DONE);
+            if (autoconnect_enabled) blectl_set_autoconnect(true);
             blectl_reset_scandelay();
         }
         

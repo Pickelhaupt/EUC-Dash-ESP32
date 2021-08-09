@@ -59,7 +59,7 @@ static void enter_wheelmgmt_event_cb( lv_obj_t * obj, lv_event_t event );
 
 static void enter_euc_connection_event_cb( lv_obj_t * obj, lv_event_t event );
 static void exit_euc_connection_event_cb( lv_obj_t * obj, lv_event_t event );
-static void euc_connect_onoff_event_handler(lv_obj_t * obj, lv_event_t event);
+//static void euc_connect_onoff_event_handler(lv_obj_t * obj, lv_event_t event);
 void euc_connection_enter_pass_event_cb( lv_obj_t * obj, lv_event_t event );
 bool euc_setup_eucctl_event_cb( EventBits_t event, void *arg );
 
@@ -107,6 +107,7 @@ void euc_connection_tile_setup( void ) {
     lv_label_set_text( exit_label, "wheel connection");
     lv_obj_align( exit_label, exit_btn, LV_ALIGN_OUT_RIGHT_MID, 15, 0 );
 
+/*
     lv_obj_t *autoconnect_label = lv_label_create( euc_connection_tile, NULL);
     lv_obj_add_style( autoconnect_label, LV_OBJ_PART_MAIN, &euc_connection_style );
     lv_label_set_text( autoconnect_label, "scan for wheels");
@@ -120,6 +121,7 @@ void euc_connection_tile_setup( void ) {
     else lv_switch_off( euc_connect_onoff, LV_ANIM_ON );
     lv_obj_align( euc_connect_onoff, euc_connection_tile, LV_ALIGN_IN_TOP_RIGHT, -10, 50 );
     lv_obj_set_event_cb( euc_connect_onoff, euc_connect_onoff_event_handler);
+    */
 
     lv_obj_t *wheelmgmt_label = lv_label_create( euc_connection_tile, NULL);
     lv_obj_add_style( wheelmgmt_label, LV_OBJ_PART_MAIN, &euc_connection_heading_style );
@@ -171,10 +173,12 @@ static void exit_euc_connection_event_cb( lv_obj_t * obj, lv_event_t event ) {
 
 static void enter_wheelscan_event_cb( lv_obj_t * obj, lv_event_t event ) {
     switch( event ) {
-        case( LV_EVENT_CLICKED ):       wheelscan_tile_setup();
+        case( LV_EVENT_CLICKED ):       wheelscan_tile_setup(blectl_get_autoconnect());
                                         blectl_set_event(BLECTL_CLI_DETECT);
                                         mainbar_jump_to_tilenumber( wheelscan_tile_num, LV_ANIM_OFF );
-                                        blectl_reset_scandelay();
+                                        blectl_set_autoconnect(false);
+                                        
+                                        //blectl_reset_scandelay();
                                         break;
     }
 }
@@ -187,8 +191,8 @@ static void enter_wheelmgmt_event_cb( lv_obj_t * obj, lv_event_t event ) {
     }
 }
 
-static void euc_connect_onoff_event_handler(lv_obj_t * obj, lv_event_t event) {
-    switch( event ) {
-        case( LV_EVENT_VALUE_CHANGED ): if(lv_switch_get_state( obj )) blectl_set_event(BLECTL_CLI_DETECT);
-    }
-}
+//static void euc_connect_onoff_event_handler(lv_obj_t * obj, lv_event_t event) {
+//    switch( event ) {
+        //case( LV_EVENT_VALUE_CHANGED ): if(lv_switch_get_state( obj )) blectl_set_event(BLECTL_CLI_DETECT);
+//    }
+//}
