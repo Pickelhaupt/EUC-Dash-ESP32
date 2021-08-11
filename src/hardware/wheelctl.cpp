@@ -569,7 +569,7 @@ void wheelctl_save_config( void ) {
         doc["lightsoff"] = wheelctl_config[ WHEELCTL_CONFIG_LIGHTS_OFF ].enable;
         doc["led"] = wheelctl_config[ WHEELCTL_CONFIG_LED ].enable;
         doc["horn"] = wheelctl_config[ WHEELCTL_CONFIG_HORN ].enable;
-        doc["simple"] = wheelctl_config[ WHEELCTL_CONFIG_HAPTIC ].enable;
+        doc["haptic"] = wheelctl_config[ WHEELCTL_CONFIG_HAPTIC ].enable;
         if ( serializeJsonPretty( doc, file ) == 0) {
             log_e("Failed to write config file");
         }

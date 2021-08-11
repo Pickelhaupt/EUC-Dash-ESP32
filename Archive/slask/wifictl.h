@@ -26,12 +26,31 @@
     #include "callback.h"
 
     #define WIFICTL_DELAY               10
+    #define NETWORKLIST_ENTRYS          10
+    #define WIFICTL_JSON_CONFIG_FILE    "/wificfg.json"
 
     #define ESP_WPS_MODE                WPS_TYPE_PBC
     #define ESP_MANUFACTURER            "ESPRESSIF"
     #define ESP_MODEL_NUMBER            "ESP32"
     #define ESP_MODEL_NAME              "LILYGO T-WATCH2020 V1"
     #define ESP_DEVICE_NAME             "ESP STATION"
+
+    /**
+     * @brief network list structure
+     */
+    typedef struct {
+        char ssid[64]="";
+        char password[64]="";
+    } networklist;
+
+    /**
+     * @brief wifictl config structure
+     */
+    typedef struct {
+        bool autoon = false;             /** @brief enable on auto on/off an wakeup and standby */
+        bool webserver = false;         /** @brief enable on webserver */
+        bool enable_on_standby = false; /** @brief enable on standby */
+    } wifictl_config_t;
 
     enum wifictl_event_t {
         WIFICTL_CONNECT                = _BV(0),
@@ -131,7 +150,6 @@
      * @brief   start an wifi wps peering
      */
     void wifictl_start_wps( void );
-    #ifdef ENABLE_WEBSERVER
     /**
      * @brief   get the current webserver configuration
      * 
@@ -144,21 +162,6 @@
      * @param   webserver   true means webserver enable, false means webserver disable
      */
     void wifictl_set_webserver( bool webserver );
-    #endif
-    #ifdef ENABLE_FTPSERVER
-    /**
-     * @brief   get the current webserver configuration
-     * 
-     * @return  true means ftpserver is enable, false ftpserver is disable
-     */
-    bool wifictl_get_ftpserver( void );
-    /**
-     * @brief   set the current werbserver configuration
-     * 
-     * @param   ftpserver   true means ftpserver enable, false means ftpserver disable
-     */
-    void wifictl_set_ftpserver( bool ftpserver );
-    #endif
     /**
      * @brief   set wifi enable on standby
      * 
@@ -171,5 +174,6 @@
      * @return  true means enabled, false means disabled
      */
     bool wifictl_get_enable_on_standby( void );
+
 
 #endif // _WIFICTL_H

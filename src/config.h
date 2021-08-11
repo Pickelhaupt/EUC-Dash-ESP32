@@ -39,7 +39,7 @@
     /*
     * firmware version string
     */
-    #define __FIRMWARE__            "2021032401"
+    #define __FIRMWARE__            "2021081001"
     #define SETTINGS_VERSION        1001 //write to SPIFFS doc
     //Not implemented yet, used to clear all data stored SPIFFS if format is changed
     #define SETTINGS_MIN_VERSION    1001 //read from SPIFFS and reset SPIFFS data if version is lower
