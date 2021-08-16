@@ -66,7 +66,6 @@ void setKSconstants()
     wheelctl_set_constant(WHEELCTL_CONST_BATT_IR, KS_DEFAULT_BATT_IR);
 }
 
-
 void decodeKS(byte KSdata[])
 {
     //Parse incoming BLE Notifications
@@ -83,7 +82,7 @@ void decodeKS(byte KSdata[])
     }
     else if (KSdata[16] == 0xb9)
     {   // Data package type 2 distance/time/top speed/fan
-        wheelctl_set_data(WHEELCTL_TRIP, (decode4byte(KSdata[2], KSdata[3], KSdata[4], KSdata[5]) / 1000.0)); // trip counter resets when wheel off
+        wheelctl_set_data(WHEELCTL_TRIP, (decode4byte(KSdata[2], KSdata[3], KSdata[4], KSdata[5]) / 1000.0)); // trip counter, resets when wheel off
         wheelctl_set_data(WHEELCTL_UPTIME, (decode2byte(KSdata[6], KSdata[7]) / 100.0)); //time since turned on
         wheelctl_set_data(WHEELCTL_TOPSPEED, (decode2byte(KSdata[8], KSdata[9]) / 100.0)); //Max speed since last power on
         wheelctl_set_data(WHEELCTL_FANSTATE, KSdata[12]); //1 if fan is running
@@ -164,13 +163,11 @@ void ks_ble_request(byte reqtype)
 {
     /****************************************************************
       reqtype is the byte representing the request id
-      0x9B -- Serial Number
-      0x63 -- Manufacturer and model
+      0x9B -- Manufacturer and model
+      0x63 -- Serial Number
       0x98 -- speed alarm settings and tiltback (Max) speed
-      0x88 -- horn
       Responses to the request is handled by the notification handler
       and will be added to the wheel data handled by wheelctl
-      todo -- find out how to toggle lights and add function
    *****************************************************************/
     byte KS_BLEreq[20] = {0x00}; //set array to zero
     KS_BLEreq[0] = 0xAA;         //Header byte 1
@@ -182,7 +179,7 @@ void ks_ble_request(byte reqtype)
     writeBLE(KS_BLEreq, 20);
 }
 
-void ks_lights(byte mode) { //0=on, 1=off
+void ks_lights(byte mode) { //0=on, 1=off (0x12 = on, 0x13 = off, 0x14 = Auto)
     byte byte2 = 0x12 + mode;
     ks_ble_set(0x73, byte2);
 }
@@ -207,15 +204,25 @@ void ks_pedals(byte mode) { //0=hard, 1=med, 2=soft
     ks_ble_set(0x87, byte2);
 }
 
+void ks_strobe(byte mode) { //0=off, 1=on
+    byte byte2 = mode; 
+    ks_ble_set(0x53, byte2);
+}
+
 void ks_ble_set(byte parameter, byte value)
 {
     /****************************************************************
       parameter is the byte representing the parameter to be set
       0x73 -- Lights (0x12, 0x13, 0x14, 0x15) value 2 = 0x01
-      0x87 -- pedals mode (0x00, 0x01, 0x02) value = 0xE0
+      0x87 -- ride mode (0x00=hard, 0x01=medium, 0x02=soft) value = 0xE0
       0x53 -- strobemode (0x00 or 0x01) value2 = 0x00
-      0x6C -- side led mode value2 = 0x00
-      0x5d -- lock wheel. value 0x00 unlock, 0x01 lock
+      0x6C -- ride led toggle value (0x00 = off,  0x01 = on) value2 = 0x00
+      0x5d -- lock wheel. value (0x00 unlock, 0x01 lock)
+      0x89 -- Calibrate value = 0x00
+      0x8a -- pedal tilt
+      0x7d -- Music LED value(0x00=off, 0x01=on)
+      0x7E -- lift sensor value(0x00=off, 0x01=on)
+      
    *****************************************************************/
     byte value2{0x00};
     if (parameter == 0x73) value2 = 0x01;
