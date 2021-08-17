@@ -114,13 +114,13 @@ class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks
         Serial.print("BLE Advertised Device found: ");
         Serial.println(advertisedDevice.toString().c_str());
         log_i("BLE Advertised Device found: %s", advertisedDevice.toString().c_str());
+        String adv_addr = advertisedDevice.getAddress().toString().c_str();
         
         //connect to stored wheel first discovered
         if(!blectl_get_event(BLECTL_CLI_DETECT)) {
             for (int i = 0; i < MAX_STORED_WHEELS; i++) { 
                 Serial.printf("stored wheel: %d wheeltype %d address: ", i, stored_wheel[i].type);
-                Serial.println(stored_wheel[i].address);
-                String adv_addr = advertisedDevice.getAddress().toString().c_str();
+                Serial.println(stored_wheel[i].address);  
                 wheel_found = false;
                 if ( adv_addr == stored_wheel[i].address ) {
                     log_i("stored wheel detected");
@@ -136,28 +136,18 @@ class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks
         }
         
         // Scan for all EUCs in range
-        // We have found a device, let us now see if it contains the service we are looking for.
-        
-        if(blectl_get_event(BLECTL_CLI_DETECT)) {
-            //blectl_clear_detected_wheels();
+               
+        if(blectl_get_event(BLECTL_CLI_DETECT) && !blectl_wheeladdress_stored(adv_addr) && !blectl_wheeladdress_detected(adv_addr)) {
             newscan = false;
             if (advertisedDevice.haveServiceUUID() && advertisedDevice.isAdvertisingService(KS_SERVICE_UUID_1))
             {
                 log_i("Kingsong, gotway or Inmotion wheel detected");
                 Serial.println("Kingsong, gotway or Inmotion wheel detected");
-
-                
-                if (!blectl_wheeladdress_stored(detected_wheel[wheel_num].address) || !blectl_wheeladdress_detected(advertisedDevice.getAddress().toString().c_str())){
                     
-                    detected_wheel[wheel_num].type = WHEELTYPE_KS;
-                    detected_wheel[wheel_num].address = advertisedDevice.getAddress().toString().c_str();
-                    detected_wheel[wheel_num].name = blectl_wheeltype_to_string(detected_wheel[wheel_num].type);
-                    Serial.printf("dectected wheel: %s address: %s\n",detected_wheel[wheel_num].name.c_str(),  detected_wheel[wheel_num].address.c_str());
-
-                    //blectl_add_stored_wheel(detected_wheel[wheel_num].address, detected_wheel[wheel_num].type, blectl_get_free_wheelslot());
-                }  else {
-                    Serial.println("wheel already stored or detected, skipping");
-                }
+                detected_wheel[wheel_num].type = WHEELTYPE_KS;
+                detected_wheel[wheel_num].address = advertisedDevice.getAddress().toString().c_str();
+                detected_wheel[wheel_num].name = blectl_wheeltype_to_string(detected_wheel[wheel_num].type);
+                Serial.printf("dectected wheel: %s address: %s\n",detected_wheel[wheel_num].name.c_str(),  detected_wheel[wheel_num].address.c_str());
                 wheel_num++;
             } 
             else if (advertisedDevice.haveServiceUUID() && advertisedDevice.isAdvertisingService(NB_SERVICE_UUID))
@@ -165,11 +155,8 @@ class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks
                 log_i("Ninebot wheel detected");
                 detected_wheel[wheel_num].type = WHEELTYPE_NB;
                 detected_wheel[wheel_num].address = advertisedDevice.getAddress().toString().c_str();
-                if (!blectl_wheeladdress_stored(detected_wheel[wheel_num].address) && !blectl_wheeladdress_detected(detected_wheel[wheel_num].address)){
-                    byte fws = blectl_get_free_wheelslot();
-                    blectl_add_stored_wheel(detected_wheel[wheel_num].address, detected_wheel[wheel_num].type, fws);
-                    //blectl_clear_event(BLECTL_CLI_DETECT);
-                }
+                detected_wheel[wheel_num].name = blectl_wheeltype_to_string(detected_wheel[wheel_num].type);
+                Serial.printf("dectected wheel: %s address: %s\n",detected_wheel[wheel_num].name.c_str(),  detected_wheel[wheel_num].address.c_str());
                 wheel_num++;
             } 
             else if (advertisedDevice.haveServiceUUID() && advertisedDevice.isAdvertisingService(NBZ_SERVICE_UUID))
@@ -177,9 +164,11 @@ class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks
                 log_i("Ninebot-Z wheel detected");
                 detected_wheel[wheel_num].type = WHEELTYPE_NBZ;
                 detected_wheel[wheel_num].address = advertisedDevice.getAddress().toString().c_str();
+                detected_wheel[wheel_num].name = blectl_wheeltype_to_string(detected_wheel[wheel_num].type);
+                Serial.printf("dectected wheel: %s address: %s\n",detected_wheel[wheel_num].name.c_str(),  detected_wheel[wheel_num].address.c_str());
                 wheel_num++;
             }
-            if (wheel_num >= (MAX_DETECTED_WHEELS -1)) {
+            if (wheel_num > (MAX_DETECTED_WHEELS)) {
                 log_i("max number of wheels detected %d", MAX_DETECTED_WHEELS);
                 pBLEScan->stop();
                 scanCompleteCB( pBLEScan->getResults() );

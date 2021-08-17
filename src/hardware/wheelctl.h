@@ -23,6 +23,7 @@
 
     #include <TTGO.h>
     #include "callback.h"
+    #include "config/wheelctlconfig.h"
     
     // Below this speed no distance or ride time is recorded
     #define MIN_RIDE_SPEED  1

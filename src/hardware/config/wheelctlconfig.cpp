@@ -31,15 +31,17 @@ bool wheelctlconfig_t::onSave(JsonDocument& doc) {
         doc["cycle_beamtype"] = cycle_beamtype;
         doc["haptic"] = haptic;
         doc["horn_while_riding"] = horn_while_riding;
+        return true;
 }
 
-bool wheelctlconfig_t::onSave(JsonDocument& doc) {
+bool wheelctlconfig_t::onLoad(JsonDocument& doc) {
         lights_mode = doc["lights_mode"] | 0x00;
         flash_mode = doc["flash_mode"] | false;
         save_light_state = doc["save_light_state"] | false;
         cycle_beamtype = doc["cycle_beamtype"] | false;
         haptic = doc["haptic"] | false;
         horn_while_riding = doc["horn_while_riding"] | false;
+        return true;
 }
 
 bool wheelctlconfig_t::onDefault( void ) {

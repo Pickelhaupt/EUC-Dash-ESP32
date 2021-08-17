@@ -23,6 +23,7 @@
 #include "gui/mainbar/mainbar.h"
 #include "hardware/pmu.h"
 #include "hardware/wheelctl.h"
+#include "hardware/config/wheelctlconfig.h"
 #include "hardware/dashboard.h"
 
 uint32_t tripinfo_tile_num;
@@ -53,7 +54,8 @@ lv_obj_t *max_power_data;
 lv_obj_t *ride_time_data;
 lv_obj_t *energy_consumption_data;
 lv_obj_t *trip_economy_data;
-extern trip_data_t current_trip;
+//extern trip_data_t current_trip;
+extern tripdata_t current_tripdata;
 
 void tripinfo_tile_setup(void)
 {
@@ -213,15 +215,15 @@ void tripinfo_update( void ) {
     char temp[16]="";
     
     if (dashboard_get_config(DASHBOARD_IMPDIST)) {
-        float imptrip = current_trip.trip / 1.6;
+        float imptrip = current_tripdata.trip / 1.6;
         snprintf( temp, sizeof( temp ), "%0.2f mi", imptrip );
     } else {
-        snprintf( temp, sizeof( temp ), "%0.2f km", current_trip.trip );
+        snprintf( temp, sizeof( temp ), "%0.2f km", current_tripdata.trip );
     }
     lv_label_set_text( trip_data, temp);
     lv_obj_align( trip_data, tripinfo_cont, LV_ALIGN_IN_TOP_RIGHT, -5, 30 );
 
-    int seconds = current_trip.ride_time;
+    int seconds = current_tripdata.ride_time;
     int r_hours = seconds / 3600;
     int r_remain = seconds % 3600;
     int r_minutes = r_remain / 60;
@@ -232,37 +234,37 @@ void tripinfo_update( void ) {
     lv_obj_align( ride_time_data, trip_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
 
     if (dashboard_get_config(DASHBOARD_IMPDIST)) {
-        float imp_avgspd = current_trip.avg_speed / 1.6;
+        float imp_avgspd = current_tripdata.avg_speed / 1.6;
         snprintf( temp, sizeof( temp ), "%0.2f mph", imp_avgspd );
     } else {
-        snprintf( temp, sizeof( temp ), "%0.2f kmh", current_trip.avg_speed );
+        snprintf( temp, sizeof( temp ), "%0.2f kmh", current_tripdata.avg_speed );
     }
     lv_label_set_text( avg_speed_data, temp);
     lv_obj_align( avg_speed_data, ride_time_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
 
     if (dashboard_get_config(DASHBOARD_IMPDIST)) {
-        float imp_maxspd = current_trip.max_speed / 1.6;
+        float imp_maxspd = current_tripdata.max_speed / 1.6;
         snprintf( temp, sizeof( temp ), "%0.2f mph", imp_maxspd );
     } else {
-        snprintf( temp, sizeof( temp ), "%0.2f kmh", current_trip.max_speed );
+        snprintf( temp, sizeof( temp ), "%0.2f kmh", current_tripdata.max_speed );
     }
     lv_label_set_text( max_speed_data, temp);
     lv_obj_align( max_speed_data, avg_speed_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
 
-    snprintf( temp, sizeof( temp ), "%0.2f A", current_trip.max_current );
+    snprintf( temp, sizeof( temp ), "%0.2f A", current_tripdata.max_current );
     lv_label_set_text( max_current_data, temp);
     lv_obj_align( max_current_data, max_speed_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
 
-    snprintf( temp, sizeof( temp ), "%0.1f W", current_trip.max_power );
+    snprintf( temp, sizeof( temp ), "%0.1f W", current_tripdata.max_power );
     lv_label_set_text( max_power_data, temp);
     lv_obj_align( max_power_data, max_current_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
 
-    snprintf( temp, sizeof( temp ), "%0.1f Wh", current_trip.consumed_energy );
+    snprintf( temp, sizeof( temp ), "%0.1f Wh", current_tripdata.consumed_energy );
     lv_label_set_text( energy_consumption_data, temp);
     lv_obj_align( energy_consumption_data, max_power_data, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0 );
 
     static float r_econo = 0.0;
-    r_econo = current_trip.trip_economy;
+    r_econo = current_tripdata.trip_economy;
     if (dashboard_get_config(DASHBOARD_IMPDIST)) {
         r_econo = r_econo * 1.6;
         snprintf( temp, sizeof( temp ), "%0.1f Wh/mi", r_econo );
