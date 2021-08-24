@@ -91,91 +91,19 @@ class MyClientCallback : public BLEClientCallbacks
         log_i("onConnect");
         blectl_set_event(BLECTL_CLI_CONNECTED);
         blectl_clear_event(BLECTL_CLI_DISCONNECTED);
+        delay(100);
     }
     void onDisconnect(BLEClient *pclient)
     {
         cli_ondisconnect = true;
         blectl_set_event(BLECTL_CLI_DISCONNECTED);
         blectl_clear_event(BLECTL_CLI_CONNECTED);
+        delay(100);
         wheelctl_disconnect_actions();
         log_i("onDisconnect -- cliconnected is false");
         return;
     }
 };
-
-class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks
-{
-    /**
-        Called for each advertising BLE server.
-    */
-    void onResult(BLEAdvertisedDevice advertisedDevice)
-    {
-        Serial.printf("discover enabled? %d\n", blectl_get_event(BLECTL_CLI_DETECT));
-        Serial.print("BLE Advertised Device found: ");
-        Serial.println(advertisedDevice.toString().c_str());
-        log_i("BLE Advertised Device found: %s", advertisedDevice.toString().c_str());
-        String adv_addr = advertisedDevice.getAddress().toString().c_str();
-        
-        //connect to stored wheel first discovered
-        if(!blectl_get_event(BLECTL_CLI_DETECT)) {
-            for (int i = 0; i < MAX_STORED_WHEELS; i++) { 
-                Serial.printf("stored wheel: %d wheeltype %d address: ", i, stored_wheel[i].type);
-                Serial.println(stored_wheel[i].address);  
-                wheel_found = false;
-                if ( adv_addr == stored_wheel[i].address ) {
-                    log_i("stored wheel detected");
-                    //wheel_num++;
-                    Serial.printf("Stored wheel detected wheel num: %d address %s\n", i, stored_wheel[i].address.c_str());
-                    myDevice = new BLEAdvertisedDevice(advertisedDevice);
-                    myWheeltype = stored_wheel[i].type;
-                    wheel_found = true;
-                    pBLEScan->stop();
-                    scanCompleteCB( pBLEScan->getResults() );
-                }
-            }
-        }
-        
-        // Scan for all EUCs in range
-               
-        if(blectl_get_event(BLECTL_CLI_DETECT) && !blectl_wheeladdress_stored(adv_addr) && !blectl_wheeladdress_detected(adv_addr)) {
-            newscan = false;
-            if (advertisedDevice.haveServiceUUID() && advertisedDevice.isAdvertisingService(KS_SERVICE_UUID_1))
-            {
-                log_i("Kingsong, gotway or Inmotion wheel detected");
-                Serial.println("Kingsong, gotway or Inmotion wheel detected");
-                    
-                detected_wheel[wheel_num].type = WHEELTYPE_KS;
-                detected_wheel[wheel_num].address = advertisedDevice.getAddress().toString().c_str();
-                detected_wheel[wheel_num].name = blectl_wheeltype_to_string(detected_wheel[wheel_num].type);
-                Serial.printf("dectected wheel: %s address: %s\n",detected_wheel[wheel_num].name.c_str(),  detected_wheel[wheel_num].address.c_str());
-                wheel_num++;
-            } 
-            else if (advertisedDevice.haveServiceUUID() && advertisedDevice.isAdvertisingService(NB_SERVICE_UUID))
-            {
-                log_i("Ninebot wheel detected");
-                detected_wheel[wheel_num].type = WHEELTYPE_NB;
-                detected_wheel[wheel_num].address = advertisedDevice.getAddress().toString().c_str();
-                detected_wheel[wheel_num].name = blectl_wheeltype_to_string(detected_wheel[wheel_num].type);
-                Serial.printf("dectected wheel: %s address: %s\n",detected_wheel[wheel_num].name.c_str(),  detected_wheel[wheel_num].address.c_str());
-                wheel_num++;
-            } 
-            else if (advertisedDevice.haveServiceUUID() && advertisedDevice.isAdvertisingService(NBZ_SERVICE_UUID))
-            {
-                log_i("Ninebot-Z wheel detected");
-                detected_wheel[wheel_num].type = WHEELTYPE_NBZ;
-                detected_wheel[wheel_num].address = advertisedDevice.getAddress().toString().c_str();
-                detected_wheel[wheel_num].name = blectl_wheeltype_to_string(detected_wheel[wheel_num].type);
-                Serial.printf("dectected wheel: %s address: %s\n",detected_wheel[wheel_num].name.c_str(),  detected_wheel[wheel_num].address.c_str());
-                wheel_num++;
-            }
-            if (wheel_num > (MAX_DETECTED_WHEELS)) {
-                log_i("max number of wheels detected %d", MAX_DETECTED_WHEELS);
-                pBLEScan->stop();
-                scanCompleteCB( pBLEScan->getResults() );
-            }
-        }
-    } // onResult
-};    // MyAdvertisedDeviceCallbacks
 
 void blectl_reset_scandelay(void) {
     NextMillis = millis() - 14000;
@@ -498,6 +426,7 @@ bool blectl_stored_wheel_exist(byte wheelnum) {
     if ( stored_wheel[ wheelnum ].address == "00:00:00:00:00:00" ) return false;
     else return true;
 }
+
 bool blectl_wheeladdress_stored(String addr){
 for (int i = 0; i < MAX_STORED_WHEELS; i++) { 
         if (stored_wheel[i].address == addr) {
@@ -581,26 +510,86 @@ bool blectl_set_prio_stored_wheel(byte wheelnum) {
     return successful;
 }
 
+
+void matchStoredWheels(BLEAdvertisedDevice advertisedDevice) {
+    String adv_addr = advertisedDevice.getAddress().toString().c_str();
+    for (int i = 0; i < MAX_STORED_WHEELS; i++) { 
+        if (stored_wheel[i].address != "00:00:00:00:00:00") {
+            Serial.printf("stored wheel: %d wheeltype %d address: ", i, stored_wheel[i].type);
+            Serial.println(stored_wheel[i].address);  
+            wheel_found = false;
+            if ( adv_addr == stored_wheel[i].address ) {
+                log_i("stored wheel detected");
+                Serial.printf("Stored wheel detected, wheel num: %d address %s\n", i, stored_wheel[i].address.c_str());
+                myDevice = new BLEAdvertisedDevice(advertisedDevice);
+                myWheeltype = stored_wheel[i].type;
+                clidoConnect = true;
+                blectl_set_event(BLECTL_CLI_DOCONNECT);
+                return;
+            }
+            else{
+                Serial.printf("device %s is not a stored wheel\n", advertisedDevice.getAddress().toString().c_str());
+            }
+        }
+    }
+}
+
+void detectNewWheels(BLEAdvertisedDevice advertisedDevice) {
+    String adv_addr = advertisedDevice.getAddress().toString().c_str();
+    if(!blectl_wheeladdress_stored(adv_addr) && !blectl_wheeladdress_detected(adv_addr)) {
+        newscan = false;
+        if (advertisedDevice.haveServiceUUID() && advertisedDevice.isAdvertisingService(KS_SERVICE_UUID_1))
+        {
+            log_i("Kingsong, gotway or Inmotion wheel detected");
+            Serial.println("Kingsong, gotway or Inmotion wheel detected");
+                
+            detected_wheel[wheel_num].type = WHEELTYPE_KS;
+            detected_wheel[wheel_num].address = advertisedDevice.getAddress().toString().c_str();
+            detected_wheel[wheel_num].name = blectl_wheeltype_to_string(detected_wheel[wheel_num].type);
+            Serial.printf("dectected wheel: %s address: %s\n",detected_wheel[wheel_num].name.c_str(),  detected_wheel[wheel_num].address.c_str());
+            wheel_num++;
+        } 
+        else if (advertisedDevice.haveServiceUUID() && advertisedDevice.isAdvertisingService(NB_SERVICE_UUID))
+        {
+            log_i("Ninebot wheel detected");
+            detected_wheel[wheel_num].type = WHEELTYPE_NB;
+            detected_wheel[wheel_num].address = advertisedDevice.getAddress().toString().c_str();
+            detected_wheel[wheel_num].name = blectl_wheeltype_to_string(detected_wheel[wheel_num].type);
+            Serial.printf("dectected wheel: %s address: %s\n",detected_wheel[wheel_num].name.c_str(),  detected_wheel[wheel_num].address.c_str());
+            wheel_num++;
+        } 
+        else if (advertisedDevice.haveServiceUUID() && advertisedDevice.isAdvertisingService(NBZ_SERVICE_UUID))
+        {
+            log_i("Ninebot-Z wheel detected");
+            detected_wheel[wheel_num].type = WHEELTYPE_NBZ;
+            detected_wheel[wheel_num].address = advertisedDevice.getAddress().toString().c_str();
+            detected_wheel[wheel_num].name = blectl_wheeltype_to_string(detected_wheel[wheel_num].type);
+            Serial.printf("dectected wheel: %s address: %s\n",detected_wheel[wheel_num].name.c_str(),  detected_wheel[wheel_num].address.c_str());
+            wheel_num++;
+        }
+        if (wheel_num > (MAX_DETECTED_WHEELS)) {
+            log_i("max number of wheels detected %d", MAX_DETECTED_WHEELS);
+        }
+    }
+}
+
 static void scanCompleteCB(BLEScanResults scanResults) {
 	log_e("Scan complete!\n");
 	log_e("We found %d devices\n", scanResults.getCount());
-    //Serial.printf("We found %d devices\n", scanResults.getCount());
-	scanResults.dump();
-    if(wheel_found){
-        clidoConnect = true;
-        blectl_set_event(BLECTL_CLI_DOCONNECT);
-        Serial.printf("We found %d wheels\n", wheel_num);
-        blectl_detected_wheels = wheel_num;
-    }
-    if (blectl_get_event(BLECTL_CLI_DETECT)) {
-        for( int i = 0 ; i < MAX_DETECTED_WHEELS ; i++ ) {
-            Serial.printf("dectected wheel: %s address: %s\n",detected_wheel[i].name.c_str(),  detected_wheel[i].address.c_str());
+    
+    if(blectl_get_event(BLECTL_CLI_DETECT)) {
+        for(int i = 0 ; (i < scanResults.getCount()) ; i++) {
+            if(wheel_num <= (MAX_DETECTED_WHEELS)) detectNewWheels(scanResults.getDevice(i));
         }
         blectl_set_event(BLECTL_CLI_DETECT_DONE);
         blectl_send_event_cb(BLECTL_CLI_DETECT_DONE, NULL);
+        blectl_clear_event(BLECTL_CLI_DETECT); 
         newscan = true;
+    } else {
+        for(int i = 0 ; (i < scanResults.getCount()) ; i++) {
+            if(!blectl_get_event(BLECTL_CLI_DOCONNECT)) matchStoredWheels(scanResults.getDevice(i));
+        }
     }
-    blectl_clear_event(BLECTL_CLI_DETECT);  
 } // scanCompleteCB
 
 void blectl_cli_loop(void)
@@ -628,7 +617,7 @@ void blectl_cli_loop(void)
             log_w("We have failed to connect to the server;");
         }
         clidoConnect = false;
-        //blectl_clear_event(BLECTL_CLI_DOCONNECT);
+        blectl_clear_event(BLECTL_CLI_DOCONNECT);
     }
     
     if (millis() - NextMillis > scandelay)
@@ -906,10 +895,10 @@ void blectl_scan_setup()
     powermgm_register_cb(POWERMGM_SILENCE_WAKEUP | POWERMGM_STANDBY | POWERMGM_WAKEUP, blectl_cli_powermgm_event_cb, "blectl_cli");
     powermgm_register_loop_cb(POWERMGM_SILENCE_WAKEUP | POWERMGM_STANDBY | POWERMGM_WAKEUP, blectl_cli_powermgm_loop_cb, "blectl_cli loop");
     pBLEScan = BLEDevice::getScan();
-    pBLEScan->setAdvertisedDeviceCallbacks(new MyAdvertisedDeviceCallbacks());
-    pBLEScan->setInterval(1349);
-    pBLEScan->setWindow(449);
-    pBLEScan->setActiveScan(true);
+    //pBLEScan->setAdvertisedDeviceCallbacks(new MyAdvertisedDeviceCallbacks());
+    //pBLEScan->setInterval(1349);
+    //pBLEScan->setWindow(449);
+    //pBLEScan->setActiveScan(true);
     blectl_clear_detected_wheels();
     blectl_scan_once(2);
     //blectl_reset_scandelay();
